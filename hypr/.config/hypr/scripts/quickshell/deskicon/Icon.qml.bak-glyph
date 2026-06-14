@@ -1,0 +1,80 @@
+import QtQuick
+import Quickshell
+import Quickshell.Io
+import Quickshell.Wayland
+
+// Standalone desktop emblem: a centered Arch logo on the Bottom layer.
+// Sits above the wallpaper but below normal windows, and is click-through.
+ShellRoot {
+    id: root
+
+    // Live accent color, pulled from the same theme file the rest of the shell uses.
+    property color accent: "#89b4fa"
+
+    Process {
+        id: themeReader
+        command: ["cat", Quickshell.env("HOME") + "/.config/hypr/scripts/quickshell/qs_colors.json"]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                try {
+                    let c = JSON.parse(this.text.trim());
+                    if (c.blue) root.accent = c.blue;
+                } catch (e) {}
+            }
+        }
+    }
+    Timer {
+        interval: 1000; running: true; repeat: true; triggeredOnStart: true
+        onTriggered: themeReader.running = true
+    }
+
+    Variants {
+        model: Quickshell.screens
+
+        delegate: Component {
+            PanelWindow {
+                id: win
+                required property var modelData
+                screen: modelData
+
+                WlrLayershell.namespace: "desk-icon"
+                WlrLayershell.layer: WlrLayer.Bottom
+                exclusionMode: ExclusionMode.Ignore
+                color: "transparent"
+
+                anchors { top: true; bottom: true; left: true; right: true }
+
+                // Empty input region -> fully click-through to the desktop.
+                mask: Region {}
+
+                // Faint halo behind the glyph for a soft glow.
+                Text {
+                    anchors.centerIn: parent
+                    text: ""                       // nf-linux-archlinux
+                    font.family: "JetBrainsMono Nerd Font Mono"
+                    font.pixelSize: Math.round(win.height * 0.34)
+                    color: root.accent
+                    opacity: glyph.opacity * 0.35
+                    scale: 1.06
+                }
+
+                Text {
+                    id: glyph
+                    anchors.centerIn: parent
+                    text: ""                       // nf-linux-archlinux
+                    font.family: "JetBrainsMono Nerd Font Mono"
+                    font.pixelSize: Math.round(win.height * 0.30)
+                    color: root.accent
+
+                    // Slow "breathing" so it feels alive without being distracting.
+                    SequentialAnimation on opacity {
+                        running: true
+                        loops: Animation.Infinite
+                        NumberAnimation { from: 0.72; to: 0.95; duration: 3500; easing.type: Easing.InOutSine }
+                        NumberAnimation { from: 0.95; to: 0.72; duration: 3500; easing.type: Easing.InOutSine }
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,100 @@
+import QtQuick
+import Quickshell
+import Quickshell.Io
+import Quickshell.Wayland
+import Qt5Compat.GraphicalEffects
+
+// Standalone desktop emblem: a centered white Arch logo with a wallpaper-adaptive
+// accent glow, on the Bottom layer. Above the wallpaper, below windows, click-through.
+ShellRoot {
+    id: root
+
+    // Live accent color (material primary), regenerated from each wallpaper by matugen.
+    property color accent: "#89b4fa"
+
+    Process {
+        id: themeReader
+        command: ["cat", Quickshell.env("HOME") + "/.config/hypr/scripts/quickshell/qs_colors.json"]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                try {
+                    let c = JSON.parse(this.text.trim());
+                    if (c.blue) root.accent = c.blue;
+                } catch (e) {}
+            }
+        }
+    }
+    Timer {
+        interval: 1000; running: true; repeat: true; triggeredOnStart: true
+        onTriggered: themeReader.running = true
+    }
+
+    Variants {
+        model: Quickshell.screens
+
+        delegate: Component {
+            PanelWindow {
+                id: win
+                required property var modelData
+                screen: modelData
+
+                WlrLayershell.namespace: "desk-icon"
+                WlrLayershell.layer: WlrLayer.Bottom
+                exclusionMode: ExclusionMode.Ignore
+                color: "transparent"
+
+                anchors { top: true; bottom: true; left: true; right: true }
+
+                // Empty input region -> fully click-through to the desktop.
+                mask: Region {}
+
+                property int glyphSize: Math.round(win.height * 0.30)
+
+                // Shared slow "breathing" so the whole emblem feels alive.
+                property real breathe: 0.9
+                SequentialAnimation on breathe {
+                    running: true
+                    loops: Animation.Infinite
+                    NumberAnimation { from: 0.82; to: 1.0; duration: 3500; easing.type: Easing.InOutSine }
+                    NumberAnimation { from: 1.0; to: 0.82; duration: 3500; easing.type: Easing.InOutSine }
+                }
+
+                // 1. Wide, soft accent wash for a coloured glow that follows the wallpaper.
+                Text {
+                    anchors.centerIn: parent
+                    text: ""
+                    font.family: "JetBrainsMono Nerd Font Mono"
+                    font.pixelSize: win.glyphSize
+                    color: root.accent
+                    scale: 1.14
+                    opacity: win.breathe * 0.28
+                    z: -2
+                }
+
+                // 2. Tighter accent glow hugging the white logo's edges.
+                Glow {
+                    anchors.fill: whiteGlyph
+                    source: whiteGlyph
+                    color: root.accent
+                    radius: Math.round(win.glyphSize * 0.10)
+                    samples: 33
+                    spread: 0.25
+                    opacity: win.breathe
+                    z: -1
+                }
+
+                // 3. The white Arch logo on top. Padding gives the glow headroom.
+                Text {
+                    id: whiteGlyph
+                    anchors.centerIn: parent
+                    text: ""
+                    font.family: "JetBrainsMono Nerd Font Mono"
+                    font.pixelSize: win.glyphSize
+                    padding: Math.round(win.glyphSize * 0.18)
+                    color: "white"
+                    opacity: win.breathe
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,322 @@
+import QtQuick
+import QtQuick.Layouts
+import QtQuick.Controls
+import Quickshell
+import Quickshell.Io
+import QtQuick.Window
+import "../"
+
+// BlackArch arsenal browser: pick a category, search, install with one click,
+// launch installed tools in a terminal. Data comes from blackarch_fetcher.py.
+Item {
+    id: window
+    focus: true
+
+    // injected by Main.qml's executeSwitch (declared so the props assign cleanly)
+    property int layoutWidth: 0
+    property int layoutHeight: 0
+    property var notifModel
+    property var liveNotifs
+
+    Caching { id: paths }
+    Scaler { id: scaler; currentWidth: Screen.width; currentHeight: Screen.height }
+    readonly property real sf: scaler.baseScale
+    function s(v) { return Math.round(v * window.sf); }
+
+    MatugenColors { id: th }
+
+    // -------------------------------------------------------------- data
+    property var categories: []
+    property int selectedCat: 0
+    property string query: ""
+    property bool loading: true
+
+    // reactive view: re-evaluates when categories / selectedCat / query change
+    property var toolsView: {
+        window.categories; window.selectedCat; window.query;
+        if (!window.categories.length) return [];
+        var c = window.categories[Math.min(window.selectedCat, window.categories.length - 1)];
+        if (!c) return [];
+        var q = window.query.trim().toLowerCase();
+        if (!q) return c.tools;
+        return c.tools.filter(function (t) { return t.name.toLowerCase().indexOf(q) !== -1; });
+    }
+
+    Process {
+        id: fetcher
+        running: true
+        command: ["python3", Quickshell.env("HOME") + "/.config/hypr/scripts/quickshell/blackarch/blackarch_fetcher.py"]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                try {
+                    var d = JSON.parse(this.text);
+                    if (d && d.categories) window.categories = d.categories;
+                } catch (e) {}
+                window.loading = false;
+            }
+        }
+    }
+
+    function refresh() { window.loading = true; fetcher.running = true; }
+    // re-read installed status every time the page is shown again (e.g. after an install)
+    onVisibleChanged: if (visible) refresh()
+
+    function install(tool) {
+        Quickshell.execDetached(["kitty", "--hold", "sudo", "pacman", "-S", "--needed", "blackarch/" + tool]);
+    }
+    function launch(tool) {
+        Quickshell.execDetached(["kitty", "--hold", "bash", "-lc", tool]);
+    }
+    function closePage() {
+        Quickshell.execDetached(["bash", Quickshell.env("HOME") + "/.config/hypr/scripts/qs_manager.sh", "close"]);
+    }
+
+    // -------------------------------------------------------------- frame
+    Rectangle {
+        anchors.fill: parent
+        radius: window.s(16)
+        color: th.base
+        border.color: Qt.alpha(th.red, 0.5)
+        border.width: 1
+        clip: true
+
+        RowLayout {
+            anchors.fill: parent
+            anchors.margins: window.s(16)
+            spacing: window.s(14)
+
+            // ============================ SIDEBAR: categories
+            Rectangle {
+                Layout.fillHeight: true
+                Layout.preferredWidth: window.s(240)
+                radius: window.s(12)
+                color: Qt.alpha(th.surface0, 0.4)
+                border.color: th.surface1
+                border.width: 1
+
+                ColumnLayout {
+                    anchors.fill: parent
+                    anchors.margins: window.s(12)
+                    spacing: window.s(10)
+
+                    // title
+                    RowLayout {
+                        Layout.fillWidth: true
+                        spacing: window.s(10)
+                        Rectangle {
+                            width: window.s(34); height: window.s(34); radius: window.s(9)
+                            color: Qt.alpha(th.red, 0.18)
+                            Text { anchors.centerIn: parent; text: "󰣚"; font.family: "Iosevka Nerd Font"; font.pixelSize: window.s(19); color: th.red }
+                        }
+                        ColumnLayout {
+                            spacing: 0
+                            Text { text: "BlackArch"; font.family: "JetBrains Mono"; font.weight: Font.Black; font.pixelSize: window.s(15); color: th.text }
+                            Text { text: window.categories.length + " categories"; font.family: "JetBrains Mono"; font.pixelSize: window.s(10); color: th.subtext0 }
+                        }
+                    }
+
+                    Rectangle { Layout.fillWidth: true; height: 1; color: Qt.alpha(th.surface1, 0.6) }
+
+                    ListView {
+                        id: catList
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        clip: true
+                        model: window.categories
+                        spacing: window.s(4)
+                        currentIndex: window.selectedCat
+                        ScrollBar.vertical: ScrollBar { policy: ScrollBar.AsNeeded }
+
+                        delegate: Rectangle {
+                            required property var modelData
+                            required property int index
+                            width: catList.width - window.s(8)
+                            height: window.s(40)
+                            radius: window.s(8)
+                            property bool sel: index === window.selectedCat
+                            color: sel ? Qt.alpha(th.red, 0.18) : (cma.containsMouse ? Qt.alpha(th.surface1, 0.5) : "transparent")
+                            border.color: sel ? Qt.alpha(th.red, 0.6) : "transparent"
+                            border.width: 1
+                            Behavior on color { ColorAnimation { duration: 120 } }
+
+                            RowLayout {
+                                anchors.fill: parent
+                                anchors.leftMargin: window.s(12)
+                                anchors.rightMargin: window.s(10)
+                                spacing: window.s(8)
+                                Text {
+                                    text: modelData.name
+                                    font.family: "JetBrains Mono"
+                                    font.weight: parent.parent.sel ? Font.Bold : Font.Medium
+                                    font.pixelSize: window.s(12)
+                                    color: parent.parent.sel ? th.text : th.subtext0
+                                    Layout.fillWidth: true
+                                    elide: Text.ElideRight
+                                }
+                                Text {
+                                    text: (modelData.installed > 0 ? modelData.installed + "/" : "") + modelData.total
+                                    font.family: "JetBrains Mono"; font.pixelSize: window.s(10)
+                                    color: modelData.installed > 0 ? th.green : th.overlay0
+                                }
+                            }
+                            MouseArea {
+                                id: cma; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                                onClicked: { window.selectedCat = index; window.query = ""; }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // ============================ CONTENT: tools
+            ColumnLayout {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                spacing: window.s(12)
+
+                // header row
+                RowLayout {
+                    Layout.fillWidth: true
+                    spacing: window.s(12)
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        spacing: 0
+                        Text {
+                            text: window.categories.length ? window.categories[Math.min(window.selectedCat, window.categories.length-1)].name.toUpperCase() : "LOADING…"
+                            font.family: "JetBrains Mono"; font.weight: Font.Black; font.pixelSize: window.s(26); color: th.red
+                        }
+                        Text {
+                            text: window.toolsView.length + " tools shown" + (window.query ? "  ·  filtered" : "")
+                            font.family: "JetBrains Mono"; font.pixelSize: window.s(12); color: th.subtext0
+                        }
+                    }
+                    // refresh
+                    Rectangle {
+                        width: window.s(40); height: window.s(40); radius: window.s(10)
+                        color: rma.containsMouse ? Qt.alpha(th.blue, 0.15) : Qt.alpha(th.surface0, 0.5)
+                        border.color: rma.containsMouse ? th.blue : th.surface1; border.width: 1
+                        Text { anchors.centerIn: parent; text: window.loading ? "󱦟" : "󰑐"; font.family: "Iosevka Nerd Font"; font.pixelSize: window.s(18); color: window.loading ? th.yellow : th.subtext0 }
+                        MouseArea { id: rma; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: window.refresh() }
+                    }
+                    // close
+                    Rectangle {
+                        width: window.s(40); height: window.s(40); radius: window.s(10)
+                        color: xma.containsMouse ? Qt.alpha(th.red, 0.15) : Qt.alpha(th.surface0, 0.5)
+                        border.color: xma.containsMouse ? th.red : th.surface1; border.width: 1
+                        Text { anchors.centerIn: parent; text: ""; font.family: "Iosevka Nerd Font"; font.pixelSize: window.s(16); color: xma.containsMouse ? th.red : th.subtext0 }
+                        MouseArea { id: xma; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: window.closePage() }
+                    }
+                }
+
+                // search box
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: window.s(44)
+                    radius: window.s(10)
+                    color: Qt.alpha(th.surface0, 0.5)
+                    border.color: searchInput.activeFocus ? th.red : th.surface1
+                    border.width: 1
+                    RowLayout {
+                        anchors.fill: parent
+                        anchors.leftMargin: window.s(14); anchors.rightMargin: window.s(14)
+                        spacing: window.s(10)
+                        Text { text: ""; font.family: "Iosevka Nerd Font"; font.pixelSize: window.s(16); color: th.subtext0 }
+                        TextField {
+                            id: searchInput
+                            Layout.fillWidth: true
+                            placeholderText: "search tools in this category…"
+                            color: th.text
+                            placeholderTextColor: th.overlay0
+                            font.family: "JetBrains Mono"; font.pixelSize: window.s(13)
+                            background: null
+                            onTextChanged: window.query = text
+                            Keys.onEscapePressed: { if (text.length) text = ""; else window.closePage(); }
+                        }
+                    }
+                }
+
+                // tool list
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    radius: window.s(12)
+                    color: Qt.alpha(th.surface0, 0.3)
+                    border.color: th.surface1; border.width: 1
+                    clip: true
+
+                    ListView {
+                        id: toolList
+                        anchors.fill: parent
+                        anchors.margins: window.s(8)
+                        clip: true
+                        model: window.toolsView
+                        spacing: window.s(6)
+                        ScrollBar.vertical: ScrollBar { policy: ScrollBar.AsNeeded }
+
+                        delegate: Rectangle {
+                            required property var modelData
+                            width: toolList.width - window.s(6)
+                            height: window.s(50)
+                            radius: window.s(9)
+                            color: tma.containsMouse ? Qt.alpha(th.surface1, 0.5) : Qt.alpha(th.surface0, 0.45)
+                            border.color: modelData.installed ? Qt.alpha(th.green, 0.45) : th.surface1
+                            border.width: 1
+                            Behavior on color { ColorAnimation { duration: 120 } }
+
+                            RowLayout {
+                                anchors.fill: parent
+                                anchors.leftMargin: window.s(14); anchors.rightMargin: window.s(10)
+                                spacing: window.s(10)
+
+                                Text {
+                                    text: modelData.installed ? "" : "󰏗"
+                                    font.family: "Iosevka Nerd Font"; font.pixelSize: window.s(16)
+                                    color: modelData.installed ? th.green : th.overlay0
+                                }
+                                Text {
+                                    text: modelData.name
+                                    font.family: "JetBrains Mono"; font.weight: Font.Medium; font.pixelSize: window.s(13)
+                                    color: th.text; Layout.fillWidth: true; elide: Text.ElideRight
+                                }
+
+                                // LAUNCH (installed only)
+                                Rectangle {
+                                    visible: modelData.installed
+                                    width: window.s(96); height: window.s(34); radius: window.s(8)
+                                    color: lma.containsMouse ? Qt.alpha(th.green, 0.25) : Qt.alpha(th.green, 0.12)
+                                    border.color: th.green; border.width: 1
+                                    RowLayout { anchors.centerIn: parent; spacing: window.s(6)
+                                        Text { text: "󰐊"; font.family: "Iosevka Nerd Font"; font.pixelSize: window.s(14); color: th.green }
+                                        Text { text: "Launch"; font.family: "JetBrains Mono"; font.weight: Font.Bold; font.pixelSize: window.s(11); color: th.green }
+                                    }
+                                    MouseArea { id: lma; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: window.launch(modelData.name) }
+                                }
+                                // INSTALL (not installed)
+                                Rectangle {
+                                    visible: !modelData.installed
+                                    width: window.s(96); height: window.s(34); radius: window.s(8)
+                                    color: ima.containsMouse ? Qt.alpha(th.red, 0.22) : Qt.alpha(th.surface1, 0.6)
+                                    border.color: ima.containsMouse ? th.red : th.surface2; border.width: 1
+                                    RowLayout { anchors.centerIn: parent; spacing: window.s(6)
+                                        Text { text: "󰇚"; font.family: "Iosevka Nerd Font"; font.pixelSize: window.s(14); color: ima.containsMouse ? th.red : th.subtext0 }
+                                        Text { text: "Install"; font.family: "JetBrains Mono"; font.weight: Font.Bold; font.pixelSize: window.s(11); color: ima.containsMouse ? th.red : th.subtext0 }
+                                    }
+                                    MouseArea { id: ima; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: window.install(modelData.name) }
+                                }
+                            }
+                            MouseArea { id: tma; anchors.fill: parent; hoverEnabled: true; acceptedButtons: Qt.NoButton }
+                        }
+                    }
+
+                    // empty / loading state
+                    Text {
+                        anchors.centerIn: parent
+                        visible: window.toolsView.length === 0
+                        text: window.loading ? "loading arsenal…" : "no tools match"
+                        font.family: "JetBrains Mono"; font.pixelSize: window.s(14); color: th.subtext0
+                    }
+                }
+            }
+        }
+    }
+}
