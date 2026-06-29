@@ -205,7 +205,7 @@ Item {
         id: sysPoller
         // Stripped down to only the properties not provided by SysData.qml
         command: ["bash", "-c", 
-            "df -h / | awk 'NR==2 {print $5}' | tr -d '%' || echo '0'; " +
+            "df -h /home | awk 'NR==2 {print $5}' | tr -d '%' || echo '0'; " +
             "powerprofilesctl get 2>/dev/null || echo 'balanced'; " +
             "awk '{print int($1/3600)\"h \"int(($1%3600)/60)\"m\"}' /proc/uptime 2>/dev/null || echo '0h 0m'; " +
             "wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null | awk '{print int($2*100), ($3==\"[MUTED]\"?\"off\":\"on\")}' || echo '0 on'; " +
