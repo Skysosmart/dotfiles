@@ -5,5 +5,9 @@ systemctl --user stop graphical-session-pre.target
 
 sleep 0.5
 
-hyprctl dispatch exit
+if [[ -n "$NIRI_SOCKET" ]]; then
+    niri msg action quit --skip-confirmation
+else
+    hyprctl dispatch exit
+fi
 

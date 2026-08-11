@@ -1,6 +1,12 @@
 #!/bin/bash
 
 # Cycle focus to the next monitor
+if [[ -n "$NIRI_SOCKET" ]]; then
+    # Niri handles cursor placement on focus change itself
+    niri msg action focus-monitor-next
+    exit 0
+fi
+
 hyprctl dispatch focusmonitor +1
 
 # Get the newly focused monitor's geometry

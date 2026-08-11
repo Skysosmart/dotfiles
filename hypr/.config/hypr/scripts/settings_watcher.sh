@@ -104,14 +104,15 @@ compile_settings() {
     NEW_NONMON_HASH=$(md5sum "$SETTINGS_CONF" "$KEYBINDS_CONF" "$AUTOSTART_CONF" "$ENV_CONF" 2>/dev/null | md5sum)
     NEW_MON_HASH=$(md5sum "$MONITORS_CONF" 2>/dev/null | md5sum)
 
+    # Under niri these confs aren't loaded by the compositor; config.kdl live-reloads on its own
     if [ "$OLD_MON_HASH" != "$NEW_MON_HASH" ]; then
         # Monitor layout actually changed — full reload needed
         echo "Monitor config changed, reloading Hyprland..."
-        hyprctl reload
+        [[ -z "$NIRI_SOCKET" ]] && hyprctl reload
     elif [ "$OLD_NONMON_HASH" != "$NEW_NONMON_HASH" ]; then
         # Non-monitor settings changed (keybinds, autostart, input, env) — reload safe, no display flicker
         echo "Non-monitor config changed, reloading Hyprland..."
-        hyprctl reload
+        [[ -z "$NIRI_SOCKET" ]] && hyprctl reload
     else
         # Nothing that affects Hyprland changed (e.g. uiScale, weatherApiKey) — skip reload entirely
         echo "No Hyprland config changes detected, skipping reload."
