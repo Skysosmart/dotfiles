@@ -2,13 +2,13 @@
 lastLoadedOutputPreset=live_eq
 
 [StreamInputs]
-inputDevice=alsa_input.usb-046d_G435_Wireless_Gaming_Headset_V001008005.1-01.mono-fallback
+inputDevice=alsa_input.usb-Apple__Inc._EarPods_A291SUZI79-00.mono-fallback
 
 [StreamOutputs]
 mostUsedPresets=live_eq
-outputDevice=alsa_output.usb-046d_G435_Wireless_Gaming_Headset_V001008005.1-01.analog-stereo
+outputDevice=alsa_output.usb-Apple__Inc._EarPods_A291SUZI79-00.analog-stereo
 plugins=equalizer#0
-usedPresets=live_eq:16
+usedPresets=live_eq:22
 
 [Window]
 height=500

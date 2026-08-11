@@ -6,3 +6,17 @@
 [user]
 	name = Skysosmart
 	email = 165190534+Skysosmart@users.noreply.github.com
+[credential "https://github.com"]
+	helper = 
+	helper = !/usr/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+	helper = 
+	helper = !/usr/bin/gh auth git-credential
+[pull]
+	rebase = false
+[merge]
+	conflictstyle = zdiff3
+[rerere]
+	enabled = true
+[fetch]
+	prune = true

@@ -178,3 +178,21 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 
 # user-local binaries (claude, etc.)
 export PATH="$HOME/.local/bin:$PATH"
+
+# ==============================================================================
+# Metasploit — keep the launch banner small
+# ==============================================================================
+# msfconsole picks a RANDOM logo from /opt/metasploit/data/logos/*.txt on every
+# launch; several (missile-command 176c, zsploit-1 263c, zsploit-3 128c,
+# metasploit-trail 41 rows, ctf2020 60 rows ...) overflow an 80-col terminal.
+# This wrapper keeps the randomness but only ever picks a compact banner.
+# MSFLOGO is set for the single invocation only. Delete this function to
+# restore the full stock rotation.
+msfconsole() {
+  local -a small_logos=(
+    cowsay.txt cow-head.txt cow-branded-longhorn.txt figlet.txt
+    help-using-a-module.txt i-heart-shells.txt metasploit-heart-red.txt
+    metasploit-park.txt metasploit-shield.txt honk.txt r7-metasploit.txt
+  )
+  MSFLOGO="${small_logos[RANDOM % ${#small_logos[@]} + 1]}" command msfconsole "$@"
+}
