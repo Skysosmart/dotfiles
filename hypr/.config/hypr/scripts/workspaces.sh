@@ -45,6 +45,31 @@ if ! [[ "$SEQ_END" =~ ^[0-9]+$ ]]; then
 fi
 
 print_workspaces() {
+    if [[ -n "$NIRI_SOCKET" ]]; then
+        spaces=$(timeout 2 niri msg --json workspaces 2>/dev/null)
+        wins=$(timeout 2 niri msg --json windows 2>/dev/null)
+        if [ -z "$spaces" ] || [ -z "$wins" ]; then return; fi
+
+        # Same output schema as the Hyprland path: [{id, state, tooltip}]
+        # Niri workspaces are per-output with a 1-based idx; use the focused output's strip.
+        jq -n --argjson ws "$spaces" --argjson wins "$wins" --arg end "$SEQ_END" -c '
+            (($ws | map(select(.is_focused)) | first | .output) // ($ws[0].output)) as $out |
+            ($ws | map(select(.output == $out))) as $mine |
+            [range(1; ($end|tonumber) + 1)] | map(
+                . as $i |
+                ($mine | map(select(.idx == $i)) | first) as $w |
+                (if $w == null then [] else ($wins | map(select(.workspace_id == $w.id))) end) as $ww |
+                { id: $i,
+                  state: (if ($w != null and $w.is_active) then "active"
+                          elif (($ww | length) > 0) then "occupied"
+                          else "empty" end),
+                  tooltip: ((($ww | first | .title) // "Empty")) }
+            )' > "$QS_RUN_WORKSPACES/workspaces.tmp"
+
+        mv "$QS_RUN_WORKSPACES/workspaces.tmp" "$QS_RUN_WORKSPACES/workspaces.json"
+        return
+    fi
+
     # Get raw data with a timeout fallback
     spaces=$(timeout 2 hyprctl workspaces -j 2>/dev/null)
     active=$(timeout 2 hyprctl activeworkspace -j 2>/dev/null | jq '.id')
@@ -87,6 +112,21 @@ print_workspaces
 # Listen to Hyprland socket wrapped in an infinite loop
 # ============================================================================
 while true; do
+    if [[ -n "$NIRI_SOCKET" ]]; then
+        # Niri: JSON event stream instead of Hyprland's socket2. Same 50ms debounce.
+        niri msg --json event-stream 2>/dev/null | while read -r line; do
+            case "$line" in
+                *Workspace*|*Window*)
+                    while read -t 0.05 -r extra_line; do
+                        continue
+                    done
+                    print_workspaces
+                    ;;
+            esac
+        done
+        sleep 1
+        continue
+    fi
     socat -u UNIX-CONNECT:$XDG_RUNTIME_DIR/hypr/$HYPRLAND_INSTANCE_SIGNATURE/.socket2.sock - | while read -r line; do
         case "$line" in
             workspace*|focusedmon*|activewindow*|createwindow*|closewindow*|movewindow*|destroyworkspace*)
