@@ -3,11 +3,15 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
 import QtQuick.Window
+import Qt5Compat.GraphicalEffects
 import "../"
 
-// Gaming-style capture HUD — a glassy neon pill docked top-center.
+// Capture HUD styled after the Windows 11 Xbox Game Bar "Capture" widget:
+//   a small dark themed-acrylic window with a header (drag grip · "Capture"
+//   title · close button) over a row of flat Fluent capture buttons.
+//   Surfaces/text/accents follow the live matugen palette (recolors w/ wallpaper).
 // Buttons drive ~/.config/hypr/scripts/screenshot.sh (the existing backend):
-//   region shot · fullscreen shot · shot+edit · record toggle · open folder · close.
+//   region shot · fullscreen shot · shot+edit · record toggle · open folder.
 // Recording state is polled live so the REC button reflects reality.
 Item {
     id: window
@@ -24,8 +28,25 @@ Item {
     function s(v) { return Math.round(v * window.sf); }
 
     MatugenColors { id: th }
-    readonly property color accent: th.blue
-    readonly property color recColor: th.red
+
+    // -------------------------------------------------------------- palette
+    // Themed acrylic: surfaces + text track the live matugen palette
+    // (qs_colors.json, hot-reloaded). Each capture button lights up in its
+    // own accent on hover; the REC / close states use the theme red.
+    readonly property color winFillTop:  Qt.alpha(th.surface0, 0.85)
+    readonly property color winFillBot:  Qt.alpha(th.crust,    0.85)
+    readonly property color headerFill:  Qt.alpha(th.text, 0.04)
+    readonly property color hairline:    Qt.alpha(th.text, 0.10)
+    readonly property color divider:     Qt.alpha(th.text, 0.07)
+    readonly property color icon:        Qt.alpha(th.text, 0.85)
+    readonly property color iconBright:  th.text
+    readonly property color label:       th.subtext0
+    readonly property color title:       th.text
+    readonly property color grip:        Qt.alpha(th.overlay1, 0.9)
+    readonly property color recRed:      th.red
+    readonly property color closeRed:    th.red
+
+    readonly property string sans: "Noto Sans"
 
     readonly property string home: Quickshell.env("HOME")
     readonly property string shot: home + "/.config/hypr/scripts/screenshot.sh"
@@ -80,224 +101,270 @@ Item {
 
     // -------------------------------------------------------------- intro
     property real intro: 0
-    NumberAnimation on intro { from: 0; to: 1; duration: 280; easing.type: Easing.OutCubic; running: true }
+    NumberAnimation on intro { from: 0; to: 1; duration: 220; easing.type: Easing.OutCubic; running: true }
 
-    // slow neon breathing for the border/glow
+    // gentle pulse — used ONLY for the recording dot (no neon border breathing)
     property real pulse: 0.5
     SequentialAnimation on pulse {
         loops: Animation.Infinite; running: true
-        NumberAnimation { to: 1.0; duration: 1600; easing.type: Easing.InOutSine }
-        NumberAnimation { to: 0.5; duration: 1600; easing.type: Easing.InOutSine }
+        NumberAnimation { to: 1.0; duration: 900; easing.type: Easing.InOutSine }
+        NumberAnimation { to: 0.4; duration: 900; easing.type: Easing.InOutSine }
     }
 
     // -------------------------------------------------------------- button model
-    // glyphs are MDI Nerd Font codepoints, rendered via String.fromCodePoint
+    // glyphs are MDI Nerd Font codepoints, rendered via String.fromCodePoint.
+    // 'close' lives in the header, so it's not part of this row.
     property var actions: [
         { id: "region", type: "icon", cp: 0xF019E, caption: "Region", clr: th.blue     }, // crop
         { id: "full",   type: "icon", cp: 0xF0379, caption: "Screen", clr: th.sapphire }, // monitor
         { id: "edit",   type: "icon", cp: 0xF03EB, caption: "Edit",   clr: th.mauve    }, // pencil
-        { id: "record", type: "rec",  cp: 0,       caption: "REC",    clr: th.red      },
-        { id: "folder", type: "icon", cp: 0xF024B, caption: "Files",  clr: th.peach    }, // folder
-        { id: "close",  type: "icon", cp: 0xF0156, caption: "Close",  clr: th.overlay2 }  // close
+        { id: "record", type: "rec",  cp: 0,       caption: "Record", clr: th.red      },
+        { id: "folder", type: "icon", cp: 0xF024B, caption: "Files",  clr: th.peach    }  // folder
     ]
 
     Keys.onEscapePressed: { window.closeBar(); event.accepted = true; }
 
-    // ============================================================== HUD pill
+    // ============================================================== widget window
     Item {
         anchors.fill: parent
         opacity: window.intro
-        scale: 0.96 + 0.04 * window.intro
-
-        // outer neon glow (stacked translucent rects → soft halo, no shader)
-        Rectangle {
-            anchors.centerIn: pill
-            width: pill.width + window.s(26)
-            height: pill.height + window.s(26)
-            radius: height / 2
-            color: "transparent"
-            border.width: window.s(10)
-            border.color: Qt.alpha(window.recording ? window.recColor : window.accent,
-                                   0.10 + 0.10 * window.pulse)
-        }
-        Rectangle {
-            anchors.centerIn: pill
-            width: pill.width + window.s(12)
-            height: pill.height + window.s(12)
-            radius: height / 2
-            color: "transparent"
-            border.width: window.s(6)
-            border.color: Qt.alpha(window.recording ? window.recColor : window.accent,
-                                   0.16 + 0.16 * window.pulse)
-        }
+        transform: Translate { y: (1 - window.intro) * window.s(8) }
 
         Rectangle {
-            id: pill
+            id: card
             anchors.centerIn: parent
-            width: row.implicitWidth + window.s(34)
-            height: window.s(78)
-            radius: height / 2
 
-            // frosted dark glass
+            readonly property real headerH: window.s(38)
+            readonly property real bodyH:   window.s(78)
+            readonly property real bodyPad: window.s(14)
+
+            width: bodyRow.implicitWidth + bodyPad * 2
+            height: headerH + window.s(1) + bodyH
+            radius: window.s(10)
+            antialiasing: true
+
             gradient: Gradient {
-                GradientStop { position: 0.0; color: Qt.alpha(th.surface0, 0.6) }
-                GradientStop { position: 1.0; color: Qt.alpha(th.crust,    0.6) }
+                GradientStop { position: 0.0; color: window.winFillTop }
+                GradientStop { position: 1.0; color: window.winFillBot }
             }
             border.width: window.s(1)
-            border.color: Qt.alpha(window.recording ? window.recColor : window.accent,
-                                   0.45 + 0.25 * window.pulse)
+            border.color: window.hairline
 
-            // specular sheen overlay (liquid glass)
-            Rectangle {
-                anchors.fill: parent
-                radius: parent.radius
-                antialiasing: true
-                gradient: Gradient {
-                    GradientStop { position: 0.0;  color: Qt.rgba(1, 1, 1, 0.18) }
-                    GradientStop { position: 0.30; color: Qt.rgba(1, 1, 1, 0.0) }
-                    GradientStop { position: 1.0;  color: Qt.rgba(0, 0, 0, 0.05) }
-                }
+            // soft ambient lift, like a floating Windows widget
+            layer.enabled: true
+            layer.effect: DropShadow {
+                horizontalOffset: 0
+                verticalOffset: window.s(8)
+                radius: window.s(30)
+                samples: 25
+                color: Qt.rgba(0, 0, 0, 0.45)
+                transparentBorder: true
             }
 
-            // top sheen highlight
-            Rectangle {
+            // ---------------------------------------------------- header bar
+            Item {
+                id: header
                 anchors { top: parent.top; left: parent.left; right: parent.right }
-                anchors.margins: window.s(6)
-                height: parent.height * 0.42
-                radius: height / 2
-                gradient: Gradient {
-                    GradientStop { position: 0.0; color: Qt.rgba(1, 1, 1, 0.06) }
-                    GradientStop { position: 1.0; color: "transparent" }
+                height: card.headerH
+
+                // faint header tint + rounded top corners (clipped by card radius)
+                Rectangle {
+                    anchors.fill: parent
+                    color: window.headerFill
+                    radius: card.radius
+                    // square off the bottom so it meets the divider cleanly
+                    Rectangle {
+                        anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
+                        height: parent.radius
+                        color: parent.color
+                    }
+                }
+
+                // drag-grip dots (decorative — reads as a movable window)
+                Grid {
+                    id: gripDots
+                    anchors { left: parent.left; leftMargin: window.s(13); verticalCenter: parent.verticalCenter }
+                    columns: 2
+                    rowSpacing: window.s(3)
+                    columnSpacing: window.s(3)
+                    Repeater {
+                        model: 6
+                        delegate: Rectangle {
+                            width: window.s(2); height: window.s(2); radius: width / 2
+                            color: window.grip
+                        }
+                    }
+                }
+
+                Text {
+                    id: titleText
+                    anchors { left: gripDots.right; leftMargin: window.s(11); verticalCenter: parent.verticalCenter }
+                    text: "Capture"
+                    color: window.title
+                    font.family: window.sans
+                    font.weight: Font.DemiBold
+                    font.pixelSize: window.s(13)
+                }
+
+                // live recording chip (right beside the title)
+                Row {
+                    anchors { left: titleText.right; leftMargin: window.s(10); verticalCenter: parent.verticalCenter }
+                    spacing: window.s(5)
+                    visible: window.recording
+                    Rectangle {
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: window.s(8); height: window.s(8); radius: width / 2
+                        color: window.recRed
+                        opacity: 0.45 + 0.55 * window.pulse
+                    }
+                    Text {
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: "REC"
+                        color: window.recRed
+                        font.family: window.sans
+                        font.weight: Font.Bold
+                        font.pixelSize: window.s(10)
+                        font.letterSpacing: window.s(1)
+                    }
+                }
+
+                // close button — Windows titlebar style (red fill on hover)
+                Rectangle {
+                    id: closeBtn
+                    anchors { right: parent.right; rightMargin: window.s(6); verticalCenter: parent.verticalCenter }
+                    width: window.s(34); height: window.s(26)
+                    radius: window.s(6)
+                    color: closeMa.containsMouse
+                           ? (closeMa.pressed ? Qt.darker(window.closeRed, 1.2) : window.closeRed)
+                           : "transparent"
+                    Behavior on color { ColorAnimation { duration: 110 } }
+
+                    Text {
+                        anchors.centerIn: parent
+                        text: String.fromCodePoint(0xF0156) // close ✕
+                        font.family: "Iosevka NF"
+                        font.pixelSize: window.s(15)
+                        color: closeMa.containsMouse ? "white" : window.icon
+                    }
+                    MouseArea {
+                        id: closeMa
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: window.closeBar()
+                    }
                 }
             }
 
-            RowLayout {
-                id: row
-                anchors.centerIn: parent
-                spacing: window.s(6)
+            // ---------------------------------------------------- divider
+            Rectangle {
+                id: hr
+                anchors { top: header.bottom; left: parent.left; right: parent.right }
+                height: window.s(1)
+                color: window.divider
+            }
 
-                // ----- status block (state dot + label) -----
+            // ---------------------------------------------------- body (capture buttons)
+            Item {
+                anchors { top: hr.bottom; left: parent.left; right: parent.right; bottom: parent.bottom }
+
                 RowLayout {
-                    spacing: window.s(8)
-                    Layout.leftMargin: window.s(8)
-                    Layout.rightMargin: window.s(4)
+                    id: bodyRow
+                    anchors.centerIn: parent
+                    spacing: window.s(4)
 
-                    Rectangle {
-                        Layout.alignment: Qt.AlignVCenter
-                        width: window.s(12); height: window.s(12); radius: width / 2
-                        color: window.recording ? window.recColor : th.green
-                        // pulse the dot while recording
-                        opacity: window.recording ? (0.45 + 0.55 * window.pulse) : 1.0
-                    }
-                    ColumnLayout {
-                        spacing: 0
-                        Text {
-                            text: window.recording ? "RECORDING" : "GAME BAR"
-                            color: window.recording ? window.recColor : th.text
-                            font.family: "JetBrains Mono"; font.weight: Font.Black
-                            font.pixelSize: window.s(13); font.letterSpacing: window.s(1)
-                        }
-                        Text {
-                            text: window.recording ? "tap stop to save" : "capture / record"
-                            color: th.subtext0
-                            font.family: "JetBrains Mono"; font.pixelSize: window.s(9)
-                        }
-                    }
-                }
+                    Repeater {
+                        model: window.actions
+                        delegate: Item {
+                            id: btn
+                            required property var modelData
+                            Layout.alignment: Qt.AlignVCenter
+                            width: window.s(78); height: window.s(64)
 
-                Rectangle {
-                    Layout.alignment: Qt.AlignVCenter
-                    Layout.leftMargin: window.s(4); Layout.rightMargin: window.s(4)
-                    width: window.s(1); height: window.s(46)
-                    color: Qt.alpha(th.overlay0, 0.4)
-                }
+                            property bool isRec: modelData.type === "rec"
+                            property bool active: isRec && window.recording
+                            property color accent: modelData.clr
+                            property color glyphClr: btn.active
+                                ? window.recRed
+                                : (ma.containsMouse ? btn.accent : window.icon)
 
-                // ----- action buttons -----
-                Repeater {
-                    model: window.actions
-                    delegate: Item {
-                        id: btn
-                        required property var modelData
-                        Layout.alignment: Qt.AlignVCenter
-                        width: window.s(64); height: window.s(60)
+                            // flat Fluent hover/press fill — tinted with this button's accent
+                            Rectangle {
+                                anchors.fill: parent
+                                anchors.margins: window.s(3)
+                                radius: window.s(7)
+                                color: btn.active
+                                       ? Qt.alpha(window.recRed, 0.18)
+                                       : (ma.pressed ? Qt.alpha(btn.accent, 0.26)
+                                          : (ma.containsMouse ? Qt.alpha(btn.accent, 0.15) : "transparent"))
+                                border.width: (ma.containsMouse || btn.active) ? window.s(1) : 0
+                                border.color: Qt.alpha(btn.active ? window.recRed : btn.accent, 0.45)
+                                Behavior on color { ColorAnimation { duration: 120 } }
+                            }
 
-                        property bool isRec: modelData.type === "rec"
-                        property bool active: isRec && window.recording
-                        property color tint: active ? window.recColor : modelData.clr
+                            ColumnLayout {
+                                anchors.centerIn: parent
+                                spacing: window.s(4)
 
-                        Rectangle {
-                            id: bg
-                            anchors.fill: parent
-                            radius: window.s(16)
-                            color: ma.containsMouse || btn.active
-                                   ? Qt.alpha(btn.tint, btn.active ? 0.22 : 0.16)
-                                   : Qt.alpha(th.surface1, 0.0)
-                            border.width: (ma.containsMouse || btn.active) ? window.s(1) : 0
-                            border.color: Qt.alpha(btn.tint, 0.55)
-                            Behavior on color { ColorAnimation { duration: 140 } }
-                            scale: ma.pressed ? 0.92 : (ma.containsMouse ? 1.04 : 1.0)
-                            Behavior on scale { NumberAnimation { duration: 110; easing.type: Easing.OutCubic } }
-                        }
+                                // icon area
+                                Item {
+                                    Layout.alignment: Qt.AlignHCenter
+                                    width: window.s(24); height: window.s(24)
 
-                        ColumnLayout {
-                            anchors.centerIn: parent
-                            spacing: window.s(2)
-
-                            // icon area
-                            Item {
-                                Layout.alignment: Qt.AlignHCenter
-                                width: window.s(26); height: window.s(26)
-
-                                // standard glyph icon
-                                Text {
-                                    visible: !btn.isRec
-                                    anchors.centerIn: parent
-                                    text: btn.isRec ? "" : String.fromCodePoint(btn.modelData.cp)
-                                    // NOTE: use "Iosevka NF" (full font). The family name
-                                    // "Iosevka Nerd Font" resolves to an OLD ttf that lacks newer MDI icons → tofu.
-                                    font.family: "Iosevka NF"
-                                    font.pixelSize: window.s(22)
-                                    color: ma.containsMouse ? btn.tint : Qt.alpha(th.text, 0.85)
-                                    Behavior on color { ColorAnimation { duration: 140 } }
-                                }
-
-                                // record indicator: dot that morphs into a stop square
-                                Rectangle {
-                                    visible: btn.isRec
-                                    anchors.centerIn: parent
-                                    width: window.s(18); height: window.s(18)
-                                    radius: btn.active ? window.s(4) : width / 2
-                                    color: window.recColor
-                                    Behavior on radius { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
-                                    // pulsing ring while recording
-                                    Rectangle {
+                                    // standard glyph icon
+                                    Text {
+                                        visible: !btn.isRec
                                         anchors.centerIn: parent
-                                        visible: btn.active
-                                        width: parent.width + window.s(8) * window.pulse + window.s(4)
-                                        height: width; radius: width / 2
-                                        color: "transparent"
-                                        border.width: window.s(2)
-                                        border.color: Qt.alpha(window.recColor, 0.7 - 0.5 * window.pulse)
+                                        text: btn.isRec ? "" : String.fromCodePoint(btn.modelData.cp)
+                                        // NOTE: use "Iosevka NF" (full font). "Iosevka Nerd Font"
+                                        // resolves to an OLD ttf lacking newer MDI icons → tofu.
+                                        font.family: "Iosevka NF"
+                                        font.pixelSize: window.s(20)
+                                        color: btn.glyphClr
+                                        Behavior on color { ColorAnimation { duration: 120 } }
+                                    }
+
+                                    // record indicator: filled circle that morphs into a stop square
+                                    Rectangle {
+                                        visible: btn.isRec
+                                        anchors.centerIn: parent
+                                        width: window.s(16); height: window.s(16)
+                                        radius: btn.active ? window.s(3) : width / 2
+                                        color: window.recRed
+                                        Behavior on radius { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
+                                        // pulsing ring while recording
+                                        Rectangle {
+                                            anchors.centerIn: parent
+                                            visible: btn.active
+                                            width: parent.width + window.s(8) * window.pulse + window.s(4)
+                                            height: width; radius: width / 2
+                                            color: "transparent"
+                                            border.width: window.s(2)
+                                            border.color: Qt.rgba(window.recRed.r, window.recRed.g,
+                                                                  window.recRed.b, 0.7 - 0.5 * window.pulse)
+                                        }
                                     }
                                 }
+
+                                Text {
+                                    Layout.alignment: Qt.AlignHCenter
+                                    text: btn.active ? "Stop" : btn.modelData.caption
+                                    font.family: window.sans
+                                    font.weight: Font.Medium
+                                    font.pixelSize: window.s(10)
+                                    color: btn.active ? window.recRed
+                                           : (ma.containsMouse ? btn.accent : window.label)
+                                    Behavior on color { ColorAnimation { duration: 120 } }
+                                }
                             }
 
-                            Text {
-                                Layout.alignment: Qt.AlignHCenter
-                                text: btn.active ? "STOP" : btn.modelData.caption
-                                font.family: "JetBrains Mono"; font.weight: Font.Bold
-                                font.pixelSize: window.s(9)
-                                color: ma.containsMouse || btn.active ? btn.tint : th.subtext0
-                                Behavior on color { ColorAnimation { duration: 140 } }
+                            MouseArea {
+                                id: ma
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: window.fire(btn.modelData.id)
                             }
-                        }
-
-                        MouseArea {
-                            id: ma
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: window.fire(btn.modelData.id)
                         }
                     }
                 }

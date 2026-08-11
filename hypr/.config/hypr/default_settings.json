@@ -33,6 +33,7 @@
     {"type":"bind","mods":"$mainMod","key":"Q","dispatcher":"exec","command":"bash ~/.config/hypr/scripts/qs_manager.sh toggle music"},
     {"type":"bind","mods":"$mainMod","key":"B","dispatcher":"exec","command":"bash ~/.config/hypr/scripts/qs_manager.sh toggle battery"},
     {"type":"bind","mods":"$mainMod","key":"W","dispatcher":"exec","command":"bash ~/.config/hypr/scripts/qs_manager.sh toggle wallpaper"},
+    {"type":"bind","mods":"$mainMod SHIFT_L","key":"W","dispatcher":"exec","command":"bash ~/.config/hypr/scripts/qs_manager.sh toggle wallpaper Video"},
     {"type":"bind","mods":"$mainMod","key":"S","dispatcher":"exec","command":"bash ~/.config/hypr/scripts/qs_manager.sh toggle calendar"},
     {"type":"bind","mods":"$mainMod","key":"N","dispatcher":"exec","command":"bash ~/.config/hypr/scripts/qs_manager.sh toggle network"},
     {"type":"bind","mods":"$mainMod SHIFT_L","key":"T","dispatcher":"exec","command":"bash ~/.config/hypr/scripts/qs_manager.sh toggle focustime"},

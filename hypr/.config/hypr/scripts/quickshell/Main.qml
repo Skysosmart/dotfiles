@@ -38,7 +38,7 @@ PanelWindow {
                 if (targetWidget === effectivelyActive) {
                     let currentItem = widgetStack.currentItem;
 
-                    if (arg !== "" && currentItem && currentItem.activeMode !== undefined && currentItem.activeMode !== arg) {
+                    if (arg !== "" && currentItem && currentItem.activeMode !== undefined && currentItem.activeMode !== arg && (targetWidget !== "wallpaper" || masterWindow.isWallpaperModeArg(arg))) {
                         currentItem.activeMode = arg;
                     } else if (cmd === "toggle") {
                         switchWidget("hidden", "");
@@ -112,6 +112,13 @@ PanelWindow {
     }
 
     property var widgetCache: ({})
+
+    function isWallpaperModeArg(arg) {
+        return [
+            "All", "Video", "Red", "Orange", "Yellow",
+            "Green", "Blue", "Purple", "Pink", "Monochrome", "Search"
+        ].indexOf(arg) !== -1;
+    }
 
     function preloadWidget(name) {
         if (widgetCache[name]) return;
@@ -477,6 +484,7 @@ PanelWindow {
         props["layoutWidth"]  = t.w;
         props["layoutHeight"] = t.h;
         if (newWidget === "wallpaper") props["widgetArg"] = arg;
+        if (newWidget === "wallpaper" && masterWindow.isWallpaperModeArg(arg)) props["activeMode"] = arg;
 
         let cached = widgetCache[newWidget];
         if (cached) {
@@ -485,7 +493,7 @@ PanelWindow {
             if (cached.layoutWidth  !== undefined) cached.layoutWidth  = t.w;
             if (cached.layoutHeight !== undefined) cached.layoutHeight = t.h;
             if (newWidget === "wallpaper" && cached.widgetArg !== undefined) cached.widgetArg = arg;
-            if (arg !== "" && cached.activeMode !== undefined) cached.activeMode = arg;
+            if (arg !== "" && cached.activeMode !== undefined && (newWidget !== "wallpaper" || masterWindow.isWallpaperModeArg(arg))) cached.activeMode = arg;
 
             cached.visible = true;
             if (immediate) {

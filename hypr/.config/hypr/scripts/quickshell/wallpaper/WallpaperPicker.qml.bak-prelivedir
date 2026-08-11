@@ -151,10 +151,6 @@ Item {
         if (outputs === "none") return;
         
         window.isApplying = true;
-        // Video applies fade (1s) then start mpvpaper, so they take longer than a
-        // static awww swap. Hold the lock past that window so a fast second click
-        // can't start a new mpvpaper before this one is up (which stacks them).
-        applyUnlockTimer.interval = isVideo ? 1500 : 250;
         applyUnlockTimer.restart();
         
         window.targetWallName = safeFileName;
@@ -186,7 +182,7 @@ Item {
                     export TARGET_MONITORS="${escOutputs}"
                     
                     cp "$DEST_FILE" ${paths.getCacheDir("wallpaper_picker")}/current_wallpaper.png || true
-                    pkill -9 mpvpaper || true
+                    pkill mpvpaper || true
                     
                     echo "" >> ${logFile}
                     echo "[$(date +'%H:%M:%S.%3N')] APPLYING CACHED SEARCH: $DEST_FILE TO $TARGET_MONITORS" >> ${logFile}
@@ -228,7 +224,7 @@ Item {
                         magick "$DEST_FILE" -resize x420 -quality 70 "$FINAL_THUMB" || true
                         
                         cp "$DEST_FILE" ${paths.getCacheDir("wallpaper_picker")}/current_wallpaper.png || true
-                        pkill -9 mpvpaper || true
+                        pkill mpvpaper || true
                         
                         echo "" >> ${logFile}
                         echo "[$(date +'%H:%M:%S.%3N')] APPLYING NEW DOWNLOAD: $DEST_FILE TO $TARGET_MONITORS" >> ${logFile}
@@ -247,7 +243,7 @@ Item {
             return;
         }
 
-        const originalFile = (isVideo ? window.liveDir : window.srcDir) + "/" + cleanName;
+        const originalFile = window.srcDir + "/" + cleanName;
         const thumbFile = paths.getCacheDir("wallpaper_picker") + "/thumbs/" + safeFileName;
         
         const escOriginal = escapeBash(originalFile);
@@ -260,35 +256,13 @@ Item {
             wallpaperCmd = `
                 echo "" >> ${logFile}
                 echo "[$(date +'%H:%M:%S.%3N')] APPLYING LOCAL VIDEO: ${escOriginal} TO ${escOutputs}" >> ${logFile}
-
-                # Fade the awww base layer to the video's poster frame first. mpvpaper
-                # draws on top of awww, so this both (a) gives the live wallpaper the
-                # same transition static images get and (b) leaves the base reflecting
-                # the live selection instead of the previous wallpaper. The outer
-                # script already pkilled the old mpvpaper, so the fade is visible.
-                if [ -f "${escThumb}" ]; then
-                    if [ "${escOutputs}" = "all" ]; then
-                        awww img "${escThumb}" --transition-type ${randomTransition} --transition-pos 0.5,0.5 --transition-fps 144 --transition-duration 1 >> ${logFile} 2>&1 &
-                    else
-                        awww img -o "${escOutputs}" "${escThumb}" --transition-type ${randomTransition} --transition-pos 0.5,0.5 --transition-fps 144 --transition-duration 1 >> ${logFile} 2>&1 &
-                    fi
-                    # Let the fade play on the exposed base before the video covers it.
-                    sleep 1
-                fi
-
-                # Drop any mpvpaper that raced in during the fade (rapid re-selects)
-                # so only this, the latest, live wallpaper ends up running.
-                pkill -9 mpvpaper || true
-
-                # --start=5 begins playback on the same frame the poster was grabbed
-                # from (qs_manager.sh uses -ss 5), so the video continues seamlessly
-                # from the frame we just faded into instead of jumping back to 0s.
+                
                 if [ "${escOutputs}" = "all" ]; then
-                    mpvpaper -o '--start=5 loop --no-audio --hwdec=auto --profile=high-quality --video-sync=display-resample --interpolation --tscale=oversample' '*' "${escOriginal}" >> ${logFile} 2>&1 &
+                    mpvpaper -o 'loop --no-audio --hwdec=auto --profile=high-quality --video-sync=display-resample --interpolation --tscale=oversample' '*' "${escOriginal}" >> ${logFile} 2>&1 &
                 else
                     IFS=',' read -ra MON_ARR <<< "${escOutputs}"
                     for mon in "\${MON_ARR[@]}"; do
-                        mpvpaper -o '--start=5 loop --no-audio --hwdec=auto --profile=high-quality --video-sync=display-resample --interpolation --tscale=oversample' "\$mon" "${escOriginal}" >> ${logFile} 2>&1 &
+                        mpvpaper -o 'loop --no-audio --hwdec=auto --profile=high-quality --video-sync=display-resample --interpolation --tscale=oversample' "\$mon" "${escOriginal}" >> ${logFile} 2>&1 &
                     done
                 fi
             `;
@@ -307,7 +281,7 @@ Item {
 
         const fullScript = `
             cp "${isVideo ? escThumb : escOriginal}" ${paths.getCacheDir("wallpaper_picker")}/current_wallpaper.png || true
-            pkill -9 mpvpaper || true
+            pkill mpvpaper || true
             
             ${wallpaperCmd}
             ( matugen image "${escThumb}" --source-color-index 0 || true; bash "${escReload}" || true ) &
@@ -581,16 +555,9 @@ Item {
     readonly property string searchDir: "file://" + paths.getCacheDir("wallpaper_picker") + "/search_thumbs"
     readonly property string srcDir: {
         const dir = Quickshell.env("WALLPAPER_DIR")
-        return (dir && dir !== "")
-        ? dir
+        return (dir && dir !== "") 
+        ? dir 
         : Quickshell.env("HOME") + "/Pictures/Wallpapers"
-    }
-    // Live/video wallpapers live in their own dir, separate from static images.
-    readonly property string liveDir: {
-        const dir = Quickshell.env("LIVE_WALLPAPER_DIR")
-        return (dir && dir !== "")
-        ? dir
-        : Quickshell.env("HOME") + "/Pictures/LiveWallpapers"
     }
 
     readonly property var transitions: ["simple", "fade", "left", "right", "top", "bottom", "wipe", "grow", "center", "outer", "random", "wave"]
@@ -1261,7 +1228,7 @@ Item {
                     
                     MediaPlayer {
                         id: previewPlayer
-                        source: delegateRoot.isPlayingVideo ? "file://" + window.liveDir + "/" + window.getCleanName(delegateRoot.safeFileName) : ""
+                        source: delegateRoot.isPlayingVideo ? "file://" + window.srcDir + "/" + window.getCleanName(delegateRoot.safeFileName) : ""
                         audioOutput: AudioOutput { muted: true }
                         videoOutput: previewOutput
                         loops: MediaPlayer.Infinite

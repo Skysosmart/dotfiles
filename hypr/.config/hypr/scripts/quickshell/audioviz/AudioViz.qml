@@ -5,9 +5,9 @@ import Quickshell.Io
 import Quickshell.Wayland
 import Qt5Compat.GraphicalEffects
 
-// Standalone desktop audio visualizer: a continuous wave that traces the Arch
-// logo's triangular silhouette (with a little gap), pulsing live with cava.
-// Above the wallpaper, below windows, fully click-through.
+// Standalone desktop audio visualizer: a smooth ring around the BlackArch logo whose
+// radius pulses with the audio (mirrored spectrum, so it stays symmetric). Driven by
+// cava. Above the wallpaper, below windows, fully click-through.
 ShellRoot {
     id: root
 
@@ -18,20 +18,14 @@ ShellRoot {
     readonly property int barCount: 120
     property var levels: []
 
+    // ring colour uses the SAME source as the BlackArch logo: matugen's primary (c.blue)
+    // from qs_colors.json, so the ring and the logo always share one accent.
     Process {
         id: themeReader
         command: ["cat", Quickshell.env("HOME") + "/.config/hypr/scripts/quickshell/qs_colors.json"]
-        stdout: StdioCollector {
-            onStreamFinished: {
-                try {
-                    let c = JSON.parse(this.text.trim());
-                    if (c.blue)  root.accent  = c.blue;
-                    if (c.peach) root.accent2 = c.peach;
-                } catch (e) {}
-            }
-        }
+        stdout: StdioCollector { onStreamFinished: { try { let c = JSON.parse(this.text.trim()); if (c.blue) root.accent = c.blue; } catch (e) {} } }
     }
-    Timer { interval: 2000; running: true; repeat: true; triggeredOnStart: true; onTriggered: themeReader.running = true }
+    Timer { interval: 1000; running: true; repeat: true; triggeredOnStart: true; onTriggered: themeReader.running = true }
 
     Process {
         id: cava
@@ -68,47 +62,28 @@ ShellRoot {
 
                 // smoothed levels, so the wave glides instead of jittering
                 property var sm: []
-                readonly property real ampMax: win.height * 0.085
+                readonly property real baseR:  win.height * 0.195   // ring radius, sits around the logo
+                readonly property real ampMax: win.height * 0.030   // ripple depth
 
-                // Arch-logo triangle (relative to centre), sized to hug the glyph + a little gap
-                function corners() {
-                    var S = win.height;
-                    return [
-                        { x: 0,           y: -S * 0.150 },   // apex
-                        { x: -S * 0.140,  y:  S * 0.112 },   // bottom-left
-                        { x:  S * 0.140,  y:  S * 0.112 }    // bottom-right
-                    ];
-                }
-
+                // Smooth pulsing ring: a circle around the logo whose radius is modulated by the
+                // audio. The spectrum is mirrored low->high->low across the vertical axis so the
+                // ring stays symmetric and seamless. Trivial + robust: no tracing, no self-overlap.
                 function buildWave() {
                     var cx = win.width / 2, cy = win.height / 2;
-                    var c = corners();
-                    var edges = [[c[0], c[1]], [c[1], c[2]], [c[2], c[0]]];
-                    var lens = [];
-                    var total = 0;
-                    for (var k = 0; k < 3; k++) {
-                        lens[k] = Math.hypot(edges[k][1].x - edges[k][0].x, edges[k][1].y - edges[k][0].y);
-                        total += lens[k];
-                    }
+
                     var n = root.levels.length || 1;
                     if (win.sm.length !== n) { win.sm = []; for (var s = 0; s < n; s++) win.sm[s] = 0; }
-                    for (var z = 0; z < n; z++) win.sm[z] += ((root.levels[z] || 0) - win.sm[z]) * 0.38;  // ease
+                    for (var z = 0; z < n; z++) win.sm[z] += ((root.levels[z] || 0) - win.sm[z]) * 0.22;  // calm ease
 
-                    var M = 264, pts = [];
+                    var M = 360, pts = [], R = win.baseR, A = win.ampMax;
                     for (var i = 0; i <= M; i++) {
-                        var t = (i % M) / M;
-                        var dist = t * total, ei = 0, acc = 0;
-                        while (ei < 2 && dist > acc + lens[ei]) { acc += lens[ei]; ei++; }
-                        var loc = lens[ei] > 0 ? (dist - acc) / lens[ei] : 0;
-                        var e = edges[ei];
-                        var px = e[0].x + (e[1].x - e[0].x) * loc;
-                        var py = e[0].y + (e[1].y - e[0].y) * loc;
-                        var dx = e[1].x - e[0].x, dy = e[1].y - e[0].y;
-                        var nx = dy, ny = -dx, nl = Math.hypot(nx, ny) || 1; nx /= nl; ny /= nl;
-                        if (nx * px + ny * py < 0) { nx = -nx; ny = -ny; }      // outward
-                        var fb = t * n, bi = Math.floor(fb) % n, bn = (bi + 1) % n, fr = fb - Math.floor(fb);
-                        var amp = ((win.sm[bi] * (1 - fr) + win.sm[bn] * fr) / 100) * win.ampMax;
-                        pts.push(Qt.point(cx + px + nx * amp, cy + py + ny * amp));
+                        var t = i / M;
+                        var bf = (t < 0.5 ? t * 2 : (1 - t) * 2) * (n - 1);   // mirror so halves match
+                        var bi = Math.floor(bf), bn = Math.min(bi + 1, n - 1), fr = bf - bi;
+                        var amp = ((win.sm[bi] * (1 - fr) + win.sm[bn] * fr) / 100) * A;
+                        var ang = -Math.PI / 2 + t * 2 * Math.PI;             // start at top, go around
+                        var r = R + amp;
+                        pts.push(Qt.point(cx + Math.cos(ang) * r, cy + Math.sin(ang) * r));
                     }
                     wave.pts = pts;
                 }
@@ -122,11 +97,11 @@ ShellRoot {
                     property var pts: []
 
                     layer.enabled: true
-                    layer.effect: Glow { radius: 14; samples: 19; spread: 0.3; color: root.accent }
+                    layer.effect: Glow { radius: 22; samples: 29; spread: 0.5; color: root.accent }
 
                     ShapePath {
-                        strokeColor: root.af(root.accent, 0.95)
-                        strokeWidth: win.height * 0.0032
+                        strokeColor: "white"
+                        strokeWidth: win.height * 0.0034
                         fillColor: "transparent"
                         capStyle: ShapePath.RoundCap
                         joinStyle: ShapePath.RoundJoin

@@ -52,7 +52,7 @@ function getLayout(name, mx, my, mw, mh, userScale) {
         "wallpaper": { w: mw, h: s(650, scale), rx: 0, ry: Math.floor((mh/2)-(s(650, scale)/2)), comp: "wallpaper/WallpaperPicker.qml" },
         
         // --- Top Center HUD ---
-        "gamebar":   { w: s(720, scale), h: s(130, scale), rx: Math.floor((mw/2)-(s(720, scale)/2)), ry: s(66, scale), comp: "gamebar/GameBar.qml" },
+        "gamebar":   { w: s(720, scale), h: s(200, scale), rx: Math.floor((mw/2)-(s(720, scale)/2)), ry: s(31, scale), comp: "gamebar/GameBar.qml" },
 
         // --- Top Left Edge ---
         "music":     { w: s(700, scale), h: s(650, scale), rx: s(5, scale), ry: s(60, scale), comp: "music/MusicPopup.qml" },

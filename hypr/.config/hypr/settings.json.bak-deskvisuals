@@ -576,7 +576,7 @@
       "mods": "$mainMod",
       "key": "A",
       "dispatcher": "exec",
-      "command": "bash ~/.config/hypr/scripts/deskvisuals.sh toggle",
+      "command": "bash ~/.config/hypr/scripts/deskicon.sh toggle",
       "isEditing": false
     },
     {
@@ -633,9 +633,6 @@
     },
     {
       "command": "~/.config/hypr/scripts/audioviz.sh start"
-    },
-    {
-      "command": "kdeconnect-indicator"
     }
   ]
 }

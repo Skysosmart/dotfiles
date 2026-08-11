@@ -166,7 +166,9 @@ if [ -f "$CACHE_DIR/rec_pid" ]; then
     [ "$REC_PID" != "0" ] && kill -SIGINT $REC_PID 2>/dev/null
 
     # 2. WAIT FOR GSR TO CLOSE GRACEFULLY AND FINALIZE MP4
-    timeout=30
+    # Writing the moov atom on a long recording can take several seconds; force-killing
+    # before that finishes truncates the file. Allow up to 15s before the SIGKILL fallback.
+    timeout=150
     while kill -0 $REC_PID 2>/dev/null && [ $timeout -gt 0 ]; do
         sleep 0.1
         timeout=$((timeout - 1))
@@ -229,8 +231,18 @@ if [ "$FULL_MODE" = true ] || [ -n "$GEOMETRY" ]; then
         [ -n "$MIC_DEVICE" ] && [ "$MIC_DEVICE" != "null" ] && MIC_DEV="$MIC_DEVICE" || MIC_DEV=$(pactl get-default-source 2>/dev/null)
         MIC_DEV="${MIC_DEV:-default}"
 
-        # Reverted back to the portal method for reliable security clearance
-        GSR_ARGS=(-w "portal" -c "mp4" -f "60" -ac "aac")
+        # Hybrid GPU (AMD iGPU + NVIDIA dGPU): the compositor allocates frames on
+        # the AMD card, but this session exports NVIDIA PRIME-offload env globally,
+        # which forces GSR onto the NVIDIA EGL device. NVIDIA's EGL cannot import the
+        # AMD-tiled portal DMA-BUFs -> "no more input formats" -> capture never saves.
+        # Direct KMS capture (-w screen) reads the AMD scanout via gsr-kms-server
+        # (which has cap_sys_admin), bypassing the portal/PipeWire import entirely.
+        GSR_ARGS=(-w "screen" -c "mp4" -f "60" -ac "aac")
+
+        # Strip NVIDIA offload vars so GSR auto-detects the AMD card that drives the
+        # display (otherwise its card detection locks onto the monitor-less NVIDIA GPU).
+        NV_STRIP=(-u __NV_PRIME_RENDER_OFFLOAD -u __NV_PRIME_RENDER_OFFLOAD_PROVIDER \
+                  -u __GLX_VENDOR_LIBRARY_NAME -u __VK_LAYER_NV_optimus)
 
         AUDIO_MIX=""
 
@@ -278,8 +290,8 @@ if [ "$FULL_MODE" = true ] || [ -n "$GEOMETRY" ]; then
             GSR_ARGS+=(-a "$AUDIO_MIX")
         fi
 
-        # Execute gpu-screen-recorder
-        gpu-screen-recorder "${GSR_ARGS[@]}" -o "$VID_FILENAME" > /dev/null 2>&1 &
+        # Execute gpu-screen-recorder (log kept so a future failure is diagnosable)
+        env "${NV_STRIP[@]}" gpu-screen-recorder "${GSR_ARGS[@]}" -o "$VID_FILENAME" > "$CACHE_DIR/gsr.log" 2>&1 &
         REC_PID=$!
 
         echo "$REC_PID" > "$CACHE_DIR/rec_pid"

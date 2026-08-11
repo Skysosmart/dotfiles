@@ -37,15 +37,13 @@ qs_ensure_cache "wallpaper_picker"
 BT_PID_FILE="$QS_RUN_DIR/bt_scan_pid"
 BT_SCAN_LOG="$QS_LOG_DIR/bt_scan.log"
 SRC_DIR="${WALLPAPER_DIR:-${srcdir:-$HOME/Pictures/Wallpapers}}"
-# Live/video wallpapers are kept in their own dir, separate from static images.
-LIVE_DIR="${LIVE_WALLPAPER_DIR:-$HOME/Pictures/LiveWallpapers}"
 THUMB_DIR="$QS_CACHE_WALLPAPER_PICKER/thumbs"
 PREP_LOCK="$QS_RUN_DIR/wallpaper_prep.lock"
 
 export MAGICK_THREAD_LIMIT=1
 
 QS_NETWORK_CACHE="$QS_CACHE_NETWORK"
-mkdir -p "$QS_NETWORK_CACHE" "$THUMB_DIR" "$LIVE_DIR"
+mkdir -p "$QS_NETWORK_CACHE" "$THUMB_DIR"
 
 NETWORK_MODE_FILE="$QS_NETWORK_CACHE/mode"
 
@@ -80,7 +78,7 @@ handle_wallpaper_prep() {
         fi
         echo $BASHPID > "$PREP_LOCK"
 
-        export THUMB_DIR SRC_DIR LIVE_DIR MANIFEST MAGICK_THREAD_LIMIT=1
+        export THUMB_DIR SRC_DIR MANIFEST MAGICK_THREAD_LIMIT=1
 
         THUMB_SOURCE_FILE="$THUMB_DIR/.source_dir"
         if [ -f "$THUMB_SOURCE_FILE" ]; then
@@ -99,15 +97,11 @@ handle_wallpaper_prep() {
         [ ! -f "$MANIFEST" ] && build_manifest
 
         SRC_LIST=$(mktemp)
-        # Static images come from SRC_DIR; live/video wallpapers come from LIVE_DIR.
-        {
-            find "$SRC_DIR" -maxdepth 1 -type f \
-                \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" \
-                   -o -iname "*.gif" -o -iname "*.webp" \) -printf "%f\n"
-            find "$LIVE_DIR" -maxdepth 1 -type f \
-                \( -iname "*.mp4" -o -iname "*.mkv" -o -iname "*.mov" \
-                   -o -iname "*.webm" \) -printf "%f\n"
-        } 2>/dev/null | sort > "$SRC_LIST"
+        find "$SRC_DIR" -maxdepth 1 -type f \
+            \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" \
+               -o -iname "*.gif" -o -iname "*.mp4" -o -iname "*.mkv" \
+               -o -iname "*.mov" -o -iname "*.webm" \) \
+            -printf "%f\n" | sort > "$SRC_LIST"
 
         comm -23 <(sed 's/^000_//' "$MANIFEST" | sort) "$SRC_LIST" | while read -r orphan; do
             rm -f "$THUMB_DIR/$orphan" "$THUMB_DIR/000_$orphan"
@@ -115,32 +109,28 @@ handle_wallpaper_prep() {
         done
 
         while IFS= read -r filename; do
+            img="$SRC_DIR/$filename"
+            [ -f "$img" ] || continue
+
             extension="${filename##*.}"
 
+            if [[ "${extension,,}" == "webp" ]]; then
+                new_img="${img%.*}.jpg"
+                magick "$img" "$new_img" && rm -f "$img"
+                img="$new_img"
+                filename="$(basename "$img")"
+                extension="jpg"
+            fi
+
             if [[ "${extension,,}" =~ ^(mp4|mkv|mov|webm)$ ]]; then
-                # Live/video wallpaper — source lives in LIVE_DIR, tagged with 000_ prefix.
-                img="$LIVE_DIR/$filename"
-                [ -f "$img" ] || continue
                 thumb="$THUMB_DIR/000_$filename"
                 [ -f "$THUMB_DIR/$filename" ] && rm -f "$THUMB_DIR/$filename"
                 if [ ! -f "$thumb" ]; then
-                    # -nostdin: ffmpeg must not consume this loop's stdin (the comm stream).
-                    ffmpeg -nostdin -y -ss 00:00:05 -i "$img" -vframes 1 \
+                    ffmpeg -y -ss 00:00:05 -i "$img" -vframes 1 \
                         -threads 1 -f image2 -q:v 2 "$thumb" >/dev/null 2>&1
                     echo "000_$filename" >> "$MANIFEST"
                 fi
             else
-                # Static image — source lives in SRC_DIR.
-                img="$SRC_DIR/$filename"
-                [ -f "$img" ] || continue
-
-                if [[ "${extension,,}" == "webp" ]]; then
-                    new_img="${img%.*}.jpg"
-                    magick "$img" "$new_img" && rm -f "$img"
-                    img="$new_img"
-                    filename="$(basename "$img")"
-                fi
-
                 thumb="$THUMB_DIR/$filename"
                 if [ ! -f "$thumb" ]; then
                     magick "$img" -resize x420 -quality 70 "$thumb"
@@ -193,7 +183,7 @@ if [[ "$ACTION" == "open" || "$ACTION" == "toggle" ]]; then
 
         CURRENT_SRC=""
         if pgrep -a "mpvpaper" > /dev/null; then
-            CURRENT_SRC=$(pgrep -a mpvpaper | grep -o "$LIVE_DIR/[^' ]*" | head -n1)
+            CURRENT_SRC=$(pgrep -a mpvpaper | grep -o "$SRC_DIR/[^' ]*" | head -n1)
         elif command -v awww >/dev/null; then
             CURRENT_SRC=$(awww query 2>/dev/null | grep -o "$SRC_DIR/[^ ]*" | head -n1)
         fi

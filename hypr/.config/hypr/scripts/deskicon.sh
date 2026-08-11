@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ─────────────────────────────────────────────────────────────────────────────
-#  Centered desktop Arch logo (standalone quickshell instance)
+#  Centered desktop BlackArch logo (standalone quickshell instance)
 #  start  : launch if not already running   (used at autostart for always-on)
 #  stop   : kill it
 #  toggle : flip it on/off                   (bound to a key)

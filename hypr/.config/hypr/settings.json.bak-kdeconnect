@@ -633,9 +633,6 @@
     },
     {
       "command": "~/.config/hypr/scripts/audioviz.sh start"
-    },
-    {
-      "command": "kdeconnect-indicator"
     }
   ]
 }

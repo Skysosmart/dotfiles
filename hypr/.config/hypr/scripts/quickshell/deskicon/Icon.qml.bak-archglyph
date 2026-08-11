@@ -4,10 +4,9 @@ import Quickshell.Io
 import Quickshell.Wayland
 import Qt5Compat.GraphicalEffects
 
-// Desktop BlackArch emblem (katana+chevron silhouette filled with a live wallpaper
-// gradient + accent glow). Click it to open the "world" launcher: a large rotating
-// wireframe earth with apps pinned to its surface, linked by a network of artificial
-// lines, over a Matrix (cmatrix) rain backdrop.
+// Desktop Arch emblem (white + wallpaper-adaptive accent glow). Click it to open the
+// "world" launcher: a large rotating wireframe earth with apps pinned to its surface,
+// linked by a network of artificial lines, over a Matrix (cmatrix) rain backdrop.
 ShellRoot {
     id: root
 
@@ -84,7 +83,7 @@ ShellRoot {
                 color: "transparent"
                 anchors { top: true; bottom: true; left: true; right: true }
 
-                property int glyphSize: Math.round(logoWin.height * 0.34)
+                property int glyphSize: Math.round(logoWin.height * 0.30)
                 mask: Region { item: clickZone }
 
                 property real breathe: 0.9
@@ -94,34 +93,24 @@ ShellRoot {
                     NumberAnimation { from: 1.0; to: 0.82; duration: 3500; easing.type: Easing.InOutSine }
                 }
 
-                // faint enlarged accent wash behind the emblem (same as the old bg glyph)
-                ColorOverlay {
-                    anchors.centerIn: parent
-                    width: baBody.width; height: baBody.height
-                    source: baBody; color: root.accent
-                    scale: 1.14; opacity: logoWin.breathe * 0.28; z: -2
+                Text {
+                    anchors.centerIn: parent; text: ""; font.family: "JetBrainsMono Nerd Font Mono"
+                    font.pixelSize: logoWin.glyphSize; color: root.accent; scale: 1.14
+                    opacity: logoWin.breathe * 0.28; z: -2
                 }
-                // single-accent glow halo
                 Glow {
-                    anchors.fill: baBody; source: baBody; color: root.accent
+                    anchors.fill: whiteGlyph; source: whiteGlyph; color: root.accent
                     radius: Math.round(logoWin.glyphSize * 0.10); samples: 33; spread: 0.25
                     opacity: logoWin.breathe; z: -1
                 }
-                // solid-filled BlackArch emblem, white body — same single-accent treatment
-                // the old Arch glyph used (white fill + accent glow).
-                Image {
-                    id: baBody
-                    anchors.centerIn: parent
-                    source: Quickshell.env("HOME") + "/.config/hypr/scripts/quickshell/deskicon/blackarch-solid.png"
-                    width: logoWin.glyphSize; height: logoWin.glyphSize
-                    sourceSize.width: logoWin.glyphSize; sourceSize.height: logoWin.glyphSize
-                    fillMode: Image.PreserveAspectFit
-                    smooth: true
-                    opacity: logoWin.breathe
+                Text {
+                    id: whiteGlyph; anchors.centerIn: parent; text: ""
+                    font.family: "JetBrainsMono Nerd Font Mono"; font.pixelSize: logoWin.glyphSize
+                    padding: Math.round(logoWin.glyphSize * 0.18); color: "white"; opacity: logoWin.breathe
                 }
                 Item {
                     id: clickZone; anchors.centerIn: parent
-                    width: logoWin.glyphSize * 0.62; height: logoWin.glyphSize
+                    width: logoWin.glyphSize * 1.1; height: logoWin.glyphSize
                     MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: root.launcherOpen = true }
                 }
             }
