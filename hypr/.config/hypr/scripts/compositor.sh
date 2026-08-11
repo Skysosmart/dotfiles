@@ -20,8 +20,8 @@ comp_next_kb_layout() {
 }
 
 comp_dispatch_exec() {
-    # hyprctl exec runs the string through a shell; niri spawn does not — match via sh -c
-    if comp_is_niri; then niri msg action spawn -- sh -c "$*"
+    # hyprctl exec runs the string through a shell; niri's spawn-sh matches that
+    if comp_is_niri; then niri msg action spawn-sh -- "$*"
     else hyprctl dispatch exec -- "$@"; fi
 }
 
@@ -41,9 +41,9 @@ comp_monitors_json() {
                   x: (.logical.x // 0),
                   y: (.logical.y // 0),
                   scale: (.logical.scale // 1),
-                  transform: ({"normal":0,"90":1,"180":2,"270":3,
-                               "flipped":4,"flipped-90":5,"flipped-180":6,"flipped-270":7}
-                              [(.logical.transform // "normal")] // 0),
+                  transform: ({"Normal":0,"90":1,"180":2,"270":3,
+                               "Flipped":4,"Flipped90":5,"Flipped180":6,"Flipped270":7}
+                              [(.logical.transform // "Normal")] // 0),
                   focused: false,
                   availableModes: ((.modes // []) | map("\(.width)x\(.height)@\(.refresh_rate/1000)Hz"))
                 })
