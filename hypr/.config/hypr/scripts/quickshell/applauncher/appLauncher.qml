@@ -146,7 +146,7 @@ Item {
     }
 
     function launchApp(execStr) {
-        Quickshell.execDetached(["hyprctl", "dispatch", "exec", "--", execStr]);
+        Quickshell.execDetached(["bash", "-c", "source \"$HOME/.config/hypr/scripts/compositor.sh\" && comp_dispatch_exec \"$1\"", "_", execStr]);
         Quickshell.execDetached(["bash", Quickshell.env("HOME") + "/.config/hypr/scripts/qs_manager.sh", "close"]);
     }
 

@@ -184,7 +184,7 @@ ShellRoot {
                 
                 Process {
                     id: kbPoller
-                    command: ["bash", "-c", "hyprctl devices -j | jq -r '.keyboards[] | select(.main == true) | .active_keymap' | head -n1 | cut -c1-2 | tr '[:lower:]' '[:upper:]'"]
+                    command: ["bash", "-c", "\"$HOME/.config/hypr/scripts/quickshell/watchers/kb_fetch.sh\""]
                     stdout: StdioCollector {
                         onStreamFinished: {
                             let layout = this.text.trim();

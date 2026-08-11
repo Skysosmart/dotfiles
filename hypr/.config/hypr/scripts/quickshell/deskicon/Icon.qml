@@ -17,7 +17,7 @@ ShellRoot {
     property string lastAppsRaw: ""   // skip refreshes when the app list is unchanged
 
     function launch(execStr) {
-        Quickshell.execDetached(["hyprctl", "dispatch", "exec", "--", execStr]);
+        Quickshell.execDetached(["bash", "-c", "source \"$HOME/.config/hypr/scripts/compositor.sh\" && comp_dispatch_exec \"$1\"", "_", execStr]);
         root.launcherOpen = false;
     }
 

@@ -94,7 +94,7 @@ Item {
 
     Process {
         id: monitorProc
-        command: ["sh", "-c", "export PATH=$PATH:/usr/bin:/usr/local/bin:/run/current-system/sw/bin && hyprctl monitors -j"]
+        command: ["bash", "-c", "export PATH=$PATH:/usr/bin:/usr/local/bin:/run/current-system/sw/bin && source \"$HOME/.config/hypr/scripts/compositor.sh\" && comp_monitors_json"]
         running: false
         
         stdout: StdioCollector {
