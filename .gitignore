@@ -20,3 +20,7 @@ hypr/.config/hypr/scripts/quickshell/guide/previews/
 *id_rsa*
 *credentials*
 *service_account*
+
+# iNiR runtime copy (managed by ~/iNiR repo + ./setup update, not stow)
+quickshell/.config/quickshell/inir/
+illogical-impulse/.config/illogical-impulse/backups/
