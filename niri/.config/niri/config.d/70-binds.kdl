@@ -18,7 +18,10 @@ binds {
     // ═══════════════════════════════════════════════════════════════════════
 
     // Niri's built-in overview (zoomed-out workspace view).
-    Mod+Tab repeat=false { toggle-overview; }
+    Mod+Grave repeat=false { toggle-overview; }
+
+    // Focus next monitor (user's old dotfiles habit).
+    Mod+Tab { focus-monitor-next; }
 
     // Quit Niri (shows confirmation dialog).
     Mod+Shift+E { quit; }
@@ -54,6 +57,10 @@ binds {
     // Unified snip menu (pick action/scope from the in-overlay toolbar).
     Ctrl+Shift+S { spawn "inir" "region" "menu"; }
 
+    // Control panel + right sidebar (old dotfiles: battery / network panels).
+    Super+B { spawn "inir" "controlPanel" "toggle"; }
+    Super+N { spawn "inir" "sidebarRight" "toggle"; }
+
     // Wallpaper picker, settings, cheatsheet, panel family switch.
     Ctrl+Alt+T { spawn "inir" "wallpaperSelector" "toggle"; }
     Mod+Comma { spawn "inir" "settings"; }
@@ -70,7 +77,8 @@ binds {
     Mod+T { spawn "inir" "terminal"; }
     Mod+Return { spawn "inir" "terminal"; }
     Super+E { spawn "nautilus"; }
-    Super+W { spawn "inir" "browser"; }
+    Super+W { spawn "inir" "wallpaperSelector" "toggle"; }
+    Mod+F { spawn "firefox"; }
 
     // ═══════════════════════════════════════════════════════════════════════
     // Window management
@@ -78,6 +86,7 @@ binds {
 
     // Close window (iNiR's close with confirmation dialog for unsaved work).
     Mod+Q repeat=false { spawn "inir" "close-window"; }
+    Alt+F4 repeat=false { spawn "inir" "close-window"; }
 
     // Maximize column (fills screen width, keeps gaps/bar).
     Mod+D { maximize-column; }
@@ -85,8 +94,8 @@ binds {
     // Maximize window to screen edges (no gaps, like traditional maximize).
     // Mod+M { maximize-window-to-edges; }
 
-    // Fullscreen (app goes borderless edge-to-edge).
-    Mod+F { fullscreen-window; }
+    // Fullscreen (app goes borderless edge-to-edge). Mod+F launches Firefox.
+    Mod+Shift+F { fullscreen-window; }
 
     // Toggle floating / tiling.
     Mod+A { toggle-window-floating; }
@@ -143,7 +152,8 @@ binds {
     Mod+H     { focus-column-left; }
     Mod+J     { focus-window-down; }
     Mod+K     { focus-window-up; }
-    Mod+L     { focus-column-right; }
+    // Mod+L locks like the old dotfiles (column-right still on Mod+Right).
+    Mod+L     { spawn "inir" "lock" "activate"; }
 
     // Jump to first / last column.
     Mod+Home { focus-column-first; }

@@ -9,57 +9,57 @@
 /* CSS custom properties for libadwaita color overrides */
 :root {
     /* Accent */
-    --accent-bg-color: #cdc0ec;
-    --accent-fg-color: #443a5f;
-    --accent-color: #cdc0ec;
+    --accent-bg-color: #576144;
+    --accent-fg-color: #ffffff;
+    --accent-color: #576144;
 
     /* Window */
-    --window-bg-color: #110f14;
-    --window-fg-color: #eae3ef;
+    --window-bg-color: #f4f3ec;
+    --window-fg-color: #2a2722;
 
     /* View */
-    --view-bg-color: #110f14;
-    --view-fg-color: #eae3ef;
+    --view-bg-color: #f4f3ec;
+    --view-fg-color: #2a2722;
 
     /* Headerbar */
-    --headerbar-bg-color: #110f14;
-    --headerbar-fg-color: #eae3ef;
-    --headerbar-backdrop-color: #110f14;
+    --headerbar-bg-color: #f4f3ec;
+    --headerbar-fg-color: #2a2722;
+    --headerbar-backdrop-color: #f4f3ec;
     --headerbar-border-color: transparent;
     --headerbar-shade-color: transparent;
     --headerbar-darker-shade-color: transparent;
 
     /* Sidebar */
-    --sidebar-bg-color: #110f14;
-    --sidebar-fg-color: #eae3ef;
-    --sidebar-backdrop-color: #110f14;
+    --sidebar-bg-color: #f4f3ec;
+    --sidebar-fg-color: #2a2722;
+    --sidebar-backdrop-color: #f4f3ec;
     --sidebar-border-color: transparent;
     --sidebar-shade-color: rgba(0, 0, 0, 0.25);
 
     /* Secondary Sidebar (Nautilus places) */
-    --secondary-sidebar-bg-color: #110f14;
-    --secondary-sidebar-fg-color: #eae3ef;
-    --secondary-sidebar-backdrop-color: #110f14;
+    --secondary-sidebar-bg-color: #f4f3ec;
+    --secondary-sidebar-fg-color: #2a2722;
+    --secondary-sidebar-backdrop-color: #f4f3ec;
     --secondary-sidebar-border-color: transparent;
     --secondary-sidebar-shade-color: rgba(0, 0, 0, 0.25);
 
     /* Popover */
-    --popover-bg-color: #1b181f;
-    --popover-fg-color: #aea9b4;
+    --popover-bg-color: #eceae4;
+    --popover-fg-color: #56524c;
     --popover-shade-color: rgba(0, 0, 0, 0.25);
 
     /* Dialog */
-    --dialog-bg-color: #211e26;
-    --dialog-fg-color: #aea9b4;
+    --dialog-bg-color: #e6e4de;
+    --dialog-fg-color: #56524c;
 
     /* Card */
-    --card-bg-color: #141218;
-    --card-fg-color: #aea9b4;
+    --card-bg-color: #f2f0ea;
+    --card-fg-color: #56524c;
     --card-shade-color: rgba(0, 0, 0, 0.15);
 
     /* Thumbnail */
-    --thumbnail-bg-color: #27242d;
-    --thumbnail-fg-color: #aea9b4;
+    --thumbnail-bg-color: #e0ded8;
+    --thumbnail-fg-color: #56524c;
 
     /* Misc */
     --shade-color: rgba(0, 0, 0, 0.25);
@@ -72,6 +72,6 @@ tooltip * {
 }
 
 tooltip.background {
-    background-color: #1b181f;
-    color: #aea9b4;
+    background-color: #eceae4;
+    color: #56524c;
 }
