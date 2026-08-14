@@ -14,6 +14,33 @@ ACTION="$1"
 TARGET="$2"
 SUBTARGET="$3"
 
+# -----------------------------------------------------------------------------
+# BIND TRACE (opt-in, for debugging intermittent keybinds)
+#
+# 35 of the 73 Hyprland binds run through this script, so "the keybind did
+# nothing" is ambiguous: either Hyprland never dispatched it, or it did and this
+# script was slow/failed. This records every invocation + how long it took, which
+# tells the two apart -- if a keypress produces NO line here, the bind never
+# fired at the compositor level and the problem is not in this script.
+#
+#   enable:  touch ~/.cache/quickshell/trace_binds
+#   read:    tail -f $XDG_RUNTIME_DIR/quickshell/logs/binds.log
+#   disable: rm ~/.cache/quickshell/trace_binds
+#
+# Uses only bash builtins (EPOCHREALTIME, printf -v) so it adds no forks.
+# -----------------------------------------------------------------------------
+if [ -f "$HOME/.cache/quickshell/trace_binds" ]; then
+    _QS_T0=$EPOCHREALTIME
+    _qs_trace() {
+        local end=${EPOCHREALTIME/./} start=${_QS_T0/./} ts
+        printf -v ts '%(%H:%M:%S)T' -1
+        printf '%s %6sms rc=%-3s args=[%s|%s|%s]\n' \
+            "$ts" "$(( (end - start) / 1000 ))" "$1" "$ACTION" "$TARGET" "$SUBTARGET" \
+            >> "${XDG_RUNTIME_DIR:-/tmp}/quickshell/logs/binds.log" 2>/dev/null
+    }
+    trap '_qs_trace "$?"' EXIT
+fi
+
 if [[ "$ACTION" =~ ^[0-9]+$ ]]; then
     # Send IPC command directly to Main.qml via Quickshell's native IPC handler
     quickshell -p "$SHELL_QML_PATH" ipc call main handleCommand "close" "" "" >/dev/null 2>&1
