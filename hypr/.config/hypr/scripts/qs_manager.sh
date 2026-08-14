@@ -65,7 +65,13 @@ MANIFEST="$THUMB_DIR/.manifest"
 # -----------------------------------------------------------------------------
 
 if ! pgrep -f "quickshell.*Shell.qml" >/dev/null; then
-    quickshell -p "$SHELL_QML_PATH" >/dev/null 2>&1 &
+    # Keep the shell's own output. This used to go to /dev/null, which meant every
+    # QML error/warning from the bar was discarded -- widget breakage left no trace
+    # anywhere to debug from. Truncated on each start so it can't grow unbounded;
+    # the previous run is kept as .log.1 so a crash is still readable after respawn.
+    SHELL_LOG="$QS_LOG_DIR/shell.log"
+    [ -f "$SHELL_LOG" ] && mv -f "$SHELL_LOG" "$SHELL_LOG.1" 2>/dev/null
+    quickshell -p "$SHELL_QML_PATH" >"$SHELL_LOG" 2>&1 &
     disown
 fi
 
