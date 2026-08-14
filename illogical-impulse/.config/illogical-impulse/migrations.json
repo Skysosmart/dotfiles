@@ -1,8 +1,0 @@
-{
-  "applied": [
-    "012-plasma-integration-qt-theming",
-    "014-malloc-arena-optimization",
-    "018-modularize-niri-config"
-  ],
-  "skipped": []
-}
