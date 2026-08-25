@@ -2,12 +2,10 @@
 # Install everything the GNOME rice needs, at pinned versions, then verify.
 set -euo pipefail
 
-PAPERWM_TAG="v50.0.1"
 EXT_DIR="$HOME/.local/share/gnome-shell/extensions"
 SHELL_MAJOR="50"
 
 UUIDS=(
-    "paperwm@paperwm.github.com"
     "user-theme@gnome-shell-extensions.gcampax.github.com"
     "appindicatorsupport@rgcjonas.gmail.com"
     "clipboard-indicator@tudmotu.com"
@@ -17,27 +15,15 @@ check_only=0
 [[ "${1:-}" == "--check" ]] && check_only=1
 
 if [[ "$check_only" -eq 0 ]]; then
-    # Only PAPERWM_TAG is pinned. The pacman/yay packages install unversioned on
-    # purpose: this is a rolling distro, and hard pins would fail on every upstream
-    # bump. Compatibility is enforced below by the shell-version assertion instead.
+    # The pacman/yay packages install unversioned on purpose: this is a rolling
+    # distro, and hard pins would fail on every upstream bump. Compatibility is
+    # enforced below by the shell-version assertion instead.
     echo "==> repo packages"
     sudo pacman -S --needed gnome-shell-extensions gnome-shell-extension-appindicator
 
     echo "==> Clipboard Indicator (AUR)"
     command -v yay >/dev/null || { echo "!! yay not found" >&2; exit 1; }
     yay -S --needed gnome-shell-extension-clipboard-indicator
-
-    echo "==> PaperWM $PAPERWM_TAG (upstream; the AUR -git package is stuck at v47)"
-    mkdir -p "$EXT_DIR"
-    target="$EXT_DIR/paperwm@paperwm.github.com"
-    if [[ -d "$target/.git" ]]; then
-        git -C "$target" fetch --tags --depth 1 origin "$PAPERWM_TAG"
-    else
-        rm -rf "$target"
-        git clone --depth 1 --branch "$PAPERWM_TAG" \
-            https://github.com/paperwm/PaperWM.git "$target"
-    fi
-    git -C "$target" checkout --detach "$PAPERWM_TAG"
 fi
 
 echo "==> verifying installed extensions"

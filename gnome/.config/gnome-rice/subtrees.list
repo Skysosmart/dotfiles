@@ -7,6 +7,6 @@
 40-shell-keybindings.ini       /org/gnome/shell/keybindings/
 45-mutter-keybindings.ini      /org/gnome/mutter/keybindings/
 50-media-keys.ini              /org/gnome/settings-daemon/plugins/media-keys/
-70-paperwm.ini                 /org/gnome/shell/extensions/paperwm/keybindings/
+72-forge.ini                   /org/gnome/shell/extensions/forge/keybindings/
 75-user-theme.ini              /org/gnome/shell/extensions/user-theme/
 80-clipboard.ini               /org/gnome/shell/extensions/clipboard-indicator/
