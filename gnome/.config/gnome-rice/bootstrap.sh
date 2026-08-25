@@ -17,6 +17,9 @@ check_only=0
 [[ "${1:-}" == "--check" ]] && check_only=1
 
 if [[ "$check_only" -eq 0 ]]; then
+    # Only PAPERWM_TAG is pinned. The pacman/yay packages install unversioned on
+    # purpose: this is a rolling distro, and hard pins would fail on every upstream
+    # bump. Compatibility is enforced below by the shell-version assertion instead.
     echo "==> repo packages"
     sudo pacman -S --needed gnome-shell-extensions gnome-shell-extension-appindicator
 

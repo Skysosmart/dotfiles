@@ -119,12 +119,14 @@ drift apart.
 
 ## Extensions
 
-| Extension | Channel | Pin | Why this channel |
+| Extension | Channel | Version | Why this channel |
 |---|---|---|---|
 | **PaperWM** | upstream installer | `v50.0.1` | AUR `-git` is stuck at v47.1.0, three releases behind |
 | **User Themes** | pacman | `gnome-shell-extensions 50.3-1` | in `extra`, version-matched to the shell |
 | **AppIndicator** | pacman | `gnome-shell-extension-appindicator 1:65-1` | in `extra` |
 | **Clipboard Indicator** | AUR (yay) | `71-1` | last modified 2026-05-30, *fresher* than upstream's own tags (v44, 2022); the `-git` variant is stale (Nov 2023) |
+
+Only PaperWM is genuinely pinned; it is cloned from source, where holding a tag is stable. The three package-manager installs record the versions verified at design time but install unversioned, because hard pins on a rolling distro break on every upstream update. Compatibility is enforced instead by `bootstrap.sh`'s assertion that each extension's `metadata.json` declares shell-version 50 — which catches an incompatible build whatever its version number.
 
 The channels differ per extension because freshness differs per extension — verified
 individually, not assumed. `metadata.json` for PaperWM v50.0.1 declares

@@ -18,7 +18,7 @@
 - Every script must pass `shellcheck` and `bash -n` before its task is committed.
 - Shell theme name is exactly **`Zaru-Dark`**.
 - Terminal is **`kitty`**. Browser is **`firefox`**. File manager is **`nautilus`**.
-- Extension pins: PaperWM **`v50.0.1`**, Clipboard Indicator AUR **`71-1`**, `gnome-shell-extensions` **`50.3-1`**, `gnome-shell-extension-appindicator` **`1:65-1`**.
+- Extension versions: PaperWM is **pinned** at `v50.0.1` (git tag — it is cloned from source, so a tag is stable and free to hold). The other three install unversioned via pacman/yay and are recorded here only as the versions verified at design time, not as enforced pins: `gnome-shell-extensions 50.3-1`, `gnome-shell-extension-appindicator 1:65-1`, Clipboard Indicator AUR `71-1`. Hard-pinning them on a rolling distro would break bootstrap.sh on every upstream update; GNOME 50 compatibility is instead enforced version-agnostically by the shell-version assertion in `bootstrap.sh`.
 - Extension UUIDs (exact strings):
   - `paperwm@paperwm.github.com`
   - `user-theme@gnome-shell-extensions.gcampax.github.com`
