@@ -7,8 +7,6 @@ trap 'rm -f "$PIPE"; kill $(jobs -p) 2>/dev/null; exit 0' EXIT INT TERM
 
 if [ -n "$HYPRLAND_INSTANCE_SIGNATURE" ]; then
     LC_ALL=C socat -U - UNIX-CONNECT:$XDG_RUNTIME_DIR/hypr/$HYPRLAND_INSTANCE_SIGNATURE/.socket2.sock 2>/dev/null | grep --line-buffered "activelayout>>" > "$PIPE" &
-elif [ -n "$NIRI_SOCKET" ]; then
-    niri msg --json event-stream 2>/dev/null | grep --line-buffered "KeyboardLayout" > "$PIPE" &
 else
     sleep 10 > "$PIPE" &
 fi

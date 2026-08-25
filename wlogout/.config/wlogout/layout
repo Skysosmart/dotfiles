@@ -12,7 +12,7 @@
 }
 {
     "label" : "logout",
-    "action" : "hyprctl clients -j | jq -r '.[].pid' | xargs kill; pkill Hyprland || pkill sway || pkill niri || loginctl terminate-user $USER",
+    "action" : "hyprctl clients -j | jq -r '.[].pid' | xargs kill; pkill Hyprland || pkill sway || loginctl terminate-user $USER",
     "text" : "logout",
     "keybind" : "e"
 }

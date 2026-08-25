@@ -19,11 +19,6 @@ Item {
     property color tint: "#1e1e2e"      // base tint (usually theme.base / mantle / crust)
     property real tintAlpha: 0.6         // translucency of the fill (blur shows through)
 
-    // Frosted backdrop blur only exists under Hyprland (layerrule blur on qs-* layers).
-    // Niri 26.04 has no layer blur, so the same alpha reads murky over busy content —
-    // push the fill toward opaque there to keep text legible.
-    readonly property bool compositorBlur: !!Quickshell.env("HYPRLAND_INSTANCE_SIGNATURE")
-    readonly property real effectiveTintAlpha: compositorBlur ? tintAlpha : Math.min(1.0, tintAlpha + 0.32)
     property real radius: 22             // continuous-corner radius (rounder = more iOS)
     property real borderAlpha: 0.16      // refractive light edge
     property real highlightAlpha: 0.22   // specular top sheen
@@ -39,7 +34,7 @@ Item {
         anchors.fill: parent
         radius: glass.radius
         antialiasing: true
-        color: Qt.rgba(glass.tint.r, glass.tint.g, glass.tint.b, glass.effectiveTintAlpha)
+        color: Qt.rgba(glass.tint.r, glass.tint.g, glass.tint.b, glass.tintAlpha)
 
         // specular highlight: light catching the top edge, fading to a faint base shade
         Rectangle {

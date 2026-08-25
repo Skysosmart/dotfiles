@@ -1,12 +1,6 @@
 #!/bin/bash
 
 # Cycle focus to the next monitor
-if [[ -n "$NIRI_SOCKET" ]]; then
-    # Niri handles cursor placement on focus change itself
-    niri msg action focus-monitor-next
-    exit 0
-fi
-
 source "$(dirname "${BASH_SOURCE[0]}")/compositor.sh"
 comp_dispatch focusmonitor "+1"
 

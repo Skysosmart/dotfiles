@@ -1,22 +1,13 @@
 #!/usr/bin/env bash
-# compositor.sh — sourced shim: the one place that knows which compositor is running.
-# Niri detection via $NIRI_SOCKET, Hyprland otherwise.
-
-comp_is_niri() { [[ -n "$NIRI_SOCKET" ]]; }
+# compositor.sh — sourced shim: the one place that knows how to talk to the compositor.
 
 comp_kb_layout() {
-    if comp_is_niri; then
-        timeout 2 niri msg --json keyboard-layouts 2>/dev/null \
-            | jq -r '.names[.current_idx] // empty'
-    else
-        LC_ALL=C timeout 2 hyprctl devices -j 2>/dev/null \
-            | jq -r '(.keyboards[] | select(.main == true) | .active_keymap) // .keyboards[0].active_keymap // empty'
-    fi
+    LC_ALL=C timeout 2 hyprctl devices -j 2>/dev/null \
+        | jq -r '(.keyboards[] | select(.main == true) | .active_keymap) // .keyboards[0].active_keymap // empty'
 }
 
 comp_next_kb_layout() {
-    if comp_is_niri; then niri msg action switch-layout next
-    else hyprctl switchxkblayout main next; fi
+    hyprctl switchxkblayout main next
 }
 
 # Hyprland's Lua config reinterprets `hyprctl dispatch <args>` as the Lua expression
@@ -95,9 +86,8 @@ comp_dispatch() {
 }
 
 comp_dispatch_exec() {
-    # hyprctl exec runs the string through a shell; niri's spawn-sh matches that
-    if comp_is_niri; then niri msg action spawn-sh -- "$*"
-    elif comp_hypr_lua_config; then
+    # hyprctl exec runs the string through a shell
+    if comp_hypr_lua_config; then
         hyprctl dispatch "hl.dsp.exec_cmd($(comp_lua_str "$*"))"
     else hyprctl dispatch exec -- "$@"; fi
 }
@@ -108,7 +98,6 @@ comp_dispatch_exec() {
 # Each argument is a legacy spec: name,WIDTHxHEIGHT@RATE,XxY,scale[,transform,N]
 comp_apply_monitors() {
     (( $# )) || return 0
-    comp_is_niri && return 0   # niri reloads config.kdl on its own
 
     local spec name mode pos scale rest
     if ! comp_hypr_lua_config; then
@@ -133,27 +122,5 @@ comp_apply_monitors() {
 # Always emits hyprctl-monitors-shaped JSON:
 # [{name, width, height, refreshRate, x, y, scale, transform, focused, availableModes}]
 comp_monitors_json() {
-    if comp_is_niri; then
-        timeout 2 niri msg --json outputs 2>/dev/null | jq '
-            (if type == "object" then [.[]] else . end)
-            | map(
-                (.modes[.current_mode] // {}) as $cm |
-                {
-                  name: .name,
-                  width: ($cm.width // (.logical.width // 0)),
-                  height: ($cm.height // (.logical.height // 0)),
-                  refreshRate: (($cm.refresh_rate // 60000) / 1000),
-                  x: (.logical.x // 0),
-                  y: (.logical.y // 0),
-                  scale: (.logical.scale // 1),
-                  transform: ({"Normal":0,"90":1,"180":2,"270":3,
-                               "Flipped":4,"Flipped90":5,"Flipped180":6,"Flipped270":7}
-                              [(.logical.transform // "Normal")] // 0),
-                  focused: false,
-                  availableModes: ((.modes // []) | map("\(.width)x\(.height)@\(.refresh_rate/1000)Hz"))
-                })
-            | if length > 0 then .[0].focused = true else . end'
-    else
-        timeout 2 hyprctl monitors -j 2>/dev/null
-    fi
+    timeout 2 hyprctl monitors -j 2>/dev/null
 }

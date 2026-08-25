@@ -235,10 +235,6 @@ Item {
             if (m.transform !== 0) monitorStr += ",transform," + m.transform;
             let jsonArr = [{ name: m.name, resW: m.resW, resH: m.resH, rate: parseInt(m.rate), x: 0, y: 0, scale: m.sysScale, transform: m.transform }];
             config.setSetting("monitors", jsonArr);
-            if (Quickshell.env("NIRI_SOCKET")) {
-                Quickshell.execDetached(["notify-send", "Display Update", "Niri: edit output block in ~/.config/niri/config.kdl (reloads live)"]);
-                return;
-            }
             config.sh(monApplyCmd([monitorStr]) + " ; awww kill ; sleep 0.2 ; awww-daemon &");
             Quickshell.execDetached(["notify-send", "Display Update", "Applied: " + m.resW + "x" + m.resH + " @ " + m.rate + "Hz"]);
         } else {
@@ -289,10 +285,6 @@ Item {
                 jsonArr.push({ name: r.name, resW: r.resW, resH: r.resH, rate: parseInt(r.rate), x: r.x, y: r.y, scale: r.sysScale, transform: r.transform });
             }
             config.setSetting("monitors", jsonArr);
-            if (Quickshell.env("NIRI_SOCKET")) {
-                Quickshell.execDetached(["notify-send", "Display Update", "Niri: edit output blocks in ~/.config/niri/config.kdl (reloads live)"]);
-                return;
-            }
             config.sh(monApplyCmd(batchCmds) + " ; awww kill ; sleep 0.2 ; awww-daemon &");
             Quickshell.execDetached(["notify-send", "Display Update", "Applied layout for: " + summaryString.trim()]);
         }
