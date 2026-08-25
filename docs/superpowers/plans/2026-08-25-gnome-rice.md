@@ -326,7 +326,12 @@ else
 fi
 rm -f "$before" "$after"
 
-[[ "$fail" -eq 0 ]] && echo "==> selftest PASSED" || { echo "==> selftest FAILED ($fail)"; exit 1; }
+if [[ "$fail" -eq 0 ]]; then
+    echo "==> selftest PASSED"
+else
+    echo "==> selftest FAILED ($fail)"
+    exit 1
+fi
 ```
 
 - [ ] **Step 4: Make executable and run the static gate — expect it to fail on missing keyfiles**
