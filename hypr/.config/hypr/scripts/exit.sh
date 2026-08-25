@@ -8,6 +8,7 @@ sleep 0.5
 if [[ -n "$NIRI_SOCKET" ]]; then
     niri msg action quit --skip-confirmation
 else
-    hyprctl dispatch exit
+    source "$(dirname "${BASH_SOURCE[0]}")/compositor.sh"
+    comp_dispatch exit
 fi
 

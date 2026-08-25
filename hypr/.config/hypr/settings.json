@@ -14,7 +14,7 @@
       "rate": 144,
       "x": 0,
       "y": 0,
-      "scale": 1,
+      "scale": 1.2,
       "transform": 0
     }
   ],
@@ -23,16 +23,16 @@
       "type": "bind",
       "mods": "ALT",
       "key": "F4",
-      "dispatcher": "exec",
-      "command": "hyprctl dispatch killactive",
+      "dispatcher": "killactive",
+      "command": "",
       "isEditing": false
     },
     {
       "type": "bind",
       "mods": "$mainMod SHIFT_L",
       "key": "F",
-      "dispatcher": "exec",
-      "command": "hyprctl dispatch togglefloating",
+      "dispatcher": "togglefloating",
+      "command": "",
       "isEditing": false
     },
     {

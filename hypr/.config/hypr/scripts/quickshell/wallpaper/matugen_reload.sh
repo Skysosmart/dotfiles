@@ -46,12 +46,14 @@ TEXT_FILES=(
     "$HOME/.config/cava/colors"
     "$HOME/.config/swayosd/style.css"
     "$HOME/.config/rofi/theme.rasi"
-    "$HOME/.cache/matugen/colors-gtk.css"
+    "$HOME/.config/gtk-3.0/gtk.css"
+    "$HOME/.config/gtk-4.0/gtk.css"
     "$HOME/.config/qt5ct/colors/matugen.conf"
     "$HOME/.config/qt6ct/colors/matugen.conf"
     "$HOME/.config/qt5ct/qss/matugen-style.qss"
     "$HOME/.config/qt6ct/qss/matugen-style.qss"
     "$HOME/.config/hypr/colors.conf"
+    "$HOME/.config/hypr/colors.lua"
 )
 
 for file in "${TEXT_FILES[@]}"; do

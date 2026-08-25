@@ -16,7 +16,7 @@ PanelWindow {
     
     exclusionMode: ExclusionMode.Ignore 
     focusable: true
-    screen: Quickshell.cursorScreen
+    screen: Quickshell.screens[0] ?? null
     width: screen.width
     height: screen.height
 

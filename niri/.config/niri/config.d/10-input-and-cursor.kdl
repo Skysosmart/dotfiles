@@ -24,3 +24,11 @@ input {
         accel-profile "adaptive"
     }
 }
+
+// Cursor: Bibata Modern Ice, user-local in ~/.local/share/icons (also symlinked
+// into ~/.icons for libXcursor). Kept in sync with the hypr session's
+// XCURSOR_THEME/XCURSOR_SIZE in ~/.config/hypr/templates/env.lua.template.
+cursor {
+    xcursor-theme "Bibata-Modern-Ice"
+    xcursor-size 28
+}

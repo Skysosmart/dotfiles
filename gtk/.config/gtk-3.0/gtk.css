@@ -3,32 +3,32 @@
  * This file is overwritten when you change wallpaper
  */
 
-@define-color accent_color #576144;
+@define-color accent_color #856745;
 @define-color accent_fg_color #ffffff;
-@define-color accent_bg_color #576144;
+@define-color accent_bg_color #856745;
 
-@define-color window_bg_color #f4f3ec;
-@define-color window_fg_color #2a2722;
+@define-color window_bg_color #fbf9f5;
+@define-color window_fg_color #1b1a19;
 
-@define-color headerbar_bg_color #f4f3ec;
-@define-color headerbar_fg_color #2a2722;
+@define-color headerbar_bg_color #fbf9f5;
+@define-color headerbar_fg_color #1b1a19;
 
-@define-color popover_bg_color #eceae4;
-@define-color popover_fg_color #56524c;
+@define-color popover_bg_color #eeebe6;
+@define-color popover_fg_color #484642;
 
-@define-color view_bg_color #f4f3ec;
-@define-color view_fg_color #2a2722;
+@define-color view_bg_color #fbf9f5;
+@define-color view_fg_color #1b1a19;
 
-@define-color card_bg_color #f2f0ea;
-@define-color card_fg_color #56524c;
+@define-color card_bg_color #f6f4f0;
+@define-color card_fg_color #484642;
 
-@define-color sidebar_bg_color #f4f3ec;
-@define-color sidebar_fg_color #2a2722;
-@define-color sidebar_border_color #f4f3ec;
-@define-color sidebar_backdrop_color #f4f3ec;
+@define-color sidebar_bg_color #fbf9f5;
+@define-color sidebar_fg_color #1b1a19;
+@define-color sidebar_border_color #fbf9f5;
+@define-color sidebar_backdrop_color #fbf9f5;
 
 headerbar {
-    background-color: #f4f3ec;
+    background-color: #fbf9f5;
     box-shadow: none;
     border-bottom: none;
 }
@@ -41,24 +41,24 @@ headerbar separator {
 .nautilus-window sidebar,
 placessidebar,
 placessidebar list {
-    background-color: #f4f3ec;
-    color: #2a2722;
+    background-color: #fbf9f5;
+    color: #1b1a19;
     border-right: none;
 }
 
 placessidebar row {
     background-color: transparent;
-    color: #2a2722;
+    color: #1b1a19;
 }
 
 placessidebar row:hover {
-    background-color: #DADAD1;
+    background-color: #E1DBD3;
 }
 
 placessidebar row:selected,
 placessidebar row:selected:hover {
-    background-color: #ccccc2;
-    color: #2a2722;
+    background-color: #d4ccc2;
+    color: #1b1a19;
 }
 
 placessidebar image {
@@ -66,7 +66,7 @@ placessidebar image {
 }
 
 .view {
-    background-color: #f4f3ec;
+    background-color: #fbf9f5;
 }
 
 separator.sidebar {
@@ -77,48 +77,48 @@ separator.sidebar {
 /* Context menus and popovers */
 popover,
 popover.background {
-    background-color: #eceae4;
-    color: #56524c;
+    background-color: #eeebe6;
+    color: #484642;
 }
 
 menu,
 .context-menu,
 .popup {
-    background-color: #eceae4;
-    color: #56524c;
+    background-color: #eeebe6;
+    color: #484642;
 }
 
 menuitem {
-    color: #56524c;
+    color: #484642;
 }
 
 menuitem:hover,
 menuitem:selected {
-    background-color: #DADAD1;
+    background-color: #E1DBD3;
 }
 
 menuitem:active,
 menuitem:selected:active {
-    background-color: #ccccc2;
-    color: #2a2722;
+    background-color: #d4ccc2;
+    color: #1b1a19;
 }
 
 button:hover {
-    background-color: #DADAD1;
+    background-color: #E1DBD3;
 }
 
 button:active {
-    background-color: #ccccc2;
-    color: #2a2722;
+    background-color: #d4ccc2;
+    color: #1b1a19;
 }
 
 entry:focus,
 textview:focus,
 spinbutton:focus {
-    border-color: alpha(#576144, 0.60);
-    box-shadow: 0 0 0 1px alpha(#576144, 0.25) inset;
+    border-color: alpha(#856745, 0.60);
+    box-shadow: 0 0 0 1px alpha(#856745, 0.25) inset;
 }
 
 menu separator {
-    background-color: alpha(#56524c, 0.12);
+    background-color: alpha(#484642, 0.12);
 }

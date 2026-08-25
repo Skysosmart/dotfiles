@@ -1053,7 +1053,7 @@ Item {
         }
         ScriptAction { 
             script: {
-                if (Quickshell.env("HYPRLAND_INSTANCE_SIGNATURE")) Quickshell.execDetached(["hyprctl", "dispatch", "submap", "reset"]);
+                if (Quickshell.env("HYPRLAND_INSTANCE_SIGNATURE")) Quickshell.execDetached(["bash", "-c", 'source "$HOME/.config/hypr/scripts/compositor.sh" && comp_dispatch "$1" "$2"', "_", "submap", "reset"]);
                 Quickshell.execDetached(["bash", Quickshell.env("HOME") + "/.config/hypr/scripts/qs_manager.sh", "close"]);
             } 
         }    
@@ -2513,7 +2513,7 @@ Item {
                                         hoverEnabled: true; cursorShape: Qt.PointingHandCursor; acceptedButtons: Qt.LeftButton; enabled: !model.isEditing
                                         onClicked: {
                                             if (model.dispatcher.startsWith("exec")) { Quickshell.execDetached(["bash", "-c", model.command]); }
-                                            else if (Quickshell.env("HYPRLAND_INSTANCE_SIGNATURE")) { Quickshell.execDetached(["hyprctl", "dispatch", model.dispatcher, model.command]); }
+                                            else if (Quickshell.env("HYPRLAND_INSTANCE_SIGNATURE")) { Quickshell.execDetached(["bash", "-c", 'source "$HOME/.config/hypr/scripts/compositor.sh" && comp_dispatch "$1" "$2"', "_", model.dispatcher, model.command]); }
                                         }
                                     }
                                 }
@@ -2605,8 +2605,8 @@ Item {
                                                 dynamicKeybindsModel.setProperty(outerIndex, "key", k);
                                             }
                                             onActiveFocusChanged: {
-                                                if (!activeFocus) { accumulatedMods = []; accumulatedKey = ""; if (Quickshell.env("HYPRLAND_INSTANCE_SIGNATURE")) Quickshell.execDetached(["hyprctl", "dispatch", "submap", "reset"]); }
-                                                else if (Quickshell.env("HYPRLAND_INSTANCE_SIGNATURE")) { Quickshell.execDetached(["hyprctl", "dispatch", "submap", "passthru"]); }
+                                                if (!activeFocus) { accumulatedMods = []; accumulatedKey = ""; if (Quickshell.env("HYPRLAND_INSTANCE_SIGNATURE")) Quickshell.execDetached(["bash", "-c", 'source "$HOME/.config/hypr/scripts/compositor.sh" && comp_dispatch "$1" "$2"', "_", "submap", "reset"]); }
+                                                else if (Quickshell.env("HYPRLAND_INSTANCE_SIGNATURE")) { Quickshell.execDetached(["bash", "-c", 'source "$HOME/.config/hypr/scripts/compositor.sh" && comp_dispatch "$1" "$2"', "_", "submap", "passthru"]); }
                                             }
                                         }
                                     }

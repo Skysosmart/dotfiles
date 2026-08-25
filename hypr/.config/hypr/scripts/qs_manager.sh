@@ -52,9 +52,15 @@ if [[ "$ACTION" =~ ^[0-9]+$ ]]; then
             niri msg action focus-workspace "$ACTION" >/dev/null 2>&1
         fi
     else
-        CMD="workspace $ACTION"
-        [[ "$TARGET" == "move" ]] && CMD="movetoworkspace $ACTION"
-        hyprctl --batch "dispatch $CMD" >/dev/null 2>&1
+        # `hyprctl dispatch workspace N` is a Lua syntax error under hyprland.lua, so this
+        # goes through the shim. Sourcing it costs ~0.12ms -- against the quickshell spawn
+        # 4 lines up (~51ms) that is free, so the fast path stays fast.
+        source "$(dirname "${BASH_SOURCE[0]}")/compositor.sh"
+        if [[ "$TARGET" == "move" ]]; then
+            comp_dispatch movetoworkspace "$ACTION" >/dev/null 2>&1
+        else
+            comp_dispatch workspace "$ACTION" >/dev/null 2>&1
+        fi
     fi
     exit 0
 fi

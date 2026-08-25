@@ -219,6 +219,14 @@ Item {
         monitorsModel.setProperty(mIdx, "uiY", bestY);
     }
 
+    // `hyprctl keyword` is rejected outright by Hyprland's Lua parser ("keyword can't work
+    // with non-legacy parsers. Use eval."), so monitor application goes through
+    // comp_apply_monitors in scripts/compositor.sh, which speaks both config dialects.
+    function monApplyCmd(specs) {
+        let quoted = specs.map(function (s) { return "'" + s + "'"; }).join(" ");
+        return "bash -c 'source \"$HOME/.config/hypr/scripts/compositor.sh\" && comp_apply_monitors \"$@\"' _ " + quoted;
+    }
+
     function applyMonitors() {
         if (monitorsModel.count === 0) return;
         if (monitorsModel.count === 1) {
@@ -231,7 +239,7 @@ Item {
                 Quickshell.execDetached(["notify-send", "Display Update", "Niri: edit output block in ~/.config/niri/config.kdl (reloads live)"]);
                 return;
             }
-            config.sh("hyprctl keyword monitor " + monitorStr + " ; awww kill ; sleep 0.2 ; awww-daemon &");
+            config.sh(monApplyCmd([monitorStr]) + " ; awww kill ; sleep 0.2 ; awww-daemon &");
             Quickshell.execDetached(["notify-send", "Display Update", "Applied: " + m.resW + "x" + m.resH + " @ " + m.rate + "Hz"]);
         } else {
             let rects = [];
@@ -276,7 +284,7 @@ Item {
                 r.y = Math.round(r.y - finalMinY);
                 let monitorStr = r.name + "," + r.resW + "x" + r.resH + "@" + r.rate + "," + r.x + "x" + r.y + "," + r.sysScale;
                 if (r.transform !== 0) monitorStr += ",transform," + r.transform;
-                batchCmds.push("keyword monitor " + monitorStr);
+                batchCmds.push(monitorStr);
                 summaryString += r.name + " ";
                 jsonArr.push({ name: r.name, resW: r.resW, resH: r.resH, rate: parseInt(r.rate), x: r.x, y: r.y, scale: r.sysScale, transform: r.transform });
             }
@@ -285,7 +293,7 @@ Item {
                 Quickshell.execDetached(["notify-send", "Display Update", "Niri: edit output blocks in ~/.config/niri/config.kdl (reloads live)"]);
                 return;
             }
-            config.sh("hyprctl --batch '" + batchCmds.join(" ; ") + "' ; awww kill ; sleep 0.2 ; awww-daemon &");
+            config.sh(monApplyCmd(batchCmds) + " ; awww kill ; sleep 0.2 ; awww-daemon &");
             Quickshell.execDetached(["notify-send", "Display Update", "Applied layout for: " + summaryString.trim()]);
         }
     }
