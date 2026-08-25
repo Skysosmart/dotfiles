@@ -655,7 +655,7 @@ git commit -m "gnome: PaperWM keybinds at niri parity, six conflicts resolved"
 
 **Interfaces:**
 - Consumes: `apply.sh` (Task 2). Must not re-bind anything claimed by Task 5.
-- Produces: window close, 9 workspace switch + 9 move binds, overview, screenshot, and the eight cleared GNOME defaults.
+- Produces: window close, 9 workspace switch + 9 move binds, overview, screenshot, and the cleared GNOME defaults (the .ini files are the authoritative list).
 
 - [ ] **Step 1: Write the failing check**
 

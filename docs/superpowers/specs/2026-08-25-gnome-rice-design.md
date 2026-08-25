@@ -223,8 +223,7 @@ a hand-written `gsettings` script.
 
 ### GNOME defaults that MUST be cleared
 
-Easy to forget and they fail silently — a bind simply does nothing, or does the wrong
-thing. Each of these collides with something above:
+Easy to forget and they fail silently — a bind simply does nothing, or does the wrong thing. The table below lists the collisions found during design; a further 32 were found during implementation review and are recorded in the keyfiles themselves (`switch-to-application-1..9`, `open-new-window-application-1..9`, `move-to-monitor-*`, `switch-to-workspace-left/right/last`, `switch-group(-backward)`, and PaperWM's `center-vertically`, `drift-left/right`, `previous-workspace(-backward)`). Treat the `.ini` files as the authoritative list, not this table.
 
 | Default | Key | Collides with |
 |---|---|---|
