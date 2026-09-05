@@ -1,6 +1,6 @@
 # dotfiles
 
-My Arch Linux setup — a riced **Hyprland** + **quickshell** (Serpantinum) desktop with a Liquid-Glass theme, managed with [GNU stow](https://www.gnu.org/software/stow/).
+My Arch Linux setup - a riced **Hyprland** + **quickshell** (Serpantinum) desktop with a Liquid-Glass theme, managed with [GNU stow](https://www.gnu.org/software/stow/).
 
 ## What's here
 
