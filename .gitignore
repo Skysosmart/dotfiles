@@ -11,9 +11,6 @@
 **/logs/
 **/*.sock
 
-# Large vendored help screenshots (re-fetched by the shell)
-hypr/.config/hypr/scripts/quickshell/guide/previews/
-
 # Anything that looks like a credential (defense in depth)
 *.pem
 *.key

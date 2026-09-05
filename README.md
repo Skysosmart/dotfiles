@@ -8,8 +8,6 @@ My Arch Linux setup — a riced **Hyprland** + **quickshell** (Serpantinum) desk
 |---------|----------|
 | `hypr` | Hyprland Lua config (`hyprland.lua` + `config/*.lua`) |
 | `serpantinum` | [Serpantinum](https://github.com/ilyamiro/serpantinum) shell: `~/.config/serpantinum/settings.json` + customized source in `~/.local/share/serpantinum` (Thai translation, Save button in settings, credits removed; fonts/sounds not tracked — run the upstream installer first) |
-| `quickshell` | quickshell `ii` shell (QML widgets, services, assets) |
-| `illogical-impulse` | shell `config.json` / settings |
 | `kitty` | kitty terminal |
 | `nvim` | Neovim |
 | `cava`, `fastfetch`, `foot`, `fuzzel`, `wlogout`, `swayosd`, `mpv`, `easyeffects`, `matugen`, `kde-material-you-colors` | per-app configs |
@@ -42,7 +40,7 @@ If stow reports a conflict, the target file already exists — move it aside
 ## Notes
 
 - Secrets, tokens, browser/app state and caches are intentionally **not** tracked.
-  AI features (e.g. OpenRouter/Gemini in the quickshell sidebar) read their keys
-  from the system keyring / env vars, not from these files.
-- The 23 MB of quickshell `guide/previews` screenshots are gitignored; the shell
-  regenerates them.
+  The committed `serpantinum/settings.json` has the auto-detected `general.location`
+  block (public IP + coordinates) stripped; the shell re-detects it.
+- Serpantinum's bundled fonts and sounds (~160 MB) are gitignored; run the
+  upstream installer first, then stow this package over it.
