@@ -1,12 +1,13 @@
 # dotfiles
 
-My Arch Linux setup — a riced **Hyprland** + **quickshell** (illogical-impulse) desktop with a Liquid-Glass theme, managed with [GNU stow](https://www.gnu.org/software/stow/).
+My Arch Linux setup — a riced **Hyprland** + **quickshell** (Serpantinum) desktop with a Liquid-Glass theme, managed with [GNU stow](https://www.gnu.org/software/stow/).
 
 ## What's here
 
 | Package | Contents |
 |---------|----------|
-| `hypr` | Hyprland config, scripts, templates |
+| `hypr` | Hyprland Lua config (`hyprland.lua` + `config/*.lua`) |
+| `serpantinum` | [Serpantinum](https://github.com/ilyamiro/serpantinum) shell: `~/.config/serpantinum/settings.json` + customized source in `~/.local/share/serpantinum` (Thai translation, Save button in settings, credits removed; fonts/sounds not tracked — run the upstream installer first) |
 | `quickshell` | quickshell `ii` shell (QML widgets, services, assets) |
 | `illogical-impulse` | shell `config.json` / settings |
 | `kitty` | kitty terminal |

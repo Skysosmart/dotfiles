@@ -1,0 +1,169 @@
+#!/usr/bin/env bash
+
+VERBOSE=false
+
+BIN_DIR="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
+if [ -z "$SERPANTINUM_DIR" ]; then
+    export SERPANTINUM_DIR="$(dirname "$BIN_DIR")/src"
+fi
+
+source "$SERPANTINUM_DIR/scripts/caching.sh"
+source "$SERPANTINUM_DIR/scripts/config.sh"
+source "$SERPANTINUM_DIR/scripts/i18n.sh"
+
+if [ -z "$MAIN_QML" ]; then
+    export MAIN_QML="$(find "$SERPANTINUM_DIR/quickshell" -type f \( -name "Shell.qml" -o -name "Bar.qml" \) 2>/dev/null | head -n 1)"
+fi
+
+get_installed_version() {
+    local version_file="${XDG_STATE_HOME:-$HOME/.local/state}/serpantinum/version"
+    local ver=""
+    if [ -f "$version_file" ]; then
+        ver=$(awk -F= '/^SERPANTINUM_VERSION=/{gsub(/["'\'' ]/, "", $2); print $2}' "$version_file")
+    fi
+    if [ -z "$ver" ] && [ -n "$SERPANTINUM_VERSION" ]; then
+        ver="$SERPANTINUM_VERSION"
+    fi
+    if [ -z "$ver" ]; then
+        if [ -n "$SERPANTINUM_DIR" ] && [ -f "$SERPANTINUM_DIR/version.txt" ]; then
+            ver=$(cat "$SERPANTINUM_DIR/version.txt" 2>/dev/null | xargs)
+        elif [ -f "$(dirname "$BIN_DIR")/version.txt" ]; then
+            ver=$(cat "$(dirname "$BIN_DIR")/version.txt" 2>/dev/null | xargs)
+        elif [ -n "$SERPANTINUM_DIR" ] && [ -f "$(dirname "$SERPANTINUM_DIR")/version.txt" ]; then
+            ver=$(cat "$(dirname "$SERPANTINUM_DIR")/version.txt" 2>/dev/null | xargs)
+        fi
+    fi
+    if [ -z "$ver" ]; then
+        ver="2.0.0"
+    fi
+    echo "$ver"
+}
+
+show_help() {
+    echo "$(t "daemon.cli.usage")"
+    echo ""
+    echo "$(t "daemon.cli.description")"
+    echo ""
+    echo "$(t "daemon.cli.commands")"
+    echo "  start                   $(t "daemon.cli.cmd_start")"
+    echo "  stop                    $(t "daemon.cli.cmd_stop")"
+    echo "  status                  $(t "daemon.cli.cmd_status")"
+    echo ""
+    echo "$(t "daemon.cli.options")"
+    echo "  -v, --verbose          $(t "daemon.cli.opt_verbose")"
+    echo "  -V, --version          $(t "daemon.cli.opt_version")"
+    echo "  -h, --help             $(t "daemon.cli.opt_help")"
+    echo ""
+}
+
+COMMAND=""
+while [ $# -gt 0 ]; do
+    case "$1" in
+        -v|--verbose)
+            VERBOSE=true
+            export SERPANTINUM_VERBOSE=true
+            shift
+            ;;
+        -V|--version)
+            echo "serpantinumd v$(get_installed_version)"
+            exit 0
+            ;;
+        -h|--help)
+            show_help
+            exit 0
+            ;;
+        start|stop|status)
+            if [ -z "$COMMAND" ]; then
+                COMMAND="$1"
+            fi
+            shift
+            ;;
+        *)
+            echo "$(t "daemon.cli.unknown_arg" ARG="$1")"
+            show_help
+            exit 1
+            ;;
+    esac
+done
+
+if [ -z "$COMMAND" ]; then
+    COMMAND="start"
+fi
+
+if [ "$COMMAND" == "stop" ]; then
+    if [ -f "/tmp/serpantinumd.pid" ]; then
+        kill -TERM "$(cat "/tmp/serpantinumd.pid")" 2>/dev/null
+    else
+        pkill -TERM -f "serpantinumd" 2>/dev/null
+    fi
+    pkill -f "focus_daemon.py" 2>/dev/null
+    rm -f "/tmp/serpantinumd.pid" 2>/dev/null
+    rm -f "/tmp/serpantinumd.lock" 2>/dev/null
+    echo "$(t "daemon.cli.stopped")"
+    exit 0
+fi
+
+if [ "$COMMAND" == "status" ]; then
+    if [ -f "/tmp/serpantinumd.pid" ] && kill -0 "$(cat "/tmp/serpantinumd.pid")" 2>/dev/null; then
+        echo "$(t "daemon.cli.status_running" PID="$(cat "/tmp/serpantinumd.pid")")"
+        exit 0
+    else
+        echo "$(t "daemon.cli.status_stopped")"
+        exit 1
+    fi
+fi
+
+if [ "$COMMAND" == "start" ]; then
+    exec 9>"/tmp/serpantinumd.lock"
+
+    if ! flock -n 9; then
+        echo "$(t "daemon.already_running")"
+        exit 1
+    fi
+
+    echo $$ > "/tmp/serpantinumd.pid"
+
+    CHILD_PIDS=()
+
+    terminate_tree() {
+        local target_pid="$1"
+        local child_pid
+        for child_pid in $(pgrep -P "$target_pid" 2>/dev/null); do
+            terminate_tree "$child_pid"
+        done
+        kill -TERM "$target_pid" 2>/dev/null
+    }
+
+    cleanup() {
+        trap - SIGINT SIGTERM EXIT
+        [ "$VERBOSE" = true ] && echo "$(t "daemon.shutting_down")"
+
+        for pid in "${CHILD_PIDS[@]}"; do
+            terminate_tree "$pid"
+        done
+
+        local direct_children
+        direct_children=$(pgrep -P $$ 2>/dev/null)
+        for pid in $direct_children; do
+            terminate_tree "$pid"
+        done
+
+        pkill -f "focus_daemon.py" 2>/dev/null
+        rm -f "/tmp/serpantinumd.pid" 2>/dev/null
+        rm -f "/tmp/serpantinumd.lock" 2>/dev/null
+        exit 0
+    }
+
+    trap cleanup SIGINT SIGTERM EXIT
+
+    [ "$VERBOSE" = true ] && echo "$(t "daemon.launching")"
+
+    bash "$SERPANTINUM_DIR/quickshell/guide/wellbeing/launch_daemon.sh" &
+    CHILD_PIDS+=($!)
+
+    quickshell -p "$MAIN_QML" &
+    QS_PID=$!
+    CHILD_PIDS+=($QS_PID)
+
+    wait $QS_PID
+fi

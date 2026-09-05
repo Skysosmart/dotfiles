@@ -20,3 +20,7 @@ hypr/.config/hypr/scripts/quickshell/guide/previews/
 *id_rsa*
 *credentials*
 *service_account*
+
+# Serpantinum bundled binaries (~160MB of fonts/sounds; ship with the upstream installer)
+serpantinum/.local/share/serpantinum/src/assets/fonts/
+serpantinum/.local/share/serpantinum/src/assets/sounds/

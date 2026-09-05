@@ -1,0 +1,1053 @@
+{
+  "guide": {
+    "about": {
+      "title": "Serpantinum",
+      "loading": "กำลังโหลด...",
+      "unknown": "ไม่ทราบ",
+      "version_by": "v{version} • โดย {author}",
+      "hardware": {
+        "device_name": "ชื่ออุปกรณ์",
+        "processor": "โปรเซสเซอร์",
+        "graphics": "กราฟิก",
+        "memory": "หน่วยความจำ",
+        "disk_capacity": "ความจุดิสก์",
+        "integrated_graphics": "กราฟิกในตัว"
+      },
+      "system": {
+        "os_name": "ชื่อระบบปฏิบัติการ",
+        "kernel_version": "เวอร์ชันเคอร์เนล",
+        "desktop": "เดสก์ท็อป",
+        "shell": "เชลล์",
+        "uptime": "เวลาทำงาน",
+        "default_os": "Linux"
+      },
+      "github_repo": "ilyamiro/serpantinum"
+    },
+    "tabs": {
+      "welcome": "ยินดีต้อนรับ",
+      "general": "ทั่วไป",
+      "display": "จอแสดงผล",
+      "bar": "แถบ",
+      "launcher": "ตัวเรียกใช้",
+      "theme": "ธีม",
+      "notifications": "การแจ้งเตือน",
+      "idle": "ไม่ได้ใช้งาน",
+      "wellbeing": "สุขภาวะดิจิทัล",
+      "tutorial": "บทแนะนำ",
+      "update": "อัปเดต",
+      "about": "เกี่ยวกับ",
+      "display_widgets": "วิดเจ็ต",
+      "display_general": "ทั่วไป"
+    },
+    "launcher": {
+      "position": {
+        "title": "ตำแหน่งบนหน้าจอ",
+        "desc": "เลือกขอบหน้าจอที่ตัวเรียกใช้จะยึดติด",
+        "top": "บน",
+        "bottom": "ล่าง",
+        "left": "ซ้าย",
+        "right": "ขวา",
+        "center": "กลาง"
+      },
+      "width": {
+        "title": "ความกว้างตัวเรียกใช้",
+        "desc": "ความกว้างทั้งหมดของหน้าต่างตัวเรียกใช้ (พิกเซล)"
+      },
+      "items": {
+        "title": "จำนวนรายการที่แสดง",
+        "desc": "จำนวนผลการค้นหาที่แสดงพร้อมกัน"
+      },
+      "terminal": {
+        "title": "คำสั่งเทอร์มินัล",
+        "desc": "คำนำหน้าคำสั่งสำหรับการรันด้วย > (เช่น kitty -e, alacritty -e, foot -e)"
+      },
+      "smart_ranking": {
+        "title": "จัดเรียงรายการในตัวเรียกใช้อย่างชาญฉลาด",
+        "desc": "เรียงแอปตามการใช้งานและเวลาที่ใช้ในแอปนั้น"
+      },
+      "test": "เปิดตัวเรียกใช้"
+    },
+    "notifications": {
+      "dnd": {
+        "title": "ห้ามรบกวน",
+        "desc": "ปิดเสียงป๊อปอัปแจ้งเตือน ยกเว้นการแจ้งเตือนสำคัญ"
+      },
+      "position": {
+        "title": "ตำแหน่งป๊อปอัป",
+        "desc": "เลือกตำแหน่งที่ป๊อปอัปแจ้งเตือนจะปรากฏบนหน้าจอ",
+        "top_right": "บนขวา",
+        "top_left": "บนซ้าย",
+        "bottom_right": "ล่างขวา",
+        "bottom_left": "ล่างซ้าย",
+        "top_center": "บนกลาง",
+        "bottom_center": "ล่างกลาง"
+      },
+      "sound": {
+        "title": "เสียงแจ้งเตือน",
+        "desc": "เล่นเสียงเมื่อมีการแจ้งเตือนเข้ามา"
+      },
+      "sound_file": {
+        "title": "เอฟเฟกต์เสียง",
+        "desc": "เลือกเสียงที่จะเล่นเมื่อมีการแจ้งเตือน"
+      },
+      "empty_graphic": {
+        "title": "แอนิเมชันเมื่อไม่มีการแจ้งเตือน",
+        "desc": "แสดงภาพแมวนอนหลับในศูนย์การแจ้งเตือนเมื่อว่างเปล่า"
+      }
+    },
+    "idle": {
+      "enabled": {
+        "title": "เปิดใช้ระบบไม่ได้ใช้งาน",
+        "desc": "เปิดการจัดการพลังงานและการล็อกเมื่อหมดเวลา"
+      },
+      "manual_inhibit": {
+        "title": "ห้ามรบกวน (ให้ตื่นอยู่)",
+        "desc": "ป้องกันไม่ให้ระบบเข้าสู่สถานะไม่ได้ใช้งานด้วยตนเอง"
+      },
+      "mpris_inhibit": {
+        "title": "ยับยั้งขณะเล่นสื่อ",
+        "desc": "ป้องกันการทำงานเมื่อไม่ได้ใช้งานขณะกำลังเล่นสื่อ"
+      },
+      "respect_inhibitors": {
+        "title": "เคารพตัวยับยั้งของแอป",
+        "desc": "ปฏิบัติตามการล็อกยับยั้ง idle ของ wayland จากแอปพลิเคชัน"
+      },
+      "pipeline_notice": "ลำดับ: หรี่หน้าจอ < ล็อกเซสชัน < ปิดจอ < พักเครื่อง การกระทำที่ผิดลำดับนี้จะถูกยกเว้น",
+      "order_violation": "ถูกยกเว้น",
+      "actions_header": {
+        "title": "รายการเมื่อหมดเวลาไม่ได้ใช้งาน",
+        "desc": "ตั้งค่าเวลา ทริกเกอร์ในตัว และคำสั่งกำหนดเอง"
+      },
+      "action_name_placeholder": "ชื่อการกระทำ",
+      "command_placeholder": "คำสั่งที่จะรัน",
+      "custom_action_default": "การกระทำกำหนดเอง",
+      "custom_action_fallback": "การกระทำเมื่อไม่ได้ใช้งาน",
+      "warning_command": {
+        "title": "คำสั่งเตือน",
+        "desc": "ระยะเวลาและคำสั่งที่จะรันก่อนการกระทำ",
+        "placeholder": "เช่น notify-send 'warning'"
+      },
+      "before_command": {
+        "title": "คำสั่งก่อนหน้า",
+        "desc": "รันทันทีก่อนที่การกระทำจะทำงาน",
+        "placeholder": "เช่น playerctl pause"
+      },
+      "resume_command": {
+        "title": "คำสั่งเมื่อกลับมา",
+        "desc": "รันเมื่อผู้ใช้กลับมาใช้งาน",
+        "placeholder": "เช่น notify-send 'resumed'"
+      },
+      "dim": {
+        "title": "หรี่หน้าจอ",
+        "desc": "เวลาก่อนหรี่จอแสดงผล"
+      },
+      "dpms": {
+        "title": "ปิดจอ (DPMS)",
+        "desc": "เวลาก่อนปิดหน้าจอทั้งหมด"
+      },
+      "lock": {
+        "title": "ล็อกเซสชัน",
+        "desc": "เวลาก่อนขอรหัสผ่าน"
+      },
+      "suspend": {
+        "title": "พักเครื่อง",
+        "desc": "เวลาก่อนให้เครื่องเข้าสู่โหมดสลีป"
+      },
+      "hooks": {
+        "title": "ฮุก (คำสั่งเชลล์)"
+      }
+    },
+    "welcome": {
+      "by_author": "โดย @{author}",
+      "about": "เกี่ยวกับ",
+      "hold_for_tutorial": "กดค้างเพื่อดูบทแนะนำ",
+      "start_tutorial": "เริ่มบทแนะนำ"
+    },
+    "tutorial": {
+      "section_title": "บทแนะนำ {section}",
+      "default_desc": "คลิกเพื่อเริ่มบทแนะนำ",
+      "start": "เริ่ม"
+    },
+    "general": {
+      "language": {
+        "title": "ภาษา",
+        "desc": "เลือกภาษาของอินเทอร์เฟซระบบ"
+      },
+      "uiscale": {
+        "title": "ขนาด UI",
+        "desc": "ตั้งค่าอัตราส่วนขนาดอินเทอร์เฟซโดยรวม"
+      },
+      "avatar": {
+        "title": "รูปโปรไฟล์",
+        "desc": "เลือกรูปโปรไฟล์",
+        "select": "เลือก",
+        "select_image_path": "เลือกที่อยู่รูปภาพ..."
+      },
+      "mutesfx": {
+        "title": "ปิดเสียงเอฟเฟกต์",
+        "desc": "ปิดเสียงเอฟเฟกต์ของอินเทอร์เฟซ"
+      },
+      "sfxvolume": {
+        "title": "ปรับระดับเสียงเอฟเฟกต์",
+        "desc": "ไม่มีผลต่อเอาต์พุตเสียงของระบบ"
+      },
+      "quickactions": {
+        "title": "การกระทำด่วน",
+        "desc": "เปิดใช้โอเวอร์เลย์การกระทำด่วนแบบลอย"
+      },
+      "location": {
+        "title": "ตำแหน่งที่ตั้ง",
+        "desc": "ตั้งค่าตำแหน่งสำหรับตารางพระอาทิตย์อัตโนมัติและสภาพอากาศ",
+        "popup_title": "รายละเอียดตำแหน่ง",
+        "autodetect": "ตรวจหาอัตโนมัติ",
+        "latitude": "ละติจูด",
+        "longitude": "ลองจิจูด",
+        "apply": "นำไปใช้"
+      },
+      "weatherinterval": {
+        "title": "ช่วงเวลาอัปเดตสภาพอากาศ",
+        "desc": "ความถี่ในการดึงข้อมูล (นาที)"
+      },
+      "weatherunit": {
+        "title": "หน่วยสภาพอากาศ",
+        "desc": "มาตราอุณหภูมิสำหรับแสดงสภาพอากาศ",
+        "celsius": "เซลเซียส",
+        "fahrenheit": "ฟาเรนไฮต์",
+        "kelvin": "เคลวิน"
+      },
+      "copysettings": {
+        "title": "คัดลอกการตั้งค่า",
+        "desc": "คัดลอก JSON การตั้งค่าไปยังคลิปบอร์ด",
+        "button": "คัดลอกการตั้งค่า"
+      },
+      "screenshot_on_release": {
+        "title": "จับภาพพื้นที่เมื่อปล่อยเมาส์",
+        "desc": "ถ่ายภาพหน้าจอทันทีเมื่อลากเสร็จ โดยไม่ต้องกดปุ่มชัตเตอร์"
+      }
+    },
+    "display": {
+      "bluelight": {
+        "title": "ตัวกรองแสงสีฟ้า",
+        "desc": "เปิด/ปิดแสงหน้าจอโทนอุ่น"
+      },
+      "enable": {
+        "title": "เปิดใช้จอนี้",
+        "desc": "การปิดจะทำให้จอนี้ถูกปิดการใช้งาน"
+      },
+      "schedule": {
+        "title": "ตารางอัตโนมัติ",
+        "desc": "ปรับอุณหภูมิสีอัตโนมัติตามเวลาพระอาทิตย์ตกและขึ้นใน"
+      },
+      "temperature": {
+        "title": "อุณหภูมิสี",
+        "desc": "ปรับความเข้มของอุณหภูมิสี"
+      },
+      "uiscale": {
+        "title": "ขนาด UI",
+        "desc": "ตั้งค่าอัตราส่วนขนาดจอสำหรับจอนี้"
+      },
+      "widgets": {
+        "title": "วิดเจ็ตเดสก์ท็อป",
+        "desc": "ตั้งค่าและจัดวางวิดเจ็ตสำหรับจอนี้",
+        "open": "เปิดตัวแก้ไข",
+        "hide_bar": {
+          "title": "ซ่อนแถบในตัวแก้ไข",
+          "desc": "ซ่อนแถบอัตโนมัติขณะแก้ไขวิดเจ็ตในโหมดตัวแก้ไข"
+        }
+      }
+    },
+    "bar": {
+      "modules": {
+        "vis": "วิชวลไลเซอร์ (cava)",
+        "actions": "การกระทำ",
+        "workspaces": "เวิร์กสเปซ",
+        "media": "สื่อ",
+        "tray": "ถาดระบบ",
+        "keyboard": "แป้นพิมพ์",
+        "network": "เครือข่าย",
+        "bluetooth": "บลูทูธ",
+        "volume": "ระดับเสียง",
+        "battery": "แบตเตอรี่",
+        "focus": "โฟกัส",
+        "sysmon": "ตัวตรวจสอบระบบ",
+        "timedate": "เวลา/วันที่",
+        "info": "บันทึก/ตัวจับเวลา",
+        "weather": "สภาพอากาศ"
+      },
+      "position": {
+        "title": "ตำแหน่งแถบ",
+        "desc": "ตำแหน่งของแถบบนหน้าจอ",
+        "top": "บน",
+        "bottom": "ล่าง",
+        "left": "ซ้าย",
+        "right": "ขวา"
+      },
+      "width": {
+        "title": "ความกว้างแถบ",
+        "desc": "ตั้งค่าความกว้างของแถบเป็นเปอร์เซ็นต์"
+      },
+      "workspaces": {
+        "title": "เลือกจำนวนเวิร์กสเปซที่จะแสดง",
+        "disc": "หมายเหตุ: ไม่มีผลต่อจำนวนเวิร์กสเปซจริงในคอมโพสิเตอร์",
+        "desc": "จำนวนเวิร์กสเปซที่จะแสดง"
+      },
+      "opacity": {
+        "title": "ความทึบของแถบ",
+        "desc": "ตั้งค่าความทึบของแถบเป็นเปอร์เซ็นต์"
+      },
+      "style": {
+        "title": "สไตล์แถบ",
+        "desc": "เลือกระหว่างแบบโมดูล แบบทึบ หรือแบบเต็ม",
+        "modular": "โมดูล",
+        "solid": "ทึบ",
+        "fill": "เต็ม"
+      },
+      "time": {
+        "title": "รูปแบบเวลา",
+        "desc": "สตริงรูปแบบ (เช่น HH:mm:ss หรือ hh:mm AP)"
+      },
+      "guide_button": {
+        "title": "ปุ่มการตั้งค่า",
+        "desc": "แสดงปุ่มเปิดการตั้งค่าในแถบด้านบน"
+      },
+      "autohide": {
+        "title": "ซ่อนอัตโนมัติ",
+        "desc": "ซ่อนแถบเมื่อไม่ได้วางเมาส์"
+      },
+      "timeout": {
+        "title": "เวลาซ่อนอัตโนมัติ",
+        "desc": "หน่วงเวลาก่อนแถบจะซ่อน"
+      },
+      "config": {
+        "title": "การจัดวางแถบ",
+        "desc": "คลิกขวาที่รายการเพื่อเริ่มจัดกลุ่ม คลิกขวาที่รายการอื่นเพื่อเพิ่ม คลิกขวาที่รายการในกลุ่มเพื่อนำออก",
+        "reset": "รีเซ็ต",
+        "available": "ที่ใช้ได้",
+        "left": "ซ้าย",
+        "center": "กลาง",
+        "right": "ขวา"
+      },
+      "distinct_pills": {
+        "title": "เปิดใช้สไตล์โมดูลแบบกะทัดรัดสำหรับวิดเจ็ต",
+        "desc": "ทำให้โมดูลของแถบมีกรอบล้อมรอบและย่อขนาดให้เข้ากับสไตล์โมดูล"
+      }
+    },
+    "theme": {
+      "font": {
+        "title": "ฟอนต์",
+        "desc": "เลือกฟอนต์เริ่มต้นที่ serpantinum ใช้",
+        "select": "เลือก..."
+      },
+      "radius": {
+        "title": "รัศมีขอบ",
+        "desc": "รัศมีมุมโค้งสำหรับองค์ประกอบ UI"
+      },
+      "colors": {
+        "title": "ธีมสี",
+        "desc": "เลือกชุดสีที่กำหนดไว้ล่วงหน้า หรือสร้างธีมของคุณเอง",
+        "search": "ค้นหาธีม..."
+      },
+      "delete_theme": "ลบ",
+      "wallpaper": {
+        "title": "โฟลเดอร์วอลเปเปอร์",
+        "desc": "โฟลเดอร์สำหรับค้นหาวอลเปเปอร์",
+        "select_dir": "เลือกโฟลเดอร์...",
+        "select_wallpaper": "เลือกวอลเปเปอร์",
+        "no_wallpaper_selected": "ยังไม่ได้เลือกวอลเปเปอร์"
+      }
+    },
+    "file_picker": {
+      "title": "เลือกรูปภาพ",
+      "input_placeholder": "ค้นหา...",
+      "not_found": "ไม่พบไฟล์",
+      "no_file_selected": "ยังไม่ได้เลือกไฟล์",
+      "root": "รูท",
+      "places": {
+        "home": "โฮม",
+        "downloads": "ดาวน์โหลด",
+        "pictures": "รูปภาพ"
+      }
+    },
+    "font_picker": {
+      "title": "เลือกฟอนต์",
+      "input_placeholder": "ค้นหา...",
+      "not_found": "ไม่พบรายการ",
+      "places": {
+        "user_fonts": "ฟอนต์ผู้ใช้",
+        "system_fonts": "ฟอนต์ระบบ"
+      }
+    },
+    "sound_picker": {
+      "title": "เลือกเสียงแจ้งเตือน",
+      "no_sound_selected": "ยังไม่ได้เลือกเสียง",
+      "places": {
+        "user_sounds": "เสียงผู้ใช้",
+        "system_sounds": "เสียงระบบ"
+      }
+    },
+    "theme_editor": {
+      "title": "ธีมสีใหม่",
+      "name_placeholder": "ชื่อธีม...",
+      "preview": "ตัวอย่าง",
+      "cancel": "ยกเลิก",
+      "save": "บันทึก",
+      "default_name": "ธีมกำหนดเอง",
+      "colors": {
+        "base": "Base",
+        "mantle": "Mantle",
+        "crust": "Crust",
+        "text": "Text",
+        "sub0": "Sub0",
+        "sub1": "Sub1",
+        "surf0": "Surf0",
+        "surf1": "Surf1",
+        "surf2": "Surf2",
+        "over0": "Over0",
+        "over1": "Over1",
+        "over2": "Over2",
+        "blue": "น้ำเงิน",
+        "lavender": "ลาเวนเดอร์",
+        "sapphire": "แซฟไฟร์",
+        "sky": "ฟ้า",
+        "teal": "เขียวน้ำทะเล",
+        "green": "เขียว",
+        "yellow": "เหลือง",
+        "peach": "พีช",
+        "maroon": "แดงเข้ม",
+        "red": "แดง",
+        "mauve": "ม่วงอ่อน",
+        "pink": "ชมพู",
+        "flamingo": "ฟลามิงโก",
+        "rosewater": "โรสวอเตอร์"
+      }
+    },
+    "wellbeing": {
+      "desktop": "เดสก์ท็อป",
+      "not_available": "ไม่มี",
+      "am": "AM",
+      "pm": "PM",
+      "today": "วันนี้",
+      "week_overview": "ภาพรวมสัปดาห์",
+      "daily_average": "เฉลี่ยต่อวัน",
+      "no_data": "ไม่มีข้อมูล",
+      "same_time": "เวลาเดียวกัน",
+      "daily_usage": "การใช้งานรายวัน",
+      "peak_hours": "ช่วงเวลาที่ใช้มากที่สุด",
+      "time_hm": "{h} ชม. {m} น.",
+      "time_m": "{m} น.",
+      "months": {
+        "january": "มกราคม",
+        "february": "กุมภาพันธ์",
+        "march": "มีนาคม",
+        "april": "เมษายน",
+        "may": "พฤษภาคม",
+        "june": "มิถุนายน",
+        "july": "กรกฎาคม",
+        "august": "สิงหาคม",
+        "september": "กันยายน",
+        "october": "ตุลาคม",
+        "november": "พฤศจิกายน",
+        "december": "ธันวาคม"
+      },
+      "days": {
+        "monday": "วันจันทร์",
+        "tuesday": "วันอังคาร",
+        "wednesday": "วันพุธ",
+        "thursday": "วันพฤหัสบดี",
+        "friday": "วันศุกร์",
+        "saturday": "วันเสาร์",
+        "sunday": "วันอาทิตย์"
+      },
+      "settings": {
+        "title": "การตั้งค่าสุขภาวะดิจิทัล",
+        "overall_limit": "ขีดจำกัดรวมต่อวัน",
+        "off": "ปิด",
+        "app_limits": "ขีดจำกัดการใช้แอป",
+        "app_limits_desc": "ตั้งค่าเวลาสูงสุดต่อวันสำหรับแต่ละแอปพลิเคชัน",
+        "excluded_apps": "แอปที่ยกเว้น",
+        "excluded_apps_desc": "ยกเว้นแอปจากการติดตามโดยรวมนับจากนี้"
+      }
+    },
+    "update_available": "มีอัปเดตใหม่",
+    "save": "บันทึก",
+    "saved": "บันทึกแล้ว"
+  },
+  "sysnotif": {
+    "battery": {
+      "app_name": "ระบบ",
+      "full_title": "แบตเตอรี่เต็ม",
+      "full_body": "แบตเตอรี่ชาร์จเต็มแล้ว (100%)",
+      "low_title": "แบตเตอรี่ต่ำ",
+      "low_body": "ระดับแบตเตอรี่อยู่ที่ {pct}% กรุณาเสียบที่ชาร์จ",
+      "critical_title": "แบตเตอรี่ต่ำมาก",
+      "critical_body": "ระดับแบตเตอรี่อยู่ที่ {pct}% เสียบที่ชาร์จทันที"
+    }
+  },
+  "updater": {
+    "notification": {
+      "app_name": "อัปเดต",
+      "action_open_guide": "เปิดการตั้งค่า",
+      "update_available_title": "มีอัปเดตใหม่: v{remote}",
+      "update_available_body": "เวอร์ชันปัจจุบัน: v{local} คลิกเพื่อดูรายการเปลี่ยนแปลงและอัปเดต"
+    }
+  },
+  "polkit": {
+    "title": "ต้องยืนยันตัวตน",
+    "default_message": "แอปพลิเคชันกำลังขอสิทธิ์ผู้ดูแลระบบ",
+    "default_description": "ต้องยืนยันตัวตนเพื่อรันการกระทำนี้ในฐานะ superuser",
+    "password_placeholder": "รหัสผ่าน",
+    "error_failed": "การยืนยันตัวตนล้มเหลว กรุณาลองอีกครั้ง"
+  },
+  "applauncher": {
+    "search": "ค้นหา",
+    "placeholder": "ขึ้นต้นด้วย > เพื่อรันคำสั่ง..."
+  },
+  "calendar": {
+    "loading": "กำลังโหลด...",
+    "loading_schedule": "กำลังโหลดตารางเวลา...",
+    "no_events": "ไม่มีกิจกรรมที่กำหนดไว้",
+    "open_web": "เปิดเว็บ",
+    "weather": {
+      "wind": "ลม",
+      "humid": "ความชื้น",
+      "rain": "ฝน",
+      "feels": "รู้สึก"
+    },
+    "days": {
+      "mo": "จ",
+      "tu": "อ",
+      "we": "พ",
+      "th": "พฤ",
+      "fr": "ศ",
+      "sa": "ส",
+      "su": "อา"
+    }
+  },
+  "clipboard": {
+    "search": "ค้นหา",
+    "title": "คลิปบอร์ด",
+    "clear": "ล้าง",
+    "empty": "ไม่พบรายการ",
+    "recent": "ล่าสุด",
+    "pinned": "ปักหมุด"
+  },
+  "lock": {
+    "status": {
+      "locked": "ล็อกอยู่",
+      "access_denied": "ปฏิเสธการเข้าถึง",
+      "authenticating": "กำลังยืนยันตัวตน...",
+      "enter_pin": "ใส่ PIN"
+    },
+    "power": {
+      "suspend": "พักเครื่อง",
+      "reboot": "รีบูต",
+      "power_off": "ปิดเครื่อง"
+    },
+    "default_user": "ผู้ใช้",
+    "unknown": "ไม่ทราบ"
+  },
+  "music": {
+    "nothing_playing": "ไม่มีอะไรกำลังเล่น",
+    "loading": "กำลังโหลด...",
+    "by_artist": "โดย {artist}",
+    "unknown_artist": "ไม่ทราบศิลปิน",
+    "speaker": "ลำโพง",
+    "via_source": "ผ่าน {source}",
+    "offline": "ออฟไลน์",
+    "equalizer": "อีควอไลเซอร์",
+    "eq": {
+      "apply": "นำไปใช้",
+      "saved": "บันทึกแล้ว"
+    },
+    "presets": {
+      "flat": "แฟลต",
+      "bass": "เบส",
+      "treble": "เสียงแหลม",
+      "vocal": "เสียงร้อง",
+      "pop": "ป๊อป",
+      "rock": "ร็อก",
+      "jazz": "แจ๊ส",
+      "classic": "คลาสสิก",
+      "custom": "กำหนดเอง"
+    }
+  },
+  "network": {
+    "tabs": {
+      "ethernet": "อีเทอร์เน็ต",
+      "wifi": "Wi-Fi",
+      "bluetooth": "บลูทูธ"
+    },
+    "status": {
+      "no_ip": "ไม่มี IP",
+      "unknown": "ไม่ทราบ",
+      "calculating": "กำลังคำนวณ...",
+      "open": "เปิด",
+      "current_device": "อุปกรณ์ปัจจุบัน",
+      "powering_on": "กำลังเปิด...",
+      "powering_off": "กำลังปิด...",
+      "disconnected": "ตัดการเชื่อมต่อแล้ว",
+      "disconnecting": "กำลังตัดการเชื่อมต่อ...",
+      "hold": "กดค้าง...",
+      "connected": "เชื่อมต่อแล้ว"
+    },
+    "actions": {
+      "unpair": "ยกเลิกการจับคู่",
+      "scan": "สแกน"
+    }
+  },
+  "notifications": {
+    "center": {
+      "reserved": "สงวนไว้สำหรับอัปเดตในอนาคต"
+    },
+    "types": {
+      "default": {
+        "fallback_summary": "การแจ้งเตือน",
+        "system": "ระบบ",
+        "action": "การกระทำ"
+      },
+      "weather": {
+        "fallback_summary": "รายงานสภาพอากาศ",
+        "fallback_body": "ไม่มีข้อมูลรายละเอียด"
+      },
+      "screenshot": {
+        "badge": "ภาพหน้าจอ",
+        "fallback_summary": "จับภาพหน้าจอแล้ว",
+        "click_to_open": "คลิกเพื่อเปิดโฟลเดอร์ภาพหน้าจอ"
+      }
+    }
+  },
+  "quickactions": {
+    "systemusage": {
+      "cpu": "CPU",
+      "ram": "RAM",
+      "temp": "อุณหภูมิ",
+      "disk": "ดิสก์",
+      "net": "เน็ต"
+    },
+    "timer": {
+      "tabs": {
+        "timer": "ตัวจับเวลา",
+        "stopwatch": "นาฬิกาจับเวลา",
+        "pomodoro": "โพโมโดโร"
+      },
+      "stopwatch": {
+        "lap": "รอบ {number}"
+      },
+      "pomodoro": {
+        "phases": {
+          "focus": "โฟกัส",
+          "short_break": "พักสั้น",
+          "long_break": "พักยาว"
+        },
+        "settings": {
+          "work": "ทำงาน (นาที)",
+          "short_break": "พักสั้น (นาที)",
+          "long_break": "พักยาว (นาที)",
+          "sessions": "จำนวนรอบ"
+        }
+      },
+      "notification": {
+        "app_name": "ตัวจับเวลา Quickshell",
+        "timer_finished_title": "หมดเวลาแล้ว",
+        "timer_finished_body": "ตัวจับเวลา {time} ของคุณเสร็จสิ้นแล้ว",
+        "focus_complete_title": "โฟกัสเสร็จสิ้น",
+        "focus_complete_body": "เยี่ยมมาก! ถึงเวลาพักที่สมควรได้รับแล้ว",
+        "break_over_title": "หมดเวลาพัก",
+        "break_over_body": "หมดเวลาพักแล้ว กลับมาโฟกัสกันต่อ!",
+        "pomo_skipped_title": "ข้ามโพโมโดโร",
+        "pomo_skipped_focus_body": "ข้ามช่วงโฟกัส ไปช่วงพัก",
+        "pomo_skipped_break_body": "ข้ามช่วงพัก กลับไปโฟกัส"
+      }
+    }
+  },
+  "screenshot": {
+    "video_mode": "คลิกบันทึก (พอร์ทัลจะจัดการการเลือกพื้นที่)",
+    "select_region": "เลือกพื้นที่ที่จะจับภาพ",
+    "no_microphones": "ไม่พบไมโครโฟน (ติดตั้ง pulseaudio)",
+    "qr_timeout": "การสแกนหมดเวลาหรือล้มเหลว",
+    "qr_not_found": "ไม่พบ QR code",
+    "notifications": {
+      "screenshot_app_name": "ภาพหน้าจอ",
+      "recorder_app_name": "ตัวบันทึกหน้าจอ",
+      "system_app_name": "ระบบภาพหน้าจอ",
+      "missing_deps_title": "ขาดแพ็กเกจที่จำเป็น",
+      "missing_deps_body": "ไม่สามารถเริ่มได้ กรุณาติดตั้ง:\n{cmds}",
+      "open_folder": "เปิดโฟลเดอร์",
+      "recording_saved_title": "บันทึกวิดีโอแล้ว",
+      "recording_saved_body": "ไฟล์: {file}\nโฟลเดอร์: {folder}",
+      "recording_error_title": "ข้อผิดพลาด",
+      "recording_error_body": "บันทึกไฟล์วิดีโอไม่สำเร็จ",
+      "recording_started_title": "เริ่มบันทึกแล้ว",
+      "recording_started_body": "กดปุ่มลัดภาพหน้าจออีกครั้งเพื่อหยุด",
+      "screenshot_saved_title": "บันทึกภาพหน้าจอแล้ว",
+      "screenshot_saved_body": "ไฟล์: {file}\nโฟลเดอร์: {folder}"
+    }
+  },
+  "start": {
+    "title": "Serpantinum",
+    "made_by": "สร้างโดย @{author}",
+    "welcome": "ยินดีต้อนรับ",
+    "tagline": "เดสก์ท็อปเชลล์ที่สร้างมาเพื่อ",
+    "you": "คุณ",
+    "start_preview": "เริ่มดูตัวอย่าง"
+  },
+  "syspanel": {
+    "user": {
+      "default_name": "ผู้ใช้",
+      "default_os": "Linux",
+      "logout": "ออกจากระบบ"
+    },
+    "notifications": {
+      "title": "การแจ้งเตือน",
+      "clear": "ล้าง",
+      "silent": "เงียบ",
+      "mute": "ปิดเสียง",
+      "empty": "ไม่มีการแจ้งเตือนค้างอยู่"
+    },
+    "profiles": {
+      "performance": "ประสิทธิภาพ",
+      "balanced": "สมดุล",
+      "power_saver": "ประหยัดพลังงาน"
+    },
+    "battery": {
+      "fully_charged": "ชาร์จเต็มแล้ว",
+      "charging": "กำลังชาร์จ",
+      "charging_time": "กำลังชาร์จ • {hours} ชม. {mins} น.",
+      "discharging": "กำลังใช้แบตเตอรี่",
+      "left_time": "เหลือ {hours} ชม. {mins} น.",
+      "until_full": "จนกว่าจะเต็ม",
+      "remaining": "คงเหลือ"
+    },
+    "actions": {
+      "system_name": "ระบบ",
+      "hibernate_error_title": "ไม่สามารถไฮเบอร์เนตได้",
+      "hibernate_error_body": "ระบบนี้ไม่รองรับการไฮเบอร์เนต กรุณาตรวจสอบการตั้งค่า swap"
+    }
+  },
+  "volumepopup": {
+    "no_device": "ไม่มีอุปกรณ์",
+    "mute": "ปิดเสียง",
+    "master_output_volume": "ระดับเสียงเอาต์พุตหลัก",
+    "no_active_streams": "ไม่มีสตรีมที่ใช้งานอยู่",
+    "active_default": "ค่าเริ่มต้นที่ใช้งาน",
+    "tabs": {
+      "outputs": "เอาต์พุต",
+      "inputs": "อินพุต",
+      "streams": "สตรีม"
+    }
+  },
+  "wallpaper": {
+    "notifications": {
+      "downloading": "กำลังดาวน์โหลดวอลเปเปอร์...",
+      "type_to_search": "พิมพ์เพื่อค้นหา...",
+      "search_paused": "หยุดค้นหาชั่วคราว",
+      "searching_ddg": "กำลังค้นหาวอลเปเปอร์...",
+      "generating_thumbnails": "กำลังสร้างภาพขนาดย่อ...",
+      "no_wallpapers_found": "ไม่พบวอลเปเปอร์",
+      "videos": "วิดีโอ",
+      "history": "ใช้ล่าสุด"
+    },
+    "filters": {
+      "all": "ทั้งหมด",
+      "vid": "วิดีโอ",
+      "search": "ค้นหา",
+      "red": "แดง",
+      "orange": "ส้ม",
+      "yellow": "เหลือง",
+      "green": "เขียว",
+      "blue": "น้ำเงิน",
+      "purple": "ม่วง",
+      "pink": "ชมพู",
+      "monochrome": "ขาวดำ"
+    }
+  },
+  "weather": {
+    "desc": {
+      "sunny": "แดดจัด",
+      "clear": "ท้องฟ้าแจ่มใส",
+      "cloudy": "มีเมฆมาก",
+      "mist": "หมอก",
+      "rainy": "ฝนตก",
+      "snow": "หิมะ",
+      "storm": "พายุ",
+      "unknown": "ไม่ทราบ",
+      "offline": "ออฟไลน์"
+    },
+    "days": {
+      "mon": "จ.",
+      "tue": "อ.",
+      "wed": "พ.",
+      "thu": "พฤ.",
+      "fri": "ศ.",
+      "sat": "ส.",
+      "sun": "อา.",
+      "monday": "วันจันทร์",
+      "tuesday": "วันอังคาร",
+      "wednesday": "วันพุธ",
+      "thursday": "วันพฤหัสบดี",
+      "friday": "วันศุกร์",
+      "saturday": "วันเสาร์",
+      "sunday": "วันอาทิตย์"
+    },
+    "months": {
+      "jan": "ม.ค.",
+      "feb": "ก.พ.",
+      "mar": "มี.ค.",
+      "apr": "เม.ย.",
+      "may": "พ.ค.",
+      "jun": "มิ.ย.",
+      "jul": "ก.ค.",
+      "aug": "ส.ค.",
+      "sep": "ก.ย.",
+      "oct": "ต.ค.",
+      "nov": "พ.ย.",
+      "dec": "ธ.ค."
+    }
+  },
+  "widgets": {
+    "wallpaper": {
+      "name": "ตัวเลือกวอลเปเปอร์",
+      "desc": "เรียกดูและตั้งค่าวอลเปเปอร์เดสก์ท็อป"
+    },
+    "network": {
+      "name": "การตั้งค่าเครือข่าย",
+      "desc": "จัดการ WiFi อีเทอร์เน็ต และการเชื่อมต่อเครือข่าย"
+    },
+    "volume": {
+      "name": "ระดับเสียงและออดิโอ",
+      "desc": "จัดการอุปกรณ์เสียงและระดับเสียง"
+    },
+    "guide": {
+      "name": "การตั้งค่า",
+      "desc": "การตั้งค่า Serpantinum"
+    },
+    "calendar": {
+      "name": "ปฏิทินและนาฬิกา",
+      "desc": "ดูวันที่ เวลา และตารางเวลา"
+    },
+    "music": {
+      "name": "เครื่องเล่นสื่อ",
+      "desc": "ควบคุมเพลงและการเล่นสื่อ"
+    },
+    "notifications": {
+      "name": "ศูนย์การแจ้งเตือน",
+      "desc": "ดูการแจ้งเตือนล่าสุดและประวัติ"
+    },
+    "system": {
+      "name": "การควบคุมระบบ",
+      "desc": "ตัวตรวจสอบประสิทธิภาพ พลังงาน และการตั้งค่าด่วน"
+    },
+    "redactor": {
+      "no_widgets_active": "ไม่มีวิดเจ็ตที่ใช้งานอยู่",
+      "click_to_add": "คลิกไอคอนวิดเจ็ตในแถบเครื่องมือด้านล่างเพื่อเพิ่ม",
+      "done": "เสร็จสิ้น",
+      "widget_singular": "วิดเจ็ต",
+      "widgets_plural": "วิดเจ็ต"
+    },
+    "types": {
+      "clock": "นาฬิกา",
+      "music": "เพลง",
+      "weather": "สภาพอากาศ",
+      "image": "รูปภาพ"
+    },
+    "variants": {
+      "digital": "ดิจิทัล",
+      "analog": "อนาล็อก",
+      "full": "เต็ม",
+      "minimal": "มินิมอล",
+      "round": "กลม",
+      "compact": "กะทัดรัด",
+      "rect": "สี่เหลี่ยม",
+      "rounded": "มุมโค้ง"
+    }
+  },
+  "cli": {
+    "usage": "การใช้งาน: serpantinum [command] [options...]",
+    "description": "เดสก์ท็อปเชลล์สำหรับคอมโพสิเตอร์ wayland",
+    "commands": "คำสั่ง:",
+    "script_commands": "คำสั่งสคริปต์:",
+    "launch_desc": "เรียกใช้คอมโพเนนต์แบบสแตนด์อโลน (start, widgetredactor)",
+    "msg_desc": "ส่งคำสั่งหรือสลับเวิร์กสเปซไปยังตัวจัดการ UI",
+    "ipc_desc": "ส่งต่อการเรียก IPC ไปยังเชลล์โดยตรง",
+    "kill_desc": "หยุดดีมอนที่กำลังทำงานอย่างถูกต้อง",
+    "options": "ตัวเลือก:",
+    "verbose_desc": "เปิดใช้การบันทึกแบบละเอียด",
+    "version_desc": "แสดงข้อมูลเวอร์ชันแล้วออก",
+    "help_desc": "แสดงข้อความช่วยเหลือนี้แล้วออก",
+    "examples": "ตัวอย่าง:",
+    "daemon_stopped": "หยุดดีมอน Serpantinum แล้ว",
+    "starting_daemon": "ดีมอนไม่ได้ทำงานอยู่ กำลังเริ่ม serpantinumd ในพื้นหลัง...",
+    "error_missing_qml": "ข้อผิดพลาด: ไม่ได้ระบุเป้าหมายที่จะเรียกใช้",
+    "launch_usage": "การใช้งาน: serpantinum launch <start|widgetredactor> [args...]",
+    "error_qml_not_found": "ข้อผิดพลาด: ไม่พบ {NAME}.qml ใน {DIR}",
+    "error_shell_qml_not_found": "ข้อผิดพลาด: ไม่พบที่อยู่ของ shell.qml ใน {DIR}",
+    "error_unknown_command": "ข้อผิดพลาด: ไม่รู้จักคำสั่ง '{CMD}'",
+    "error_unknown_target": "ข้อผิดพลาด: ไม่รู้จักเป้าหมาย '{TARGET}'",
+    "launch_help": {
+      "usage": "การใช้งาน: serpantinum launch <start|widgetredactor> [arguments...]",
+      "description": "เรียกใช้คอมโพเนนต์แบบสแตนด์อโลนโดยตรงในโหมด runner",
+      "available_targets": "เป้าหมายที่ใช้ได้:",
+      "target_start": "เรียกใช้อินเทอร์เฟซตั้งค่าเริ่มต้น",
+      "target_widgetredactor": "เรียกใช้อินเทอร์เฟซตัวแก้ไขวิดเจ็ตเดสก์ท็อป"
+    },
+    "msg_help": {
+      "usage": "การใช้งาน: serpantinum msg <command|workspace> [arguments...]",
+      "description": "ส่งข้อความจัดการเลย์เอาต์ เวิร์กสเปซ และหน้าต่างโดยตรง",
+      "available_commands": "ข้อความที่ใช้ได้:",
+      "cmd_workspace": "สลับไปยังเวิร์กสเปซ <num> (เพิ่ม 'move' เพื่อย้ายหน้าต่างที่ใช้งานอยู่)",
+      "cmd_open": "เปิดแผง UI ที่จัดการ (network, guide, wallpaper, applauncher)",
+      "cmd_toggle": "สลับเปิด/ปิดแผง UI ที่จัดการ",
+      "cmd_close": "ปิดโอเวอร์เลย์เชลล์ที่เปิดอยู่"
+    },
+    "ipc_help": {
+      "usage": "การใช้งาน: serpantinum ipc call <target> <method> [arguments...]",
+      "description": "ส่งการเรียก IPC โดยตรงไปยังอินสแตนซ์ quickshell ที่กำลังทำงาน"
+    },
+    "scripts": {
+      "exit": "ยุติเซสชันกราฟิกและออกจากคอมโพสิเตอร์",
+      "lock": "เปิดใช้หน้าจอล็อก",
+      "volume": "ควบคุมระดับเสียงและสถานะปิดเสียงของ sink/source เริ่มต้น",
+      "reload": "บังคับโหลดองค์ประกอบเดสก์ท็อป quickshell ใหม่",
+      "weather": "ดึงและจัดการข้อมูลพยากรณ์อากาศและแคช",
+      "location": "ดึงและอัปเดตพิกัดทางภูมิศาสตร์",
+      "screenshot": "จับภาพหน้าจอ บันทึกวิดีโอ หรืออ่าน QR code",
+      "brightness": "ปรับความสว่างแบ็กไลต์ของจอ",
+      "current_focus": "ตรวจสอบและบันทึกการเปลี่ยนโฟกัสหน้าต่าง",
+      "monitors_detect": "ค้นหาจอแสดงผลที่ใช้งานและอัตรารีเฟรช",
+      "location_manual": "ตั้งค่าพิกัดทางภูมิศาสตร์และเขตเวลาด้วยตนเอง",
+      "blue_light_filter": "ปรับอุณหภูมิสีและตารางกลางวัน/กลางคืนอัตโนมัติ",
+      "translate": "ตัวแปลข้อความและข้อความที่เลือกแบบทันที"
+    }
+  },
+  "daemon": {
+    "already_running": "ดีมอนกำลังทำงานอยู่แล้ว กำลังออก...",
+    "shutting_down": "กำลังปิดดีมอน serpantinum...",
+    "launching": "กำลังเริ่มดีมอน serpantinum...",
+    "cli": {
+      "usage": "การใช้งาน: serpantinumd <command> [options...]",
+      "description": "ดีมอนบริการพื้นหลังสำหรับเดสก์ท็อปเชลล์ serpantinum",
+      "commands": "คำสั่ง:",
+      "cmd_start": "เริ่มบริการดีมอนและเรียกใช้ตัวทำงานพื้นหลัง",
+      "cmd_stop": "หยุดบริการดีมอนที่กำลังทำงาน",
+      "cmd_status": "ตรวจสอบสถานะการทำงานของบริการดีมอน",
+      "options": "ตัวเลือก:",
+      "opt_verbose": "เปิดใช้การบันทึกแบบละเอียด",
+      "opt_version": "แสดงข้อมูลเวอร์ชันแล้วออก",
+      "opt_help": "แสดงข้อความช่วยเหลือนี้แล้วออก",
+      "stopped": "หยุดดีมอน Serpantinum แล้ว",
+      "status_running": "ดีมอน Serpantinum กำลังทำงาน (PID: {PID})",
+      "status_stopped": "ดีมอน Serpantinum ไม่ได้ทำงานอยู่",
+      "unknown_arg": "ไม่รู้จักอาร์กิวเมนต์: {ARG}"
+    }
+  },
+  "installer": {
+    "auth": {
+      "enter_code": "ใส่รหัสเข้าถึงการติดตั้ง: ",
+      "error_interactive": "ข้อผิดพลาด: ต้องใช้เทอร์มินัลแบบโต้ตอบสำหรับการยืนยันตัวตน",
+      "error_empty": "การยืนยันตัวตนล้มเหลว: รหัสเข้าถึงต้องไม่ว่างเปล่า",
+      "error_default": "การยืนยันตัวตนล้มเหลว: รหัสเข้าถึงไม่ถูกต้องหรือถูกใช้ครบแล้ว",
+      "error_failed": "การยืนยันตัวตนล้มเหลว",
+      "access_granted": "ได้รับสิทธิ์เข้าถึง ({active}/{max} ผู้ใช้เปิดใช้รหัสนี้แล้ว)"
+    },
+    "os": {
+      "error_root": "ข้อผิดพลาด: ห้ามรันสคริปต์นี้ด้วย root/sudo โดยตรง ให้รันในฐานะผู้ใช้ปกติ",
+      "error_unsupported": "ระบบปฏิบัติการไม่รองรับ ({os}) Serpantinum รองรับเฉพาะ arch linux และดิสโทรที่สืบทอดเท่านั้น",
+      "error_not_found": "ตรวจหาระบบปฏิบัติการไม่ได้ ไม่พบ /etc/os-release",
+      "unknown_cpu": "ไม่ทราบ CPU",
+      "unknown_gpu": "ไม่ทราบ / เครื่องเสมือน",
+      "default_os": "Arch linux"
+    },
+    "ui": {
+      "user": "ผู้ใช้:",
+      "os": "ระบบปฏิบัติการ:",
+      "cpu": "CPU:",
+      "gpu": "GPU:",
+      "target_version": "เวอร์ชันเป้าหมาย:",
+      "install_mode": "โหมดติดตั้ง:",
+      "github": "GitHub:",
+      "twitter": "Twitter:",
+      "reddit": "Reddit:",
+      "telegram": "Telegram:",
+      "donate": "บริจาค:",
+      "donate_sub": "(สนับสนุนโปรเจกต์!)",
+      "packages_prompt": " แพ็กเกจ > ",
+      "packages_header": " กด esc หรือ enter เพื่อกลับ ",
+      "package_missing": "{pkg} (ยังไม่มี - จะถูกติดตั้ง)",
+      "package_installed": "{pkg} (ติดตั้งแล้ว)",
+      "compositors_title": "=== เลือกคอมโพสิเตอร์เป้าหมาย ===",
+      "installed": " (ติดตั้งแล้ว)",
+      "not_installed": " (ยังไม่ติดตั้ง)",
+      "done": "เสร็จสิ้น",
+      "compositors_prompt": " ตั้งค่าคอมโพสิเตอร์ > ",
+      "compositors_header": " เลือกคอมโพสิเตอร์ที่รองรับ แล้วเลือกเสร็จสิ้น ",
+      "sddm_title": "=== ตั้งค่าตัวจัดการจอแสดงผล (SDDM) ===",
+      "sddm_detected_active": "พบตัวจัดการจอแสดงผลที่เปิดใช้งาน: {dm}",
+      "sddm_detected_none": "พบตัวจัดการจอแสดงผลที่เปิดใช้งาน: ไม่มี",
+      "sddm_opt_install": "ติดตั้งและตั้งค่า SDDM (ธีม material you)",
+      "sddm_opt_disable": "ปิดและลบ '{dm}'",
+      "sddm_opt_wayland": "บังคับใช้แบ็กเอนด์ wayland",
+      "sddm_prompt": " ตั้งค่า SDDM > ",
+      "sddm_header": " เลือกตัวเลือก แล้วเลือกเสร็จสิ้น ",
+      "target_compositor_none": "คอมโพสิเตอร์เป้าหมาย [จำเป็น - ยังไม่ได้เลือก]",
+      "target_compositor_selected": "คอมโพสิเตอร์เป้าหมาย [{comps}]",
+      "target_compositor_req": "คอมโพสิเตอร์เป้าหมาย ({label}) [จำเป็น]",
+      "target_compositor_label": "คอมโพสิเตอร์เป้าหมาย ({comps})",
+      "unsupported_compositor": "คอมโพสิเตอร์ไม่รองรับ",
+      "menu_overview": "ภาพรวมการติดตั้งแพ็กเกจ ({count} แพ็กเกจหลัก)",
+      "menu_sddm": "ตัวจัดการล็อกอิน SDDM",
+      "menu_wallpapers": "ชุดวอลเปเปอร์",
+      "menu_telemetry": "เทเลเมทรีแบบไม่ระบุตัวตน",
+      "menu_update": "อัปเดต",
+      "menu_reinstall": "ติดตั้งใหม่",
+      "menu_install": "ติดตั้ง",
+      "menu_exit": "ออก",
+      "main_menu_prompt": " เมนูหลัก > ",
+      "main_menu_header": " ใช้ปุ่มลูกศรเพื่อเลื่อน กด enter เพื่อเลือก ",
+      "error_no_compositor": "คุณต้องเลือกคอมโพสิเตอร์ที่รองรับอย่างน้อยหนึ่งตัวก่อนดำเนินการต่อ",
+      "tagline": "เดสก์ท็อปเชลล์ที่สร้างมาเพื่อคุณ",
+      "support_creator": "สนับสนุนผู้สร้าง:",
+      "buy_coffee": "หากคุณชอบโปรเจกต์นี้ ลองเลี้ยงกาแฟผมสักแก้ว!",
+      "installed_success": "✔ ติดตั้ง Serpantinum {ver} ({commit}) สำเร็จ",
+      "failed_packages": "แพ็กเกจต่อไปนี้เกิดข้อผิดพลาดระหว่างการติดตั้ง:",
+      "restart_prompt": "รีสตาร์ทคอมโพสิเตอร์ หรือรัน 'serpantinumd start' เพื่อเริ่มต้น",
+      "ask_reboot": "ต้องการรีสตาร์ทหรือไม่? [y/n] "
+    },
+    "deps": {
+      "syncing": "กำลังซิงค์และอัปเดตแพ็กเกจระบบ (pacman -syyu)...",
+      "all_installed": "-> ติดตั้งแพ็กเกจทั้งหมดแล้ว! ข้ามขั้นตอนดาวน์โหลดแพ็กเกจ",
+      "missing_count": "-> พบ {count} แพ็กเกจที่ต้องติดตั้ง",
+      "installing_title": "กำลังติดตั้งแพ็กเกจระบบและไลบรารีที่จำเป็น...",
+      "installing_pkg": "กำลังติดตั้ง {pkg}...",
+      "install_ok": "ติดตั้ง {pkg} สำเร็จ",
+      "install_failed": "ติดตั้ง {pkg} ไม่สำเร็จ"
+    },
+    "deploy": {
+      "configuring_sddm": "กำลังตั้งค่าตัวจัดการจอแสดงผล SDDM...",
+      "disabling_dm": "-> กำลังปิดตัวจัดการจอแสดงผลที่ขัดแย้ง: {dm}",
+      "sddm_success": "-> ติดตั้งธีม material you สำหรับ SDDM และเปิดใช้บริการแล้ว [ OK ]"
+    }
+  },
+  "translator": {
+    "title": "ตัวแปลภาษา",
+    "status_translating": "กำลังแปล...",
+    "speed": "ความเร็ว: ",
+    "detected": "ตรวจพบ: ",
+    "input_label": "ข้อความต้นฉบับ",
+    "placeholder": "พิมพ์ วาง หรือพูดข้อความที่นี่...",
+    "chars": "อักขระ",
+    "translation_label": "คำแปล",
+    "empty_prompt": "คำแปลจะปรากฏที่นี่ทันที...",
+    "recent": "ล่าสุด:",
+    "failed": "ไม่มีคำแปล",
+    "quick_settings": "การตั้งค่าแทนที่ด่วน",
+    "replace_settings_title": "แทนที่ข้อความที่เลือกแบบด่วน",
+    "replace_settings_desc": "แปลข้อความที่เลือกและแทนที่ในตำแหน่งเดิม",
+    "auto_paste": "วางข้อความที่แปลอัตโนมัติ",
+    "auto_paste_sub": "หากปิด — คำแปลจะถูกคัดลอกไปยังคลิปบอร์ดเท่านั้น",
+    "keep_clipboard": "เก็บคำแปลไว้ในคลิปบอร์ด",
+    "keep_clipboard_sub": "หากปิด — เนื้อหาคลิปบอร์ดเดิมจะถูกคืนค่าหลังจากวาง"
+  },
+  "datetime": {
+    "full_date": "dddd, dd MMMM"
+  }
+}

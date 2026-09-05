@@ -1,0 +1,152 @@
+{
+  "general": {
+    "language": "en",
+    "avatarPath": "/home/zaru/Downloads/ZaruTech_Cha.png",
+    "muteSfx": false,
+    "weatherInterval": 15,
+    "weatherUnit": "metric",
+    "sfxVolume": 100,
+    "screenshotCaptureOnRelease": false,
+    "quickactions": true
+  },
+  "syspanel": {
+    "clipExpandProgress": 0,
+    "clipExpanded": false,
+    "clipState": 1
+  },
+  "bar": {
+    "position": "bottom",
+    "width": 100,
+    "opacity": 100,
+    "style": "fill",
+    "time": {
+      "format": "HH:mm:ss"
+    },
+    "autohide": false,
+    "autohideTimeout": 1000,
+    "modules": {
+      "left": [
+        "left",
+        "workspaces",
+        "media"
+      ],
+      "center": [
+        [
+          "timedate",
+          "info",
+          "weather"
+        ]
+      ],
+      "right": [
+        "tray",
+        [
+          "kb",
+          "wifi",
+          "bt",
+          "vol",
+          "bat"
+        ]
+      ]
+    },
+    "distinctPills": false,
+    "workspaceCount": 10,
+    "groupColors": {
+      "g_timedate": "#ffb3af",
+      "g_kb": "#594319"
+    }
+  },
+  "theme": {
+    "fontFamily": "Adwaita Mono",
+    "borderRadius": 10,
+    "activePreset": "Latte",
+    "matugen": false,
+    "colors": {
+      "base": "#eff1f5",
+      "blue": "#1e66f5",
+      "crust": "#dce0e8",
+      "green": "#40a02b",
+      "mantle": "#e6e9ef",
+      "maroon": "#e64553",
+      "mauve": "#8839ef",
+      "overlay0": "#9ca0b0",
+      "overlay1": "#8c8fa1",
+      "overlay2": "#7c7f93",
+      "peach": "#fe640b",
+      "pink": "#ea76cb",
+      "red": "#d20f39",
+      "sapphire": "#209fb5",
+      "subtext0": "#6c6f85",
+      "subtext1": "#5c5f77",
+      "surface0": "#ccd0da",
+      "surface1": "#bcc0cc",
+      "surface2": "#acb0be",
+      "teal": "#179299",
+      "text": "#4c4f69",
+      "yellow": "#df8e1d"
+    }
+  },
+  "idle": {
+    "enabled": true,
+    "actions": {
+      "dim": {
+        "id": "dim",
+        "timeout": 150,
+        "enabled": true,
+        "respectInhibitors": true,
+        "mprisInhibit": false,
+        "command": "",
+        "resumeCommand": "",
+        "isCustom": false
+      },
+      "dpms": {
+        "id": "dpms",
+        "timeout": 450,
+        "enabled": true,
+        "respectInhibitors": true,
+        "mprisInhibit": false,
+        "command": "",
+        "resumeCommand": "",
+        "isCustom": false
+      },
+      "lock": {
+        "id": "lock",
+        "timeout": 300,
+        "enabled": true,
+        "respectInhibitors": true,
+        "mprisInhibit": false,
+        "command": "",
+        "resumeCommand": "",
+        "isCustom": false
+      },
+      "suspend": {
+        "id": "suspend",
+        "timeout": 600,
+        "enabled": true,
+        "respectInhibitors": true,
+        "mprisInhibit": false,
+        "command": "",
+        "resumeCommand": "",
+        "isCustom": false
+      }
+    }
+  },
+  "notifications": {
+    "dnd": true,
+    "position": "top right",
+    "sound": true,
+    "soundFile": "/home/zaru/.local/share/serpantinum/src/assets/sounds/notifications/Botanica.wav"
+  },
+  "display": {
+    "monitors": {
+      "eDP-1": {
+        "enabled": false,
+        "scale": 1
+      },
+      "DP-3": {
+        "enabled": true,
+        "auto": true,
+        "scale": 1.2
+      }
+    }
+  }
+}
