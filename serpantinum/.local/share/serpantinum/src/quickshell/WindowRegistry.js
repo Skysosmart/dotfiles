@@ -47,6 +47,13 @@ function getWidgetLauncherEntries(i18n) {
             fontIcon: "󰋖"
         },
         {
+            id: "wellbeing",
+            name: tr("widgets.wellbeing.name", "Digital Wellbeing"),
+            description: tr("widgets.wellbeing.desc", "Screen time, app usage and limits"),
+            icon: "preferences-system-time",
+            fontIcon: "󰄉"
+        },
+        {
             id: "calendar",
             name: tr("widgets.calendar.name", "Calendar & Clock"),
             description: tr("widgets.calendar.desc", "View date, time, and schedule"),
@@ -95,6 +102,15 @@ function getLayout(name, mx, my, mw, mh, userScale, barPosition) {
         },
         "guide": { 
             w: 1200, h: 750, comp: "guide/GuidePopup.qml", draggable: true,
+            pos: { 
+                "top": { anchor: "center" }, 
+                "bottom": { anchor: "center" }, 
+                "left": { anchor: "center" }, 
+                "right": { anchor: "center" } 
+            } 
+        },
+        "wellbeing": { 
+            w: 940, h: 750, comp: "guide/wellbeing/WellbeingPopup.qml", draggable: true,
             pos: { 
                 "top": { anchor: "center" }, 
                 "bottom": { anchor: "center" }, 

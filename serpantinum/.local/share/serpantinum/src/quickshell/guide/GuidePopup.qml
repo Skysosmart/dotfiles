@@ -570,7 +570,6 @@ Item {
         { id: "Dock", key: "dock", name: "Dock", icon: "󰮯", file: "DockTab.qml", iconOffsetX: 0 },
         { id: "On-Screen Display", key: "osd", name: "On-Screen Display", icon: "󰕾", file: "OnScreenDisplayTab.qml", iconOffsetX: 0 },
         { id: "Notifications", key: "notifications", name: "Notifications", icon: "󰂚", file: "notifications/NotificationsTab.qml", iconOffsetX: 0 },
-        { id: "Wellbeing", key: "wellbeing", name: "Wellbeing", icon: "󰄉", file: "wellbeing/DigitalWellbeingTab.qml", iconOffsetX: 0 },        
         { id: "Idle", key: "idle", name: "Idle", icon: "󰒲", file: "IdleTab.qml", iconOffsetX: 0 },
         { id: "About", key: "about", name: "About", icon: "󰋽", file: "AboutTab.qml", iconOffsetX: 0 }
     ]
@@ -1721,7 +1720,6 @@ Item {
                                     tabDock,
                                     tabOsd,
                                     tabNotifications,
-                                    tabWellbeing,
                                     tabIdle,
                                     tabAbout
                                 ]
@@ -2744,7 +2742,7 @@ Item {
                                 }
 
                                 Rectangle {
-                                    id: tabWellbeing
+                                    id: tabIdle
                                     Layout.fillWidth: true
                                     Layout.preferredHeight: root.s(44)
                                     implicitHeight: root.s(44)
@@ -2755,75 +2753,6 @@ Item {
                                     transform: Translate { x: root.s(-24) * (1.0 - root.getTabProgress(9)) }
 
                                     property bool isDirectActive: root.currentTab === 9
-
-                                    color: tabWellbeingMa.containsMouse && !isDirectActive ? Qt.alpha(ThemeBackend.surface1, 0.5) : "transparent"
-                                    Behavior on color { ColorAnimation { duration: 150 } }
-
-                                    scale: tabWellbeingMa.pressed ? 0.98 : 1.0
-                                    Behavior on scale { NumberAnimation { duration: 250; easing.type: Easing.OutQuint } }
-
-                                    RowLayout {
-                                        anchors.fill: parent
-                                        anchors.leftMargin: root.s(10) + (tabWellbeing.isDirectActive ? root.s(4) : 0)
-                                        anchors.rightMargin: root.s(14)
-                                        spacing: root.s(10)
-
-                                        Behavior on anchors.leftMargin { NumberAnimation { duration: 400; easing.type: Easing.OutQuint } }
-
-                                        IconButton {
-                                            enabled: false
-                                            size: root.s(32)
-                                            Layout.preferredWidth: root.s(32)
-                                            Layout.preferredHeight: root.s(32)
-                                            Layout.alignment: Qt.AlignVCenter
-                                            cornerRadius: ThemeBackend.borderRadius
-                                            buttonIcon: "󰄉"
-                                            iconOffsetX: root.tabsModel[9].iconOffsetX ?? 0
-                                            iconFontSize: root.s(16)
-                                            accentColor: ThemeBackend.surface0
-                                            textColor: "#ffffff"
-                                        }
-
-                                        Text {
-                                            text: I18n.t("guide.tabs.wellbeing", "Wellbeing")
-                                            font.family: ThemeBackend.fontFamily
-                                            font.weight: tabWellbeing.isDirectActive ? Font.Bold : Font.Medium
-                                            font.pixelSize: root.s(13)
-                                            color: tabWellbeing.isDirectActive 
-                                                ? ThemeBackend.crust 
-                                                : (tabWellbeingMa.containsMouse ? ThemeBackend.text : ThemeBackend.subtext0)
-                                            Layout.fillWidth: true
-                                            Layout.alignment: Qt.AlignVCenter
-                                            elide: Text.ElideRight
-                                            Behavior on color { ColorAnimation { duration: 150 } }
-                                        }
-                                    }
-
-                                    MouseArea {
-                                        id: tabWellbeingMa
-                                        anchors.fill: parent
-                                        hoverEnabled: true
-                                        cursorShape: Qt.PointingHandCursor
-                                        onClicked: {
-                                            root.expandedTab = -1;
-                                            root.currentTab = 9;
-                                            root.currentSubTab = 0;
-                                        }
-                                    }
-                                }
-
-                                Rectangle {
-                                    id: tabIdle
-                                    Layout.fillWidth: true
-                                    Layout.preferredHeight: root.s(44)
-                                    implicitHeight: root.s(44)
-                                    radius: ThemeBackend.borderRadius
-                                    z: 1
-
-                                    opacity: root.getTabOpacity(10)
-                                    transform: Translate { x: root.s(-24) * (1.0 - root.getTabProgress(10)) }
-
-                                    property bool isDirectActive: root.currentTab === 10
 
                                     color: tabIdleMa.containsMouse && !isDirectActive ? Qt.alpha(ThemeBackend.surface1, 0.5) : "transparent"
                                     Behavior on color { ColorAnimation { duration: 150 } }
@@ -2847,7 +2776,7 @@ Item {
                                             Layout.alignment: Qt.AlignVCenter
                                             cornerRadius: ThemeBackend.borderRadius
                                             buttonIcon: "󰒲"
-                                            iconOffsetX: root.tabsModel[10].iconOffsetX ?? 0
+                                            iconOffsetX: root.tabsModel[9].iconOffsetX ?? 0
                                             iconFontSize: root.s(16)
                                             accentColor: ThemeBackend.surface0
                                             textColor: "#ffffff"
@@ -2875,7 +2804,7 @@ Item {
                                         cursorShape: Qt.PointingHandCursor
                                         onClicked: {
                                             root.expandedTab = -1;
-                                            root.currentTab = 10;
+                                            root.currentTab = 9;
                                             root.currentSubTab = 0;
                                         }
                                     }
@@ -2889,10 +2818,10 @@ Item {
                                     radius: ThemeBackend.borderRadius
                                     z: 1
 
-                                    opacity: root.getTabOpacity(11)
-                                    transform: Translate { x: root.s(-24) * (1.0 - root.getTabProgress(11)) }
+                                    opacity: root.getTabOpacity(10)
+                                    transform: Translate { x: root.s(-24) * (1.0 - root.getTabProgress(10)) }
 
-                                    property bool isDirectActive: root.currentTab === 11
+                                    property bool isDirectActive: root.currentTab === 10
 
                                     color: tabAboutMa.containsMouse && !isDirectActive ? Qt.alpha(ThemeBackend.surface1, 0.5) : "transparent"
                                     Behavior on color { ColorAnimation { duration: 150 } }
@@ -2916,7 +2845,7 @@ Item {
                                             Layout.alignment: Qt.AlignVCenter
                                             cornerRadius: ThemeBackend.borderRadius
                                             buttonIcon: "󰋽"
-                                            iconOffsetX: root.tabsModel[11].iconOffsetX ?? 0
+                                            iconOffsetX: root.tabsModel[10].iconOffsetX ?? 0
                                             iconFontSize: root.s(16)
                                             accentColor: ThemeBackend.surface0
                                             textColor: "#ffffff"
@@ -2944,7 +2873,7 @@ Item {
                                         cursorShape: Qt.PointingHandCursor
                                         onClicked: {
                                             root.expandedTab = -1;
-                                            root.currentTab = 11;
+                                            root.currentTab = 10;
                                             root.currentSubTab = 0;
                                         }
                                     }
@@ -2964,8 +2893,8 @@ Item {
                         textFontSize: root.s(13)
                         accentColor: ThemeBackend.green
                         textColor: ThemeBackend.crust
-                        opacity: root.getTabOpacity(12)
-                        transform: Translate { x: root.s(-24) * (1.0 - root.getTabProgress(12)) }
+                        opacity: root.getTabOpacity(11)
+                        transform: Translate { x: root.s(-24) * (1.0 - root.getTabProgress(11)) }
                         onClicked: {
                             root.gotoTab("about");
                         }

@@ -437,7 +437,7 @@ PanelWindow {
         if (!result) return null;
 
         let scale = masterWindow.globalUiScale || 1.0;
-        let isFixed = (name === "guide" || name === "wallpaper" || name === "notifications" || name === "system" || name === "hidden");
+        let isFixed = (name === "guide" || name === "wellbeing" || name === "wallpaper" || name === "notifications" || name === "system" || name === "hidden");
 
         if (effHidden && !isFixed) {
             let offsetAdjustment = Math.round(46 * scale);
