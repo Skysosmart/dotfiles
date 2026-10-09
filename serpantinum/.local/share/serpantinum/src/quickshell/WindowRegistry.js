@@ -116,6 +116,15 @@ function getLayout(name, mx, my, mw, mh, userScale, barPosition) {
                 "right": { anchor: "center" } 
             } 
         },
+        "browser": { 
+            w: 580, h: 250, comp: "browser/BrowserPicker.qml", 
+            pos: { 
+                "top": { anchor: "center" }, 
+                "bottom": { anchor: "center" }, 
+                "left": { anchor: "center" }, 
+                "right": { anchor: "center" } 
+            } 
+        },
         "taskmanager": { 
             w: 780, h: 720, comp: "taskmanager/TaskManagerPopup.qml", draggable: true,
             pos: { 
