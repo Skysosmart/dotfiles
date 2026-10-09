@@ -198,7 +198,9 @@ Scope {
         lockUI.authenticating = false;
         lockUI.statusText = I18n.t("lock.status.locked");
         rootLock.locked = true;
-        pamActionTimer.start();
+        root.howdyArmed = false;
+        root.howdyTyping = false;
+        root.howdyQuiet = false;
         kbPollerRestartTimer.restart();
     }
 
@@ -238,12 +240,53 @@ Scope {
     Timer {
         id: pamActionTimer
         interval: 350
-        onTriggered: {
-            if (rootLock.locked) {
-                pam.start();
-            }
+        onTriggered: root.howdyMaybeStartPam()
+    }
+
+    // --- Howdy: only scan once the user is actually here ------------------
+    // Stock Lock.qml starts PAM the moment the screen locks, which with
+    // pam_howdy means the webcam scans an empty desk. Instead, stay idle until
+    // a key press or click arms us.
+    property bool howdyArmed: false
+    property bool howdyTyping: false
+    property bool howdyQuiet: false
+
+    function howdyMaybeStartPam() {
+        if (!rootLock.locked || root.isUnlocking) return;
+        if (!root.howdyArmed) return;
+        if (pam.active) return;
+        pam.start();
+    }
+
+    function howdyArm() {
+        if (!rootLock.locked || root.isUnlocking) return;
+        if (root.howdyArmed) return;
+        root.howdyArmed = true;
+        root.howdyMaybeStartPam();
+    }
+
+    function howdyDisarm() {
+        if (!root.howdyArmed) return;
+        if (root.howdyTyping) return;   // never yank PAM out from under a typed password
+        root.howdyArmed = false;
+        if (pam.active && !lockUI.authenticating) {
+            root.howdyQuiet = true;   // suppress the "access denied" flash
+            pam.abort();
         }
     }
+
+    // Watchdog: if we are armed but PAM somehow is not running, restart it.
+    // Without this a dropped PAM context would leave the password box unable
+    // to submit (onAccepted requires pam.responseRequired).
+    Timer {
+        id: howdyEnsureTimer
+        interval: 1000
+        repeat: true
+        running: rootLock.locked && !root.isUnlocking && root.howdyArmed
+                 && !pam.active && !lockUI.authenticating
+        onTriggered: root.howdyMaybeStartPam()
+    }
+    // --- end Howdy arming -------------------------------------------------
 
     PamContext {
         id: pam
@@ -252,6 +295,8 @@ Scope {
             lockUI.authenticating = false;
             if (result === PamResult.Success) {
                 root.finishUnlock();
+            } else if (root.howdyQuiet) {
+                root.howdyQuiet = false;   // our own idle abort, not a real attempt
             } else {
                 lockUI.failed = true;
                 lockUI.statusText = I18n.t("lock.status.access_denied");
@@ -266,12 +311,9 @@ Scope {
         onExited: {
             SystemInfo.fetch();
             root.updateDeInfo();
-            pamActionTimer.restart();
             kbPollerRestartTimer.restart();
             root.resumeRevision++;
-            if (rootLock.locked) {
-                pam.start();
-            }
+            root.howdyMaybeStartPam();
         }
     }
 
@@ -667,6 +709,9 @@ Scope {
                     onInputActiveChanged: {
                         if (screenRoot.isUnlocking) return;
                         if (inputActive) {
+                            // Howdy: inputActive flips true on any key press (bar
+                            // Escape) and on any click — the "user is here" signal.
+                            root.howdyArm();
                             closeDashboardAnim.stop();
                             openDashboardAnim.restart();
                             screenRoot.restoreFocus();
@@ -815,6 +860,7 @@ Scope {
                         repeat: false
                         onTriggered: {
                             screenRoot.inputActive = false;
+                            root.howdyDisarm();
                             screenRoot.restoreFocus();
                         }
                     }
@@ -1387,6 +1433,7 @@ Scope {
                                                         screenRoot.inputActive = true;
                                                     }
                                                     idleTimer.restart();
+                                                    root.howdyTyping = newText.length > 0;
                                                     if (newText.length > 0) {
                                                         lockUI.failed = false;
                                                         lockUI.statusText = I18n.t("lock.status.enter_pin");

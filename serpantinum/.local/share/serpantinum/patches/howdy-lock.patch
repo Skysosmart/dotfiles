@@ -1,6 +1,6 @@
 --- a/src/quickshell/lock/Lock.qml
 +++ b/src/quickshell/lock/Lock.qml
-@@ -192,7 +192,9 @@
+@@ -198,7 +198,9 @@
          lockUI.authenticating = false;
          lockUI.statusText = I18n.t("lock.status.locked");
          rootLock.locked = true;
@@ -11,7 +11,7 @@
          kbPollerRestartTimer.restart();
      }
  
-@@ -237,13 +239,54 @@
+@@ -238,13 +240,54 @@
      Timer {
          id: pamActionTimer
          interval: 350
@@ -70,7 +70,7 @@
      PamContext {
          id: pam
  
-@@ -251,6 +294,8 @@
+@@ -252,6 +295,8 @@
              lockUI.authenticating = false;
              if (result === PamResult.Success) {
                  root.finishUnlock();
@@ -79,12 +79,13 @@
              } else {
                  lockUI.failed = true;
                  lockUI.statusText = I18n.t("lock.status.access_denied");
-@@ -265,11 +310,8 @@
+@@ -266,12 +311,9 @@
          onExited: {
              SystemInfo.fetch();
              root.updateDeInfo();
 -            pamActionTimer.restart();
              kbPollerRestartTimer.restart();
+             root.resumeRevision++;
 -            if (rootLock.locked) {
 -                pam.start();
 -            }
@@ -92,18 +93,17 @@
          }
      }
  
-@@ -631,6 +673,10 @@
-                     }
- 
+@@ -667,6 +709,9 @@
                      onInputActiveChanged: {
-+                        // Howdy: inputActive flips true on any key press (bar Escape)
-+                        // and on any click, so it is the "user is here" signal.
-+                        if (inputActive) root.howdyArm();
-+
                          if (screenRoot.isUnlocking) return;
                          if (inputActive) {
++                            // Howdy: inputActive flips true on any key press (bar
++                            // Escape) and on any click — the "user is here" signal.
++                            root.howdyArm();
                              closeDashboardAnim.stop();
-@@ -1008,6 +1054,7 @@
+                             openDashboardAnim.restart();
+                             screenRoot.restoreFocus();
+@@ -815,6 +860,7 @@
                          repeat: false
                          onTriggered: {
                              screenRoot.inputActive = false;
@@ -111,7 +111,7 @@
                              screenRoot.restoreFocus();
                          }
                      }
-@@ -1534,6 +1581,7 @@
+@@ -1387,6 +1433,7 @@
                                                          screenRoot.inputActive = true;
                                                      }
                                                      idleTimer.restart();
