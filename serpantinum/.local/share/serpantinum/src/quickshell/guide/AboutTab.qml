@@ -143,10 +143,7 @@ Item {
                             }
 
                             Text {
-                                text: I18n.t("guide.about.version_by", {
-                                    version: (Updater.localVersion !== "..." ? Updater.localVersion : (rootObj.dotsVersion !== "Loading..." && rootObj.dotsVersion !== I18n.t("guide.about.loading") ? rootObj.dotsVersion : "2.0.0")),
-                                    author: "@ilyamiro"
-                                })
+                                text: "v" + (Updater.localVersion !== "..." ? Updater.localVersion : (rootObj.dotsVersion !== "Loading..." && rootObj.dotsVersion !== I18n.t("guide.about.loading") ? rootObj.dotsVersion : "2.0.0"))
                                 font.family: ThemeBackend.fontFamily
                                 font.pixelSize: rootObj.s(13)
                                 color: ThemeBackend.subtext0
@@ -181,43 +178,6 @@ Item {
                             font.weight: Font.Bold
                             font.pixelSize: rootObj.s(18)
                             color: ThemeBackend.mauve
-                        }
-
-                        ClickButton {
-                            Layout.fillWidth: true
-                            Layout.preferredHeight: rootObj.s(36)
-                            horizontalPadding: rootObj.s(14)
-                            cornerRadius: ThemeBackend.borderRadius
-                            buttonText: "Changelog"
-                            textFontSize: rootObj.s(12)
-                            buttonIcon: "󰈙"
-                            iconFontSize: rootObj.s(16)
-                            accentColor: ThemeBackend.surface0
-                            textColor: ThemeBackend.text
-
-                            onTriggered: Quickshell.execDetached(["xdg-open", "https://github.com/ilyamiro/serpantinum/blob/master/CHANGELOG.md"])
-                        }
-
-                        FillButton {
-                            Layout.fillWidth: true
-                            Layout.preferredHeight: rootObj.s(38)
-                            buttonText: "Update"
-                            buttonIcon: "󰚰"
-                            accentColor: ThemeBackend.green
-                            baseColor: ThemeBackend.surface0
-                            hoverColor: Qt.alpha(ThemeBackend.green, 0.15)
-                            textColor: ThemeBackend.green
-                            filledTextColor: ThemeBackend.crust
-                            cornerRadius: ThemeBackend.borderRadius
-                            textFontSize: rootObj.s(12)
-                            iconFontSize: rootObj.s(16)
-                            fillDuration: 1200
-
-                            onTriggered: {
-                                let cmd = "if command -v kitty >/dev/null 2>&1; then kitty --hold bash -c 'eval \"$(curl -fsSL https://raw.githubusercontent.com/ilyamiro/serpantinum/master/install/install.sh)\"'; else ${TERM:-xterm} -hold -e bash -c 'eval \"$(curl -fsSL https://raw.githubusercontent.com/ilyamiro/serpantinum/master/install/install.sh)\"'; fi";
-                                Quickshell.execDetached(["bash", "-c", cmd]);
-                                Quickshell.execDetached(["bash", rootObj.appPaths.serpantinumDir + "/scripts/qs_manager.sh", "close"]);
-                            }
                         }
                     }
                 }
@@ -365,26 +325,6 @@ Item {
                             }
                         }
                     }
-                }
-            }
-
-            RowLayout {
-                Layout.alignment: Qt.AlignHCenter
-                spacing: rootObj.s(12)
-
-                ClickButton {
-                    Layout.preferredWidth: rootObj.s(260)
-                    Layout.preferredHeight: rootObj.s(42)
-                    horizontalPadding: rootObj.s(14)
-                    cornerRadius: ThemeBackend.borderRadius
-                    buttonText: I18n.t("guide.about.github_repo")
-                    textFontSize: rootObj.s(13)
-                    buttonIcon: "󰊤"
-                    iconFontSize: rootObj.s(16)
-                    accentColor: ThemeBackend.surface0
-                    textColor: ThemeBackend.text
-
-                    onTriggered: Quickshell.execDetached(["xdg-open", "https://github.com/ilyamiro/serpantinum"])
                 }
             }
         }

@@ -232,13 +232,6 @@ Item {
                 }
             }
 
-            Text {
-                text: I18n.t("guide.welcome.by_author", { author: "ilyamiro" })
-                font.family: ThemeBackend.fontFamily
-                font.pixelSize: rootObj.s(14)
-                color: ThemeBackend.subtext0
-                Layout.alignment: Qt.AlignHCenter
-            }
         }
 
         RowLayout {

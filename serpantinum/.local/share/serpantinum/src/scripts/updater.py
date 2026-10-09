@@ -3,9 +3,7 @@ import os
 import re
 import sys
 import time
-import urllib.request
 
-REPO = "ilyamiro/serpantinum"
 DEFAULT_VER = "2.0.0"
 
 state_dir = os.path.expanduser("~/.local/state/serpantinum")
@@ -83,15 +81,8 @@ except Exception:
 local_ver = get_local_ver()
 remote_ver = ""
 
-try:
-    req = urllib.request.Request(
-        f"https://raw.githubusercontent.com/{REPO}/master/version.txt",
-        headers={"User-Agent": "updater-script"}
-    )
-    res = urllib.request.urlopen(req, timeout=5)
-    remote_ver = res.read().decode("utf-8").strip()
-except Exception:
-    remote_ver = local_ver
+# Upstream update check removed: local install is hand-edited, never pull upstream.
+remote_ver = local_ver
 
 has_update = parse_v(remote_ver) > parse_v(local_ver)
 
