@@ -38,7 +38,12 @@
       "about": "Acerca de",
       "autostart": "Inicio automático",
       "display_widgets": "Widgets",
-      "display_general": "General"
+      "display_general": "General",
+      "osd": "OSD",
+      "dock": "Dock",
+      "bar_general": "General",
+      "bar_modules": "Módulos",
+      "bar_side_modules": "Módulos laterales"
     },
     "launcher": {
       "position": {
@@ -81,7 +86,9 @@
         "bottom_right": "Inferior derecha",
         "bottom_left": "Inferior izquierda",
         "top_center": "Superior centro",
-        "bottom_center": "Inferior centro"
+        "bottom_center": "Inferior centro",
+        "select_on_screen": "Seleccionar en pantalla...",
+        "close_selector": "Cerrar selector"
       },
       "sound": {
         "title": "Sonido de notificación",
@@ -94,7 +101,9 @@
       "empty_graphic": {
         "title": "Animación de centro vacío",
         "desc": "Mostrar el gráfico del gato durmiendo en el centro de notificaciones cuando esté vacío"
-      }
+      },
+      "test": "Probar notificación",
+      "test_desc": "Esta es una notificación de prueba"
     },
     "idle": {
       "enabled": {
@@ -140,23 +149,24 @@
       },
       "dim": {
         "title": "Atenuar pantalla",
-        "desc": "Tiempo antes de reducir el brillo de la pantalla"
+        "desc": "Reducir el brillo de la pantalla antes de bloquear"
       },
       "dpms": {
         "title": "Apagar pantalla (DPMS)",
-        "desc": "Tiempo antes de apagar la pantalla por completo"
+        "desc": "Apagar la señal de pantalla del monitor"
       },
       "lock": {
         "title": "Bloquear sesión",
-        "desc": "Tiempo antes de solicitar contraseña"
+        "desc": "Bloquear la sesión después de un período de inactividad"
       },
       "suspend": {
         "title": "Suspender sistema",
-        "desc": "Tiempo antes de suspender el equipo"
+        "desc": "Suspender el sistema al modo de suspensión"
       },
       "hooks": {
         "title": "Ganchos (comandos de shell)"
-      }
+      },
+      "custom_action_desc": "Acción y comando personalizados por tiempo de espera"
     },
     "welcome": {
       "by_author": "por @{author}",
@@ -254,14 +264,33 @@
         "hide_bar": {
           "title": "Ocultar barra en el redactor",
           "desc": "Ocultar automáticamente la barra al editar widgets en el modo redactor"
-        }
+        },
+        "hide_presets": "Ocultar preajustes",
+        "choose_preset": "Elegir un preajuste",
+        "presets": {
+          "title": "Preajustes de widgets"
+        },
+        "save_preset": {
+          "title": "Guardar ajuste preestablecido"
+        },
+        "preset_name_placeholder": "Introduce el nombre del ajuste...",
+        "screen_desc": "Configurar y editar widgets del escritorio"
       }
     },
     "bar": {
       "modules": {
         "vis": "Visualizador (cava)",
         "actions": "Acciones",
-        "workspaces": "Espacios de trabajo",
+        "workspaces": {
+          "style": {
+            "name": {
+              "pills": "Píldoras",
+              "numbers": "Números",
+              "pacman": "Pacman"
+            }
+          },
+          "name": "Espacios de trabajo"
+        },
         "media": "Multimedia",
         "tray": "Bandeja del sistema",
         "keyboard": "Teclado",
@@ -271,7 +300,16 @@
         "battery": "Batería",
         "focus": "Foco",
         "sysmon": "Monitor del sistema",
-        "timedate": "Hora/fecha",
+        "timedate": {
+          "name": "Hora y fecha",
+          "style": {
+            "name": {
+              "classic": "Clásico",
+              "material": "Material",
+              "badge": "Matriz de puntos"
+            }
+          }
+        },
         "info": "Grabación/temporizador",
         "weather": "Clima"
       },
@@ -290,7 +328,15 @@
       "workspaces": {
         "title": "Elegir cantidad de espacios de trabajo a mostrar",
         "disc": "Nota: esto no afecta la cantidad real de espacios de trabajo en el compositor",
-        "desc": "Número de espacios de trabajo a mostrar"
+        "desc": "Número de espacios de trabajo a mostrar",
+        "hide_empty": {
+          "title": "Ocultar escritorios vacíos",
+          "desc": "Mostrar solo los escritorios ocupados y el activo"
+        },
+        "style": {
+          "title": "Estilo",
+          "desc": "Elige el estilo visual para los indicadores de áreas de trabajo"
+        }
       },
       "opacity": {
         "title": "Opacidad de la barra",
@@ -331,6 +377,81 @@
       "distinct_pills": {
         "title": "Activar un estilo modular y compacto para los widgets",
         "desc": "Hace que los módulos de la barra tengan un contorno rectangular y reduzcan su tamaño para adaptarse a una apariencia modular"
+      },
+      "timedate": {
+        "show_date": {
+          "title": "Mostrar fecha",
+          "desc": "Mostrar el texto de la fecha junto al reloj"
+        },
+        "style": {
+          "title": "Estilo",
+          "desc": "Elige el estilo visual para el reloj y la fecha"
+        }
+      },
+      "vis": {
+        "bars": {
+          "title": "Cantidad de barras",
+          "desc": "Número de barras de frecuencia a mostrar"
+        },
+        "alignment": {
+          "title": "Alineación",
+          "desc": "Centrar el visualizador o alinearlo arriba o abajo"
+        },
+        "align": {
+          "center": "Centro",
+          "top": "Arriba",
+          "bottom": "Abajo",
+          "left": "Izquierda",
+          "right": "Derecha"
+        },
+        "continuous": {
+          "title": "Onda continua",
+          "desc": "Mostrar una onda fluida en lugar de barras discretas"
+        }
+      },
+      "sysmon": {
+        "style": {
+          "title": "Estilo de círculo",
+          "desc": "Apariencia visual de los anillos de progreso",
+          "wave": "Onda",
+          "circle": "Círculo"
+        },
+        "cpu": {
+          "title": "Uso de CPU",
+          "desc": "Mostrar el anillo de uso del procesador"
+        },
+        "ram": {
+          "title": "Uso de memoria",
+          "desc": "Mostrar el anillo de uso de memoria (RAM)"
+        },
+        "temp": {
+          "title": "Temperatura",
+          "desc": "Mostrar el anillo de temperatura del sistema"
+        },
+        "disk": {
+          "title": "Uso del disco",
+          "desc": "Mostrar el anillo de uso de almacenamiento"
+        }
+      },
+      "bat": {
+        "show_percent": {
+          "title": "Mostrar porcentaje",
+          "desc": "Muestra el porcentaje numérico de carga de la batería"
+        },
+        "show_icon": {
+          "title": "Mostrar icono",
+          "desc": "Muestra el icono de batería o indicador gráfico"
+        },
+        "style": {
+          "title": "Estilo de batería",
+          "desc": "Elige la apariencia visual del indicador de batería",
+          "name": {
+            "classic": "Clásico",
+            "minimal": "Minimalista"
+          },
+          "classic": "Píldora con onda de degradado",
+          "minimal": "Cápsula tipo iOS/Android con tapa"
+        }
       }
     },
     "theme": {
@@ -354,7 +475,8 @@
         "desc": "Directorio para buscar fondos de pantalla",
         "select_dir": "Seleccionar directorio...",
         "select_wallpaper": "Seleccionar fondo de pantalla",
-        "no_wallpaper_selected": "Ningún fondo de pantalla seleccionado"
+        "no_wallpaper_selected": "Ningún fondo de pantalla seleccionado",
+        "select": "Fondo de pantalla"
       }
     },
     "file_picker": {
@@ -366,7 +488,9 @@
       "places": {
         "home": "Carpeta personal",
         "downloads": "Descargas",
-        "pictures": "Imágenes"
+        "pictures": "Imágenes",
+        "music": "Música",
+        "documents": "Documentos"
       }
     },
     "font_picker": {
@@ -512,6 +636,143 @@
       "run_now": "Ejecutar ahora",
       "delete": "Eliminar",
       "toggle": "Activar / desactivar"
+    },
+    "osd": {
+      "capslock": {
+        "title": "Mostrar con Bloq Mayús"
+      },
+      "numlock": {
+        "title": "Mostrar con Bloq Num"
+      },
+      "airplane": {
+        "title": "Mostrar en Modo Avión"
+      },
+      "attach_bar": {
+        "title": "Acoplar a la barra en estilo solid/fill",
+        "desc": "Acoplar las ventanas OSD a la barra en modo solid o fill. Si se desactiva, el OSD permanecerá siempre en la posición configurada."
+      },
+      "test": "Probar OSD",
+      "position": {
+        "title": "Posición en pantalla del On-Screen Display",
+        "desc": "Arrastra el cuadro de vista previa para cambiar la posición",
+        "select_on_screen": "Seleccionar en pantalla...",
+        "close_selector": "Cerrar selector",
+        "bottom_center": "Centro inferior",
+        "bottom_left": "Inferior izquierda",
+        "bottom_right": "Inferior derecha",
+        "top_center": "Centro superior",
+        "top_left": "Superior izquierda",
+        "top_right": "Superior derecha"
+      },
+      "orientation": {
+        "horizontal": "Horizontal",
+        "vertical": "Vertical"
+      }
+    },
+    "common": {
+      "show_bar": "Mostrar barra",
+      "unavailable": "No disponible"
+    },
+    "position": {
+      "custom": "Personalizado"
+    },
+    "dock": {
+      "enabled": {
+        "title": "Activar dock",
+        "desc": "Activar el dock flotante de aplicaciones"
+      },
+      "position": {
+        "title": "Posición del dock",
+        "desc": "Seleccionar el borde de pantalla para anclar el dock",
+        "bottom": "Abajo",
+        "top": "Arriba",
+        "left": "Izquierda",
+        "right": "Derecha"
+      },
+      "elements": {
+        "title": "Número de elementos",
+        "desc": "Total de accesos directos mostrados en el dock"
+      },
+      "size": {
+        "title": "Tamaño de elementos",
+        "desc": "Dimensiones de los botones individuales en píxeles"
+      },
+      "autohide": {
+        "title": "Ocultar automáticamente",
+        "desc": "Ocultar el dock cuando no se pase el cursor sobre el borde"
+      },
+      "timeout": {
+        "title": "Retardo de ocultación automática",
+        "desc": "Tiempo antes de ocultarse tras salir el puntero"
+      },
+      "floating": {
+        "title": "Dock flotante",
+        "desc": "Desacoplar el dock del borde con esquinas redondeadas"
+      },
+      "transparency": {
+        "title": "Transparencia del dock",
+        "desc": "Ajustar el nivel de opacidad del fondo del dock"
+      },
+      "apps": {
+        "title": "Aplicaciones del dock",
+        "singular": "app",
+        "plural": "apps",
+        "shuffle": "Mezclar apps",
+        "empty": "No hay aplicaciones configuradas para el dock",
+        "enter_edit": "Modo de edición",
+        "exit_edit": "Salir de edición"
+      },
+      "picker": {
+        "search": "Buscar aplicaciones...",
+        "done": "Listo",
+        "empty": "No hay aplicaciones coincidentes"
+      },
+      "opacity": {
+        "title": "Opacidad del dock",
+        "desc": "Ajustar el nivel de opacidad del fondo del dock"
+      },
+      "override_bounds": {
+        "title": "Anular corrección de tamaño por límites de pantalla",
+        "desc": "Mantener tamaño personalizado incluso si el dock supera los límites de la pantalla"
+      },
+      "scrolling": {
+        "title": "Activar desplazamiento de elementos",
+        "desc": "Limitar elementos visibles y permitir desplazamiento con rueda o touchpad"
+      },
+      "visible_elements": {
+        "title": "Elementos visibles",
+        "desc": "Cantidad de elementos del dock visibles simultáneamente"
+      },
+      "hover_scale": {
+        "title": "Efecto de escala al pasar el cursor",
+        "desc": "Nivel de aumento al pasar el cursor sobre los elementos del dock"
+      },
+      "cascade_scale": {
+        "title": "Escalar elementos cercanos",
+        "desc": "Ampliación en cascada en los iconos contiguos"
+      },
+      "exclusive": {
+        "title": "Modo exclusivo",
+        "desc": "Evitar que las ventanas ocupen el espacio del dock"
+      },
+      "on_top": {
+        "title": "Colocar dock sobre las ventanas",
+        "desc": "Mantener el dock visible encima de las ventanas de aplicaciones"
+      },
+      "smart_autohide": {
+        "title": "Ocultación automática inteligente",
+        "desc": "Ocultar el dock solo cuando haya ventanas abiertas, mantener visible en el escritorio"
+      }
+    },
+    "lyrics_picker": {
+      "title": "Seleccionar archivo de letras",
+      "no_lyrics_selected": "Ningún archivo de letras seleccionado"
+    },
+    "settings": "Ajustes",
+    "search": {
+      "placeholder": "Buscar ajustes...",
+      "prompt": "Escribe para buscar ajustes...",
+      "no_results": "No se encontraron ajustes"
     }
   },
   "sysnotif": {
@@ -542,7 +803,12 @@
   },
   "applauncher": {
     "search": "Buscar",
-    "placeholder": "Empieza con > para un comando..."
+    "placeholder": "Empieza con > para un comando...",
+    "tab_applications": "Aplicaciones",
+    "tab_files": "Archivos",
+    "placeholder_files": "Buscar archivos o escribir ruta...",
+    "tab_emojis": "Emojis",
+    "placeholder_emojis": "Buscar emojis o escribir palabra clave..."
   },
   "calendar": {
     "loading": "Cargando...",
@@ -611,7 +877,11 @@
       "jazz": "Jazz",
       "classic": "Clásica",
       "custom": "Personalizado"
-    }
+    },
+    "searching_lyrics": "Buscando letra...",
+    "no_lyrics": "No se encontró la letra",
+    "select_local_file": "Seleccionar un archivo local",
+    "lyrics": "Letra"
   },
   "network": {
     "tabs": {
@@ -699,6 +969,16 @@
         "pomo_skipped_title": "Pomodoro omitido",
         "pomo_skipped_focus_body": "Sesión de enfoque omitida. Pasando al descanso.",
         "pomo_skipped_break_body": "Descanso omitido. Volviendo al enfoque."
+      }
+    },
+    "draw": {
+      "notification": {
+        "app_name": "DrawAction",
+        "saved_title": "Dibujo guardado",
+        "copied_title": "Dibujo copiado",
+        "copied_body": "Dibujo copiado al portapapeles",
+        "failed_title": "Error al exportar",
+        "failed_body": "No se pudo guardar el dibujo"
       }
     }
   },
@@ -884,13 +1164,20 @@
       "click_to_add": "Haz clic en el icono de un widget en la barra inferior para añadirlo",
       "done": "Listo",
       "widget_singular": "widget",
-      "widgets_plural": "widgets"
+      "widgets_plural": "widgets",
+      "widgets_short": "w"
     },
     "types": {
       "clock": "Reloj",
       "music": "Música",
       "weather": "Clima",
-      "image": "Imagen"
+      "image": "Imagen",
+      "visualizer": "Visualizador",
+      "user": "Usuario",
+      "usage": "Uso",
+      "battery": "Batería",
+      "github": "Github",
+      "time": "Hora"
     },
     "variants": {
       "digital": "Digital",
@@ -900,7 +1187,49 @@
       "compact": "Compacto",
       "rect": "Rectangular",
       "minimal": "Minimalista",
-      "rounded": "Redondeado"
+      "rounded": "Redondeado",
+      "bars": "Barras",
+      "continuous": "Continuo",
+      "default": "Predeterminado",
+      "material": "Material",
+      "materialAnalog": "Material analógico",
+      "lumen": "Lumen",
+      "lyrics": "Letra",
+      "simpleLyrics": "Letra simple"
+    },
+    "presets": {
+      "minimal": {
+        "name": "Minimalista",
+        "desc": "Diseño limpio y sutil con reloj digital minimalista y clima compacto."
+      },
+      "media_station": {
+        "name": "Estación Multimedia",
+        "desc": "Configuración multimedia con barras de visualizador centradas y controlador de música circular."
+      },
+      "dashboard": {
+        "name": "Panel de Control",
+        "desc": "Monitor de espacio de trabajo completo con reloj digital, uso de hardware y estado de la batería."
+      }
+    },
+    "github": {
+      "set_user": "Establecer usuario",
+      "error": "Error",
+      "commit": "commit",
+      "commits": "commits",
+      "no_day_selected": "Ningún día seleccionado",
+      "fetching": "Obteniendo contribuciones de GitHub...",
+      "fetch_error": "No se pudo obtener el usuario @{user}",
+      "enter_username": "Introduce un nombre de usuario de GitHub",
+      "no_contributions": "No se encontraron contribuciones"
+    },
+    "settings": {
+      "lyricsLines": "Líneas",
+      "lyricsAlignment": "Alineación"
+    },
+    "align": {
+      "left": "Izquierda",
+      "center": "Centro",
+      "right": "Derecha"
     }
   },
   "cli": {

@@ -10,6 +10,7 @@ import "../reusables"
 
 Item {
     id: root
+    visible: false
     focus: true
 
     function s(val) { 
@@ -21,14 +22,26 @@ Item {
     Timer {
         id: focusTimer
         interval: 50
-        running: true
+        running: false
         repeat: false
         onTriggered: root.forceActiveFocus()
     }
 
+    onVisibleChanged: {
+        if (visible) {
+            startupSequence.restart();
+            focusTimer.restart();
+        } else {
+            startupSequence.stop();
+            closeSequence.stop();
+        }
+    }
+
     Component.onCompleted: {
-        startupSequence.start();
-        focusTimer.start();
+        if (visible) {
+            startupSequence.start();
+            focusTimer.start();
+        }
     }
 
     SequentialAnimation {

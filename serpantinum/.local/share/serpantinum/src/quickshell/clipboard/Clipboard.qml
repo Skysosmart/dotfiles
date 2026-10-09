@@ -203,51 +203,13 @@ PanelWindow {
         return i === sub.length;
     }
 
-    function getClipKey(item) {
-        return (item && item.id !== undefined && item.id !== null) ? item.id.toString() : "";
-    }
-
     function syncClipBoxModel(targetItems) {
-        let newKeys = {};
-        for (let i = 0; i < targetItems.length; i++) {
-            newKeys[getClipKey(targetItems[i])] = true;
-        }
-
-        for (let i = clipBoxModel.count - 1; i >= 0; i--) {
-            let key = getClipKey(clipBoxModel.get(i));
-            if (!newKeys[key]) {
-                clipBoxModel.remove(i);
-            }
-        }
-
         for (let i = 0; i < targetItems.length; i++) {
             let item = targetItems[i];
-            let targetKey = getClipKey(item);
-
             if (i < clipBoxModel.count) {
-                let currentKey = getClipKey(clipBoxModel.get(i));
-                if (currentKey === targetKey) {
-                    let cur = clipBoxModel.get(i);
-                    if (cur.pinned !== item.pinned || cur.content !== item.content || cur.type !== item.type || cur.sectionCategory !== item.sectionCategory) {
-                        clipBoxModel.set(i, item);
-                    }
-                } else {
-                    let foundIndex = -1;
-                    for (let j = i + 1; j < clipBoxModel.count; j++) {
-                        if (getClipKey(clipBoxModel.get(j)) === targetKey) {
-                            foundIndex = j;
-                            break;
-                        }
-                    }
-                    if (foundIndex !== -1) {
-                        clipBoxModel.move(foundIndex, i, 1);
-                        let cur = clipBoxModel.get(i);
-                        if (cur.pinned !== item.pinned || cur.content !== item.content || cur.type !== item.type || cur.sectionCategory !== item.sectionCategory) {
-                            clipBoxModel.set(i, item);
-                        }
-                    } else {
-                        clipBoxModel.insert(i, item);
-                    }
+                let cur = clipBoxModel.get(i);
+                if (cur.id !== item.id || cur.pinned !== item.pinned || cur.content !== item.content || cur.type !== item.type || cur.sectionCategory !== item.sectionCategory || cur.score !== item.score) {
+                    clipBoxModel.set(i, item);
                 }
             } else {
                 clipBoxModel.append(item);
@@ -324,6 +286,8 @@ PanelWindow {
         }
 
         syncClipBoxModel(filtered);
+
+        clipList.resetScroll();
 
         if (clipBoxModel.count > 0) {
             clipList.currentIndex = 0;
@@ -452,6 +416,7 @@ PanelWindow {
     function clearAllClips() {
         clipboardWindow.allFetchedClips = [];
         clipBoxModel.clear();
+        clipList.resetScroll();
         clipActionProc.command = ["python3", Caching.qsDir + "/clipboard/clip_fetcher.py", "wipe", Caching.getCacheDir("clipboard")];
         clipActionProc.running = true;
     }
@@ -592,6 +557,7 @@ PanelWindow {
             focusRetryTimer.restart();
             focusFinalTimer.restart();
         } else {
+            clipList.resetScroll();
             clipboardWindow.expandedClipId = "";
             filterDebounceTimer.stop();
             focusTimer.stop();
@@ -643,198 +609,55 @@ PanelWindow {
 
         opacity: (clipboardWindow.isVisible || animProgress > 0.001) ? 1.0 : 0.0
 
-        Shape {
-            visible: clipboardWindow.attachEdge === "top" && container.dynamicCornerRadius > 0.5
-            x: -container.dynamicCornerRadius
-            y: 0
+        ShaderEffect {
+            visible: container.dynamicCornerRadius > 0.5
+            x: {
+                if (clipboardWindow.attachEdge === "left") return 0;
+                if (clipboardWindow.attachEdge === "right") return parent.width - container.dynamicCornerRadius;
+                return -container.dynamicCornerRadius;
+            }
+            y: {
+                if (clipboardWindow.attachEdge === "bottom") return parent.height - container.dynamicCornerRadius;
+                if (clipboardWindow.attachEdge === "left" || clipboardWindow.attachEdge === "right") return -container.dynamicCornerRadius;
+                return 0;
+            }
             width: container.dynamicCornerRadius
             height: container.dynamicCornerRadius
-            preferredRendererType: Shape.CurveRenderer
-            ShapePath {
-                fillColor: ThemeBackend.base
-                strokeColor: "transparent"
-                startX: 0
-                startY: 0
-                PathLine { x: container.dynamicCornerRadius; y: 0 }
-                PathLine { x: container.dynamicCornerRadius; y: container.dynamicCornerRadius }
-                PathArc {
-                    x: 0
-                    y: 0
-                    radiusX: container.dynamicCornerRadius
-                    radiusY: container.dynamicCornerRadius
-                    direction: PathArc.Counterclockwise
-                }
+            property vector2d itemSize: Qt.vector2d(width, height)
+            property real cornerIndex: {
+                if (clipboardWindow.attachEdge === "bottom") return 3.0;
+                if (clipboardWindow.attachEdge === "left") return 2.0;
+                if (clipboardWindow.attachEdge === "right") return 3.0;
+                return 1.0;
             }
+            property color color: ThemeBackend.base
+            fragmentShader: "file://" + Caching.serpantinumDir + "/assets/shaders/ui/corner_cutout.frag.qsb"
         }
 
-        Shape {
-            visible: clipboardWindow.attachEdge === "top" && container.dynamicCornerRadius > 0.5
-            x: parent.width
-            y: 0
+        ShaderEffect {
+            visible: container.dynamicCornerRadius > 0.5
+            x: {
+                if (clipboardWindow.attachEdge === "left") return 0;
+                if (clipboardWindow.attachEdge === "right") return parent.width - container.dynamicCornerRadius;
+                return parent.width;
+            }
+            y: {
+                if (clipboardWindow.attachEdge === "bottom") return parent.height - container.dynamicCornerRadius;
+                if (clipboardWindow.attachEdge === "left" || clipboardWindow.attachEdge === "right") return parent.height;
+                return 0;
+            }
             width: container.dynamicCornerRadius
             height: container.dynamicCornerRadius
-            preferredRendererType: Shape.CurveRenderer
-            ShapePath {
-                fillColor: ThemeBackend.base
-                strokeColor: "transparent"
-                startX: container.dynamicCornerRadius
-                startY: 0
-                PathLine { x: 0; y: 0 }
-                PathLine { x: 0; y: container.dynamicCornerRadius }
-                PathArc {
-                    x: container.dynamicCornerRadius
-                    y: 0
-                    radiusX: container.dynamicCornerRadius
-                    radiusY: container.dynamicCornerRadius
-                    direction: PathArc.Clockwise
-                }
+            property vector2d itemSize: Qt.vector2d(width, height)
+            property real cornerIndex: {
+                if (clipboardWindow.attachEdge === "bottom") return 2.0;
+                if (clipboardWindow.attachEdge === "left") return 0.0;
+                if (clipboardWindow.attachEdge === "right") return 1.0;
+                return 0.0;
             }
+            property color color: ThemeBackend.base
+            fragmentShader: "file://" + Caching.serpantinumDir + "/assets/shaders/ui/corner_cutout.frag.qsb"
         }
-
-        Shape {
-            visible: clipboardWindow.attachEdge === "bottom" && container.dynamicCornerRadius > 0.5
-            x: -container.dynamicCornerRadius
-            y: parent.height - container.dynamicCornerRadius
-            width: container.dynamicCornerRadius
-            height: container.dynamicCornerRadius
-            preferredRendererType: Shape.CurveRenderer
-            ShapePath {
-                fillColor: ThemeBackend.base
-                strokeColor: "transparent"
-                startX: 0
-                startY: container.dynamicCornerRadius
-                PathLine { x: container.dynamicCornerRadius; y: container.dynamicCornerRadius }
-                PathLine { x: container.dynamicCornerRadius; y: 0 }
-                PathArc {
-                    x: 0
-                    y: container.dynamicCornerRadius
-                    radiusX: container.dynamicCornerRadius
-                    radiusY: container.dynamicCornerRadius
-                    direction: PathArc.Clockwise
-                }
-            }
-        }
-
-        Shape {
-            visible: clipboardWindow.attachEdge === "bottom" && container.dynamicCornerRadius > 0.5
-            x: parent.width
-            y: parent.height - container.dynamicCornerRadius
-            width: container.dynamicCornerRadius
-            height: container.dynamicCornerRadius
-            preferredRendererType: Shape.CurveRenderer
-            ShapePath {
-                fillColor: ThemeBackend.base
-                strokeColor: "transparent"
-                startX: container.dynamicCornerRadius
-                startY: container.dynamicCornerRadius
-                PathLine { x: 0; y: container.dynamicCornerRadius }
-                PathLine { x: 0; y: 0 }
-                PathArc {
-                    x: container.dynamicCornerRadius
-                    y: 0
-                    radiusX: container.dynamicCornerRadius
-                    radiusY: container.dynamicCornerRadius
-                    direction: PathArc.Counterclockwise
-                }
-            }
-        }
-
-        Shape {
-            visible: clipboardWindow.attachEdge === "left" && container.dynamicCornerRadius > 0.5
-            x: 0
-            y: -container.dynamicCornerRadius
-            width: container.dynamicCornerRadius
-            height: container.dynamicCornerRadius
-            preferredRendererType: Shape.CurveRenderer
-            ShapePath {
-                fillColor: ThemeBackend.base
-                strokeColor: "transparent"
-                startX: 0
-                startY: 0
-                PathLine { x: 0; y: container.dynamicCornerRadius }
-                PathLine { x: container.dynamicCornerRadius; y: container.dynamicCornerRadius }
-                PathArc {
-                    x: 0
-                    y: 0
-                    radiusX: container.dynamicCornerRadius
-                    radiusY: container.dynamicCornerRadius
-                    direction: PathArc.Clockwise
-                }
-            }
-        }
-
-        Shape {
-            visible: clipboardWindow.attachEdge === "left" && container.dynamicCornerRadius > 0.5
-            x: 0
-            y: parent.height
-            width: container.dynamicCornerRadius
-            height: container.dynamicCornerRadius
-            preferredRendererType: Shape.CurveRenderer
-            ShapePath {
-                fillColor: ThemeBackend.base
-                strokeColor: "transparent"
-                startX: 0
-                startY: container.dynamicCornerRadius
-                PathLine { x: 0; y: 0 }
-                PathLine { x: container.dynamicCornerRadius; y: 0 }
-                PathArc {
-                    x: 0
-                    y: container.dynamicCornerRadius
-                    radiusX: container.dynamicCornerRadius
-                    radiusY: container.dynamicCornerRadius
-                    direction: PathArc.Counterclockwise
-                }
-            }
-        }
-
-        Shape {
-            visible: clipboardWindow.attachEdge === "right" && container.dynamicCornerRadius > 0.5
-            x: parent.width - container.dynamicCornerRadius
-            y: -container.dynamicCornerRadius
-            width: container.dynamicCornerRadius
-            height: container.dynamicCornerRadius
-            preferredRendererType: Shape.CurveRenderer
-            ShapePath {
-                fillColor: ThemeBackend.base
-                strokeColor: "transparent"
-                startX: container.dynamicCornerRadius
-                startY: 0
-                PathLine { x: container.dynamicCornerRadius; y: container.dynamicCornerRadius }
-                PathLine { x: 0; y: container.dynamicCornerRadius }
-                PathArc {
-                    x: container.dynamicCornerRadius
-                    y: 0
-                    radiusX: container.dynamicCornerRadius
-                    radiusY: container.dynamicCornerRadius
-                    direction: PathArc.Counterclockwise
-                }
-            }
-        }
-
-        Shape {
-            visible: clipboardWindow.attachEdge === "right" && container.dynamicCornerRadius > 0.5
-            x: parent.width - container.dynamicCornerRadius
-            y: parent.height
-            width: container.dynamicCornerRadius
-            height: container.dynamicCornerRadius
-            preferredRendererType: Shape.CurveRenderer
-            ShapePath {
-                fillColor: ThemeBackend.base
-                strokeColor: "transparent"
-                startX: container.dynamicCornerRadius
-                startY: container.dynamicCornerRadius
-                PathLine { x: container.dynamicCornerRadius; y: 0 }
-                PathLine { x: 0; y: 0 }
-                PathArc {
-                    x: container.dynamicCornerRadius
-                    y: 0
-                    radiusX: container.dynamicCornerRadius
-                    radiusY: container.dynamicCornerRadius
-                    direction: PathArc.Clockwise
-                }
-            }
-        }
-
         Rectangle {
             id: bgCard
             anchors.fill: parent
@@ -951,6 +774,12 @@ PanelWindow {
                         placeholderText: typeof I18n !== "undefined" ? I18n.t("clipboard.search", "Search clipboard") : "Search clipboard"
                         showClearButton: true
 
+                        onHasFocusChanged: {
+                            if (!searchInput.hasFocus && clipboardWindow.isVisible) {
+                                clipList.forceActiveFocus();
+                            }
+                        }
+
                         onTextEdited: function(newText) {
                             filterClips(newText);
                         }
@@ -1029,6 +858,14 @@ PanelWindow {
                     height: Math.max(0, parent.height - searchRow.height - clipboardWindow.s(10))
                     clip: true
 
+                    NumberAnimation {
+                        id: scrollAnim
+                        target: clipList
+                        property: "contentY"
+                        duration: 260
+                        easing.type: Easing.OutCubic
+                    }
+
                     ListView {
                         id: clipList
                         anchors.fill: parent
@@ -1037,13 +874,122 @@ PanelWindow {
                         spacing: clipboardWindow.s(4)
                         currentIndex: 0
                         boundsBehavior: Flickable.StopAtBounds
+                        cacheBuffer: clipboardWindow.s(600)
                         interactive: !clipboardWindow.isClearingClips && (contentHeight > height)
 
                         highlightFollowsCurrentItem: false
 
+                        Keys.forwardTo: [searchInput]
+
+                        Keys.onPressed: function(event) {
+                            if (event.key === Qt.Key_Backspace) {
+                                clipboardWindow.grabInputFocus();
+                                if (searchInput.text.length > 0) {
+                                    searchInput.text = searchInput.text.slice(0, -1);
+                                }
+                                event.accepted = true;
+                                return;
+                            }
+                            if (event.text && event.text.length > 0 && event.key !== Qt.Key_Return && event.key !== Qt.Key_Enter && event.key !== Qt.Key_Escape && event.key !== Qt.Key_Tab && event.key !== Qt.Key_Backtab && event.key !== Qt.Key_Delete) {
+                                clipboardWindow.grabInputFocus();
+                                searchInput.text += event.text;
+                                event.accepted = true;
+                            }
+                        }
+
+                        function resetScroll() {
+                            scrollAnim.stop();
+                            positionViewAtBeginning();
+                            contentY = 0;
+                        }
+
+                        function getItemBounds(idx) {
+                            if (idx < 0 || idx >= clipBoxModel.count) return null;
+                            let secH = clipboardWindow.s(22);
+                            let defaultH = clipboardWindow.s(52);
+                            let itemObj = itemAtIndex(idx);
+                            let isFirstInSection = false;
+                            let curItem = clipBoxModel.get(idx);
+                            if (curItem) {
+                                if (idx === 0) {
+                                    isFirstInSection = (curItem.sectionCategory !== undefined && curItem.sectionCategory !== "");
+                                } else {
+                                    let prevItem = clipBoxModel.get(idx - 1);
+                                    if (prevItem && curItem.sectionCategory !== prevItem.sectionCategory) {
+                                        isFirstInSection = true;
+                                    }
+                                }
+                            }
+
+                            if (itemObj) {
+                                let topY = Math.max(0, itemObj.y - (isFirstInSection ? secH : 0));
+                                let botY = itemObj.y + itemObj.height;
+                                return { top: topY, bottom: botY };
+                            }
+
+                            let curY = 0;
+                            let prevSec = "";
+                            for (let i = 0; i <= idx; i++) {
+                                let m = clipBoxModel.get(i);
+                                if (!m) break;
+                                let sec = m.sectionCategory || "";
+                                let hasSec = (sec !== "" && sec !== prevSec);
+                                if (hasSec) {
+                                    curY += secH;
+                                    prevSec = sec;
+                                }
+                                let h = defaultH;
+                                let obj = itemAtIndex(i);
+                                if (obj) {
+                                    h = obj.height;
+                                }
+                                if (i === idx) {
+                                    let topY = Math.max(0, curY - (hasSec ? secH : 0));
+                                    let botY = curY + h;
+                                    return { top: topY, bottom: botY };
+                                }
+                                curY += h + spacing;
+                            }
+                            return { top: Math.max(0, curY), bottom: curY + defaultH };
+                        }
+
+                        function ensureVisible(idx, animated) {
+                            if (idx < 0 || clipBoxModel.count === 0) return;
+                            let bounds = getItemBounds(idx);
+                            if (!bounds) return;
+
+                            let curContentY = scrollAnim.running ? scrollAnim.to : contentY;
+                            let maxScroll = Math.max(0, Math.max(contentHeight, bounds.bottom) - height);
+                            let newContentY = curContentY;
+
+                            if (bounds.top < curContentY) {
+                                newContentY = bounds.top;
+                            } else if (bounds.bottom > curContentY + height) {
+                                newContentY = bounds.bottom - height;
+                            }
+
+                            newContentY = Math.max(0, Math.min(maxScroll, newContentY));
+
+                            if (Math.abs(newContentY - contentY) > 0.5) {
+                                if (animated) {
+                                    scrollAnim.stop();
+                                    scrollAnim.from = contentY;
+                                    scrollAnim.to = newContentY;
+                                    scrollAnim.start();
+                                } else {
+                                    scrollAnim.stop();
+                                    contentY = newContentY;
+                                }
+                            }
+                        }
+
+                        onMovementStarted: {
+                            scrollAnim.stop();
+                        }
+
                         onCurrentIndexChanged: {
                             if (currentIndex >= 0) {
-                                positionViewAtIndex(currentIndex, ListView.Contain);
+                                ensureVisible(currentIndex, clipboardWindow.isKeyboardNav);
                             }
                         }
 
@@ -1097,31 +1043,12 @@ PanelWindow {
                             }
                         }
 
-                        displaced: Transition {
-                            NumberAnimation {
-                                properties: "y"
-                                duration: 280
-                                easing.type: Easing.OutCubic
-                            }
-                        }
-
-                        move: Transition {
-                            NumberAnimation {
-                                properties: "y"
-                                duration: 280
-                                easing.type: Easing.OutCubic
-                            }
-                        }
-
-                        moveDisplaced: Transition {
-                            NumberAnimation {
-                                properties: "y"
-                                duration: 280
-                                easing.type: Easing.OutCubic
-                            }
-                        }
+                        displaced: null
 
                         onContentYChanged: {
+                            if (contentY < 0 && !moving && !flicking) {
+                                contentY = 0;
+                            }
                             if (clipboardWindow.hasMoreClips && !clipFetcherProc.running && searchInput.text.trim().length === 0) {
                                 if (contentY + height >= contentHeight - clipboardWindow.s(450)) {
                                     clipboardWindow.fetchNextClipPage();
@@ -1156,13 +1083,19 @@ PanelWindow {
                                     easing.type: Easing.OutQuart
                                     onRunningChanged: {
                                         if (!running && clipDelegateWrapper.isSelected) {
-                                            clipList.positionViewAtIndex(clipList.currentIndex, ListView.Contain);
+                                            clipList.ensureVisible(clipList.currentIndex, true);
                                         }
                                     }
                                 }
                             }
 
                             property string clipIdString: (typeof model !== "undefined" && model && model.id !== undefined) ? model.id.toString() : (clipBoxModel.get(index) ? clipBoxModel.get(index).id.toString() : "")
+
+                            onClipIdStringChanged: {
+                                itemExpanded = false;
+                                dragX = 0;
+                            }
+
                             property real dragX: 0
                             property bool isDismissing: false
 
@@ -1193,6 +1126,7 @@ PanelWindow {
                                 font.family: ThemeBackend.fontFamily
                                 font.pixelSize: clipboardWindow.s(12)
                                 wrapMode: Text.Wrap
+                                textFormat: Text.PlainText
                             }
 
                             function toggleExpand() {
@@ -1210,7 +1144,7 @@ PanelWindow {
                                     if (model.type !== "image" && clipboardWindow.expandedClipId !== clipIdString) {
                                         clipboardWindow.fetchFullText(clipIdString);
                                     }
-                                    clipList.positionViewAtIndex(index, ListView.Contain);
+                                    clipList.ensureVisible(index, true);
                                 }
                             }
 
@@ -1290,10 +1224,11 @@ PanelWindow {
                                     source: (clipDelegateCard.isImage && model.content) ? (model.content.startsWith("file://") ? model.content : "file://" + model.content) : ""
                                     fillMode: Image.PreserveAspectCrop
                                     asynchronous: true
-                                    cache: true
+                                    cache: false
                                     smooth: true
-                                    mipmap: true
-                                    visible: clipDelegateCard.isImage
+                                    sourceSize.width: Math.round(Math.max(100, clipDelegateCard.width * (Screen.devicePixelRatio || 1)))
+                                    sourceSize.height: Math.round(Math.max(100, clipDelegateCard.expandedH * (Screen.devicePixelRatio || 1)))
+                                    visible: clipDelegateCard.isImage && opacity > 0.01
                                     opacity: 1.0 - (clipDelegateWrapper.itemExpandProgress * 0.85)
                                 }
 
@@ -1301,12 +1236,13 @@ PanelWindow {
                                     id: clipCardFitImg
                                     anchors.fill: parent
                                     anchors.margins: clipboardWindow.s(6) * clipDelegateWrapper.itemExpandProgress
-                                    source: (clipDelegateCard.isImage && model.content) ? (model.content.startsWith("file://") ? model.content : "file://" + model.content) : ""
+                                    source: (clipDelegateCard.isImage && model.content && clipDelegateWrapper.itemExpandProgress > 0.01) ? (model.content.startsWith("file://") ? model.content : "file://" + model.content) : ""
                                     fillMode: Image.PreserveAspectFit
                                     asynchronous: true
-                                    cache: true
+                                    cache: false
                                     smooth: true
-                                    mipmap: true
+                                    sourceSize.width: Math.round(Math.max(100, clipDelegateCard.width * (Screen.devicePixelRatio || 1)))
+                                    sourceSize.height: Math.round(Math.max(100, clipDelegateCard.expandedH * (Screen.devicePixelRatio || 1)))
                                     visible: clipDelegateCard.isImage && clipDelegateWrapper.itemExpandProgress > 0.01
                                     opacity: clipDelegateWrapper.itemExpandProgress
                                 }
@@ -1461,9 +1397,10 @@ PanelWindow {
                                         source: (!clipDelegateCard.isImage && model.type === "image" && model.content) ? (model.content.startsWith("file://") ? model.content : "file://" + model.content) : ""
                                         fillMode: Image.PreserveAspectCrop
                                         asynchronous: true
-                                        cache: true
+                                        cache: false
                                         smooth: true
-                                        mipmap: true
+                                        sourceSize.width: Math.round(clipboardWindow.s(60) * (Screen.devicePixelRatio || 1))
+                                        sourceSize.height: Math.round(clipboardWindow.s(60) * (Screen.devicePixelRatio || 1))
                                         visible: model.type === "image" && status === Image.Ready
                                     }
 
@@ -1526,6 +1463,7 @@ PanelWindow {
                                         elide: Text.ElideRight
                                         maximumLineCount: 2
                                         wrapMode: Text.Wrap
+                                        textFormat: Text.PlainText
                                         verticalAlignment: Text.AlignVCenter
                                     }
                                 }

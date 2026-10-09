@@ -5,8 +5,7 @@ import Quickshell
 import Quickshell.Io
 import "../../"
 import "../../reusables"
-import "../../info"
-import "../../singletons"
+import "../../reusables/guide"
 
 Item {
     id: displayTabRoot
@@ -22,8 +21,6 @@ Item {
     Behavior on slideY { NumberAnimation { duration: 250; easing.type: Easing.OutQuart } }
     transform: Translate { y: slideY }
     Behavior on opacity { NumberAnimation { duration: 250 } }
-
-    property real cardRadius: ThemeBackend.borderRadius <= 16 ? ThemeBackend.borderRadius * 2 : Math.min(32, 32 - 16 * Math.exp(-(ThemeBackend.borderRadius - 16) / 12))
 
     property var defaultDisplaySettings: ({
         "monitors": {}
@@ -382,11 +379,6 @@ Item {
         displayTabRoot.displaySettings = JSON.parse(JSON.stringify(current));
     }
 
-    function currentTransformPrefix(monName) {
-        // Reads the live transform for monName into $T so monitor rules we send keep the user's rotation/flip
-        return 'T=$(hyprctl monitors -j 2>/dev/null | jq -r --arg n "' + monName + '" \'[.[] | select(.name==$n) | .transform // 0][0] // 0\'); [ -z "$T" ] && T=0; ';
-    }
-
     function applyMonitorPower(monName, enabled) {
         if (!monName) return;
         if (displayTabRoot.compositor === "niri") {
@@ -404,10 +396,9 @@ Item {
                     ' mode = "' + modeStr + '",' +
                     ' position = "auto",' +
                     ' scale = ' + scaleVal.toString() + ',' +
-                    ' transform = \'"$T"\',' +
                     ' disabled = false' +
                     ' })';
-                Quickshell.execDetached(["bash", "-c", displayTabRoot.currentTransformPrefix(monName) + "hyprctl eval '" + luaCmd + "'"]);
+                Quickshell.execDetached(["bash", "-c", "hyprctl eval '" + luaCmd + "'"]);
             } else {
                 let luaCmd =
                     'hl.monitor({ output = "' + monName + '", disabled = true })';
@@ -425,8 +416,8 @@ Item {
         } else {
             let mon = displayTabRoot.monitorsList.find(m => m.name === monName);
             let modeStr = mon ? (mon.dimensions + "@" + mon.framerate) : "preferred";
-            let luaCmd = 'hl.monitor({ output = "' + monName + '", mode = "' + modeStr + '", position = "auto", scale = ' + scaleVal.toString() + ', transform = \'"$T"\' })';
-            Quickshell.execDetached(["bash", "-c", displayTabRoot.currentTransformPrefix(monName) + "hyprctl eval '" + luaCmd + "' || hyprctl keyword monitor " + monName + "," + modeStr + ",auto," + scaleVal.toString() + ",transform,$T"]);
+            let luaCmd = 'hl.monitor({ output = "' + monName + '", mode = "' + modeStr + '", position = "auto", scale = ' + scaleVal.toString() + ' })';
+            Quickshell.execDetached(["bash", "-c", "hyprctl eval '" + luaCmd + "' || hyprctl keyword monitor " + monName + "," + modeStr + ",auto," + scaleVal.toString()]);
         }
     }
 
@@ -569,7 +560,7 @@ Item {
 
                     Layout.fillWidth: true
                     clip: true
-                    radius: displayTabRoot.cardRadius
+                    radius: ThemeBackend.borderRadius
 
                     property string monName: modelData.name
                     property var monSettings: (displayTabRoot.displaySettings && displayTabRoot.displaySettings.monitors && displayTabRoot.displaySettings.monitors[monName]) ? displayTabRoot.displaySettings.monitors[monName] : ({})
@@ -637,11 +628,13 @@ Item {
                         anchors.right: parent.right
                         anchors.top: parent.top
                         anchors.margins: rootObj.s(12)
-                        spacing: 0
+                        spacing: rootObj.s(6)
 
                         RowLayout {
                             Layout.fillWidth: true
-                            Layout.bottomMargin: rootObj.s(12)
+                            Layout.bottomMargin: rootObj.s(6)
+                            Layout.leftMargin: rootObj.s(4)
+                            Layout.rightMargin: rootObj.s(4)
                             spacing: rootObj.s(8)
 
                             Text {
@@ -662,210 +655,92 @@ Item {
                             }
                         }
 
-                        Rectangle {
+                        SettingsRow {
                             visible: displayTabRoot.monitorsList.length > 1
-                            Layout.fillWidth: true
-                            implicitHeight: rowPowerToggleLayout.implicitHeight + rootObj.s(18)
-                            color: "transparent"
+                            rootObj: displayTabRoot.rootObj
+                            baseColor: Qt.alpha(ThemeBackend.surface1, 0.35)
+                            icon: "󰐥"
+                            title: I18n.t("guide.display.enable.title", "Enable Monitor")
+                            description: I18n.t("guide.display.enable.desc", "Turn display output on or off")
 
-                            RowLayout {
-                                id: rowPowerToggleLayout
-                                anchors.left: parent.left
-                                anchors.leftMargin: rootObj.s(12)
-                                anchors.right: parent.right
-                                anchors.rightMargin: rootObj.s(12)
-                                anchors.verticalCenter: parent.verticalCenter
-                                spacing: rootObj.s(16)
-
-                                ColumnLayout {
-                                    Layout.fillWidth: true
-                                    spacing: rootObj.s(2)
-
-                                    Text {
-                                        text: I18n.t("guide.display.enable.title", "Enable Monitor")
-                                        font.family: ThemeBackend.fontFamily
-                                        font.pixelSize: rootObj.s(13)
-                                        color: ThemeBackend.text
-                                    }
-
-                                    Text {
-                                        text: I18n.t("guide.display.enable.desc", "Turn display output on or off")
-                                        font.family: ThemeBackend.fontFamily
-                                        font.pixelSize: rootObj.s(11)
-                                        color: ThemeBackend.subtext0
-                                    }
+                            Toggle {
+                                id: powerToggle
+                                checked: monDelegate.monitorPowered
+                                accentColor: ThemeBackend.mauve
+                                baseColor: ThemeBackend.surface1
+                                handleColor: ThemeBackend.crust
+                                handleOffColor: ThemeBackend.text
+                                onToggled: function(c) {
+                                    monDelegate.monitorPowered = c;
+                                    displayTabRoot.updateMonitorSetting(monDelegate.monName, "powerEnabled", c);
+                                    displayTabRoot.applyMonitorPower(monDelegate.monName, c);
                                 }
 
-                                Toggle {
-                                    id: powerToggle
-                                    Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
-                                    checked: monDelegate.monitorPowered
-                                    accentColor: ThemeBackend.mauve
-                                    baseColor: ThemeBackend.surface1
-                                    handleColor: ThemeBackend.crust
-                                    handleOffColor: ThemeBackend.text
-                                    onToggled: function(c) {
-                                        monDelegate.monitorPowered = c;
-                                        displayTabRoot.updateMonitorSetting(monDelegate.monName, "powerEnabled", c);
-                                        displayTabRoot.applyMonitorPower(monDelegate.monName, c);
-                                    }
-
-                                    Binding {
-                                        target: powerToggle
-                                        property: "checked"
-                                        value: monDelegate.monitorPowered
-                                    }
+                                Binding {
+                                    target: powerToggle
+                                    property: "checked"
+                                    value: monDelegate.monitorPowered
                                 }
                             }
                         }
 
-                        Rectangle {
-                            visible: displayTabRoot.monitorsList.length > 1
-                            Layout.fillWidth: true
-                            height: 1
-                            color: Qt.alpha(ThemeBackend.surface1, 0.2)
-                            Layout.topMargin: rootObj.s(5)
-                            Layout.bottomMargin: rootObj.s(5)
-                        }
+                        SettingsGroup {
+                            rootObj: displayTabRoot.rootObj
+                            icon: "󰖔"
+                            title: I18n.t("guide.display.bluelight.title")
+                            description: I18n.t("guide.display.bluelight.desc")
+                            expanded: monDelegate.filterEnabled
 
-                        Rectangle {
-                            Layout.fillWidth: true
-                            implicitHeight: rowToggleLayout.implicitHeight + rootObj.s(18)
-                            color: "transparent"
-
-                            RowLayout {
-                                id: rowToggleLayout
-                                anchors.left: parent.left
-                                anchors.leftMargin: rootObj.s(12)
-                                anchors.right: parent.right
-                                anchors.rightMargin: rootObj.s(12)
-                                anchors.verticalCenter: parent.verticalCenter
-                                spacing: rootObj.s(16)
-
-                                ColumnLayout {
-                                    Layout.fillWidth: true
-                                    spacing: rootObj.s(2)
-
-                                    Text {
-                                        text: I18n.t("guide.display.bluelight.title")
-                                        font.family: ThemeBackend.fontFamily
-                                        font.pixelSize: rootObj.s(13)
-                                        color: ThemeBackend.text
-                                    }
-
-                                    Text {
-                                        text: I18n.t("guide.display.bluelight.desc")
-                                        font.family: ThemeBackend.fontFamily
-                                        font.pixelSize: rootObj.s(11)
-                                        color: ThemeBackend.subtext0
-                                    }
+                            Toggle {
+                                id: filterToggle
+                                Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
+                                checked: monDelegate.filterEnabled
+                                accentColor: ThemeBackend.mauve
+                                baseColor: ThemeBackend.surface1
+                                handleColor: ThemeBackend.crust
+                                handleOffColor: ThemeBackend.text
+                                onToggled: function(c) {
+                                    monDelegate.filterEnabled = c;
+                                    BlueLight.setEnabled(monDelegate.monName, c);
+                                    displayTabRoot.refreshDisplaySettings();
                                 }
 
-                                Toggle {
-                                    id: filterToggle
-                                    Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
-                                    checked: monDelegate.filterEnabled
-                                    accentColor: ThemeBackend.mauve
-                                    baseColor: ThemeBackend.surface1
-                                    handleColor: ThemeBackend.crust
-                                    handleOffColor: ThemeBackend.text
-                                    onToggled: function(c) {
-                                        monDelegate.filterEnabled = c;
-                                        BlueLight.setEnabled(monDelegate.monName, c);
-                                        displayTabRoot.refreshDisplaySettings();
-                                    }
-
-                                    Binding {
-                                        target: filterToggle
-                                        property: "checked"
-                                        value: monDelegate.filterEnabled
-                                    }
+                                Binding {
+                                    target: filterToggle
+                                    property: "checked"
+                                    value: monDelegate.filterEnabled
                                 }
                             }
-                        }
 
-                        Item {
-                            id: bluelightSectionWrapper
-                            Layout.fillWidth: true
-                            property bool isOpen: monDelegate.filterEnabled
-                            clip: true
-                            visible: implicitHeight > 0
-                            opacity: isOpen ? 1.0 : 0.0
-                            implicitHeight: isOpen ? bluelightInnerCol.implicitHeight : 0
+                            subSettings: [
+                                SettingsRow {
+                                    rootObj: displayTabRoot.rootObj
+                                    baseColor: Qt.alpha(ThemeBackend.surface1, 0.35)
+                                    icon: "󰥔"
+                                    title: I18n.t("guide.display.schedule.title")
+                                    description: I18n.t("guide.display.schedule.desc") + " " + displayTabRoot.scheduleDescription
 
-                            Behavior on opacity { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
-                            Behavior on implicitHeight { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
-
-                            ColumnLayout {
-                                id: bluelightInnerCol
-                                anchors.left: parent.left
-                                anchors.right: parent.right
-                                anchors.top: parent.top
-                                spacing: 0
-
-                                Rectangle {
-                                    Layout.fillWidth: true
-                                    height: 1
-                                    color: Qt.alpha(ThemeBackend.surface1, 0.2)
-                                    Layout.topMargin: rootObj.s(5)
-                                    Layout.bottomMargin: rootObj.s(5)
-                                }
-
-                                Rectangle {
-                                    Layout.fillWidth: true
-                                    implicitHeight: rowAutoLayout.implicitHeight + rootObj.s(18)
-                                    color: "transparent"
-
-                                    RowLayout {
-                                        id: rowAutoLayout
-                                        anchors.left: parent.left
-                                        anchors.leftMargin: rootObj.s(12)
-                                        anchors.right: parent.right
-                                        anchors.rightMargin: rootObj.s(12)
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        spacing: rootObj.s(16)
-
-                                        ColumnLayout {
-                                            Layout.fillWidth: true
-                                            spacing: rootObj.s(2)
-
-                                            Text {
-                                                text: I18n.t("guide.display.schedule.title")
-                                                font.family: ThemeBackend.fontFamily
-                                                font.pixelSize: rootObj.s(13)
-                                                color: ThemeBackend.text
-                                            }
-
-                                            Text {
-                                                text: I18n.t("guide.display.schedule.desc") + " " + displayTabRoot.scheduleDescription
-                                                font.family: ThemeBackend.fontFamily
-                                                font.pixelSize: rootObj.s(11)
-                                                color: ThemeBackend.subtext0
-                                            }
+                                    Toggle {
+                                        id: autoToggle
+                                        Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
+                                        checked: monDelegate.filterAuto
+                                        accentColor: ThemeBackend.mauve
+                                        baseColor: ThemeBackend.surface1
+                                        handleColor: ThemeBackend.crust
+                                        handleOffColor: ThemeBackend.text
+                                        onToggled: function(c) {
+                                            monDelegate.filterAuto = c;
+                                            BlueLight.setAuto(monDelegate.monName, c);
+                                            displayTabRoot.refreshDisplaySettings();
                                         }
 
-                                        Toggle {
-                                            id: autoToggle
-                                            Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
-                                            checked: monDelegate.filterAuto
-                                            accentColor: ThemeBackend.mauve
-                                            baseColor: ThemeBackend.surface1
-                                            handleColor: ThemeBackend.crust
-                                            handleOffColor: ThemeBackend.text
-                                            onToggled: function(c) {
-                                                monDelegate.filterAuto = c;
-                                                BlueLight.setAuto(monDelegate.monName, c);
-                                                displayTabRoot.refreshDisplaySettings();
-                                            }
-
-                                            Binding {
-                                                target: autoToggle
-                                                property: "checked"
-                                                value: monDelegate.filterAuto
-                                            }
+                                        Binding {
+                                            target: autoToggle
+                                            property: "checked"
+                                            value: monDelegate.filterAuto
                                         }
                                     }
-                                }
+                                },
 
                                 Item {
                                     id: tempSectionWrapper
@@ -874,191 +749,109 @@ Item {
                                     clip: true
                                     visible: implicitHeight > 0
                                     opacity: isOpen ? 1.0 : 0.0
-                                    implicitHeight: isOpen ? tempInnerCol.implicitHeight : 0
+                                    implicitHeight: isOpen ? tempInnerBox.implicitHeight : 0
 
                                     Behavior on opacity { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
                                     Behavior on implicitHeight { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
 
-                                    ColumnLayout {
-                                        id: tempInnerCol
+                                    SettingsRow {
+                                        id: tempInnerBox
                                         anchors.left: parent.left
                                         anchors.right: parent.right
                                         anchors.top: parent.top
-                                        spacing: 0
+                                        rootObj: displayTabRoot.rootObj
+                                        baseColor: Qt.alpha(ThemeBackend.surface1, 0.35)
+                                        icon: "󰔏"
+                                        title: I18n.t("guide.display.temperature.title")
+                                        description: I18n.t("guide.display.temperature.desc")
 
-                                        Rectangle {
-                                            Layout.fillWidth: true
-                                            height: 1
-                                            color: Qt.alpha(ThemeBackend.surface1, 0.2)
-                                            Layout.topMargin: rootObj.s(5)
-                                            Layout.bottomMargin: rootObj.s(5)
-                                        }
-
-                                        Rectangle {
-                                            Layout.fillWidth: true
-                                            implicitHeight: rowTempLayout.implicitHeight + rootObj.s(18)
-                                            color: "transparent"
-
-                                            RowLayout {
-                                                id: rowTempLayout
-                                                anchors.left: parent.left
-                                                anchors.leftMargin: rootObj.s(12)
-                                                anchors.right: parent.right
-                                                anchors.rightMargin: rootObj.s(12)
-                                                anchors.verticalCenter: parent.verticalCenter
-                                                spacing: rootObj.s(16)
-
-                                                ColumnLayout {
-                                                    Layout.fillWidth: true
-                                                    spacing: rootObj.s(2)
-
-                                                    Text {
-                                                        text: I18n.t("guide.display.temperature.title")
-                                                        font.family: ThemeBackend.fontFamily
-                                                        font.pixelSize: rootObj.s(13)
-                                                        color: ThemeBackend.text
-                                                    }
-
-                                                    Text {
-                                                        text: I18n.t("guide.display.temperature.desc")
-                                                        font.family: ThemeBackend.fontFamily
-                                                        font.pixelSize: rootObj.s(11)
-                                                        color: ThemeBackend.subtext0
-                                                    }
+                                        Draggable {
+                                            id: temperatureSlider
+                                            Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
+                                            Layout.rightMargin: rootObj.s(8)
+                                            implicitWidth: rootObj.s(220)
+                                            implicitHeight: rootObj.s(18)
+                                            from: 0
+                                            to: 100
+                                            stepSize: 1
+                                            defaultValue: 50
+                                            showValueBubble: true
+                                            valueFormatter: function(v) { return Math.round(v).toString() }
+                                            value: monDelegate.currentTemp
+                                            backgroundColor: ThemeBackend.surface0
+                                            accentColor: ThemeBackend.mauve
+                                            handleColor: ThemeBackend.text
+                                            handleBorderColor: ThemeBackend.mantle
+                                            onMoved: function(val) {
+                                                let rounded = Math.round(val);
+                                                if (monDelegate.currentTemp !== rounded) {
+                                                    monDelegate.currentTemp = rounded;
+                                                    displayTabRoot.updateMonitorSettingDebounced(monDelegate.monName, rounded);
                                                 }
-
-                                                RowLayout {
-                                                    Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
-                                                    spacing: rootObj.s(12)
-                                                    Layout.rightMargin: rootObj.s(8)
-
-                                                    Draggable {
-                                                        id: temperatureSlider
-                                                        implicitWidth: rootObj.s(220)
-                                                        implicitHeight: rootObj.s(18)
-                                                        from: 0
-                                                        to: 100
-                                                        stepSize: 1
-                                                        defaultValue: 50
-                                                        showValueBubble: true
-                                                        valueFormatter: function(v) { return Math.round(v).toString() }
-                                                        value: monDelegate.currentTemp
-                                                        backgroundColor: ThemeBackend.surface0
-                                                        accentColor: ThemeBackend.mauve
-                                                        handleColor: ThemeBackend.text
-                                                        handleBorderColor: ThemeBackend.mantle
-                                                        onMoved: function(val) {
-                                                            let rounded = Math.round(val);
-                                                            if (monDelegate.currentTemp !== rounded) {
-                                                                monDelegate.currentTemp = rounded;
-                                                                displayTabRoot.updateMonitorSettingDebounced(monDelegate.monName, rounded);
-                                                            }
-                                                        }
-                                                        onDragFinished: {
-                                                            displayTabRoot.flushMonitorSetting(monDelegate.monName);
-                                                        }
-                                                    }
-                                                }
+                                            }
+                                            onDragFinished: {
+                                                displayTabRoot.flushMonitorSetting(monDelegate.monName);
                                             }
                                         }
                                     }
                                 }
+                            ]
+                        }
+
+                        SettingsRow {
+                            rootObj: displayTabRoot.rootObj
+                            baseColor: Qt.alpha(ThemeBackend.surface1, 0.35)
+                            icon: "󰍍"
+                            title: I18n.t("guide.display.uiscale.title")
+                            description: I18n.t("guide.display.uiscale.desc")
+                            controlSpacing: rootObj.s(4)
+
+                            LoaderIcon {
+                                id: scaleLoader
+                                Layout.preferredWidth: rootObj.s(32)
+                                Layout.preferredHeight: rootObj.s(32)
+                                Layout.alignment: Qt.AlignVCenter
+                                running: scaleDebounceTimer.running && displayTabRoot.pendingMonScaleName === monDelegate.monName
+                                accentColor: ThemeBackend.mauve
                             }
-                        }
 
-                        Rectangle {
-                            Layout.fillWidth: true
-                            height: 1
-                            color: Qt.alpha(ThemeBackend.surface1, 0.2)
-                            Layout.topMargin: rootObj.s(5)
-                            Layout.bottomMargin: rootObj.s(5)
-                        }
-
-                        Rectangle {
-                            Layout.fillWidth: true
-                            implicitHeight: rowScaleLayout.implicitHeight + rootObj.s(18)
-                            color: "transparent"
-
-                            RowLayout {
-                                id: rowScaleLayout
-                                anchors.left: parent.left
-                                anchors.leftMargin: rootObj.s(12)
-                                anchors.right: parent.right
-                                anchors.rightMargin: rootObj.s(12)
-                                anchors.verticalCenter: parent.verticalCenter
-                                spacing: rootObj.s(16)
-
-                                ColumnLayout {
-                                    Layout.fillWidth: true
-                                    spacing: rootObj.s(2)
-
-                                    Text {
-                                        text: I18n.t("guide.display.uiscale.title")
-                                        font.family: ThemeBackend.fontFamily
-                                        font.pixelSize: rootObj.s(13)
-                                        color: ThemeBackend.text
-                                    }
-
-                                    Text {
-                                        text: I18n.t("guide.display.uiscale.desc")
-                                        font.family: ThemeBackend.fontFamily
-                                        font.pixelSize: rootObj.s(11)
-                                        color: ThemeBackend.subtext0
+                            Draggable {
+                                id: uiScaleSlider
+                                implicitWidth: rootObj.s(220)
+                                implicitHeight: rootObj.s(18)
+                                from: 0
+                                to: Math.max(0, monDelegate.validScales.length - 1)
+                                stepSize: 1
+                                defaultValue: monDelegate.validScales.indexOf(1.0) >= 0 ? monDelegate.validScales.indexOf(1.0) : 0
+                                showValueBubble: true
+                                showTooltip: true
+                                alwaysShowHandle: false
+                                valueFormatter: function(idx) {
+                                    let i = Math.round(idx);
+                                    let s = monDelegate.validScales[i] !== undefined ? monDelegate.validScales[i] : 1.0;
+                                    return s.toFixed(3).replace(/0+$/,'').replace(/\.$/,'.0');
+                                }
+                                value: monDelegate.currentScaleIndex
+                                backgroundColor: ThemeBackend.surface0
+                                accentColor: ThemeBackend.mauve
+                                handleColor: ThemeBackend.text
+                                handleBorderColor: ThemeBackend.mantle
+                                onMoved: function(idx) {
+                                    let i = Math.round(idx);
+                                    let s = monDelegate.validScales[i] !== undefined ? monDelegate.validScales[i] : 1.0;
+                                    if (monDelegate.currentScale !== s) {
+                                        monDelegate.currentScale = s;
+                                        displayTabRoot.pendingMonScaleName = monDelegate.monName;
+                                        displayTabRoot.pendingMonScaleVal = s;
+                                        scaleDebounceTimer.restart();
                                     }
                                 }
-
-                                RowLayout {
-                                    Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
-                                    spacing: rootObj.s(4)
-
-                                    LoaderIcon {
-                                        id: scaleLoader
-                                        Layout.preferredWidth: rootObj.s(32)
-                                        Layout.preferredHeight: rootObj.s(32)
-                                        Layout.alignment: Qt.AlignVCenter
-                                        running: scaleDebounceTimer.running && displayTabRoot.pendingMonScaleName === monDelegate.monName
-                                        accentColor: ThemeBackend.mauve
-                                    }
-
-                                    Draggable {
-                                        id: uiScaleSlider
-                                        implicitWidth: rootObj.s(220)
-                                        implicitHeight: rootObj.s(18)
-                                        from: 0
-                                        to: Math.max(0, monDelegate.validScales.length - 1)
-                                        stepSize: 1
-                                        defaultValue: monDelegate.validScales.indexOf(1.0) >= 0 ? monDelegate.validScales.indexOf(1.0) : 0
-                                        showValueBubble: true
-                                        showTooltip: true
-                                        alwaysShowHandle: false
-                                        valueFormatter: function(idx) {
-                                            let i = Math.round(idx);
-                                            let s = monDelegate.validScales[i] !== undefined ? monDelegate.validScales[i] : 1.0;
-                                            return s.toFixed(3).replace(/0+$/,'').replace(/\.$/,'.0');
-                                        }
-                                        value: monDelegate.currentScaleIndex
-                                        backgroundColor: ThemeBackend.surface0
-                                        accentColor: ThemeBackend.mauve
-                                        handleColor: ThemeBackend.text
-                                        handleBorderColor: ThemeBackend.mantle
-                                        onMoved: function(idx) {
-                                            let i = Math.round(idx);
-                                            let s = monDelegate.validScales[i] !== undefined ? monDelegate.validScales[i] : 1.0;
-                                            if (monDelegate.currentScale !== s) {
-                                                monDelegate.currentScale = s;
-                                                displayTabRoot.pendingMonScaleName = monDelegate.monName;
-                                                displayTabRoot.pendingMonScaleVal = s;
-                                                scaleDebounceTimer.restart();
-                                            }
-                                        }
-                                        onDragFinished: {
-                                            scaleDebounceTimer.stop();
-                                            if (displayTabRoot.pendingMonScaleName !== "") {
-                                                displayTabRoot.applyMonitorScale(displayTabRoot.pendingMonScaleName, displayTabRoot.pendingMonScaleVal);
-                                                displayTabRoot.updateMonitorSetting(displayTabRoot.pendingMonScaleName, "scale", displayTabRoot.pendingMonScaleVal);
-                                                displayTabRoot.pendingMonScaleName = "";
-                                            }
-                                        }
+                                onDragFinished: {
+                                    scaleDebounceTimer.stop();
+                                    if (displayTabRoot.pendingMonScaleName !== "") {
+                                        displayTabRoot.applyMonitorScale(displayTabRoot.pendingMonScaleName, displayTabRoot.pendingMonScaleVal);
+                                        displayTabRoot.updateMonitorSetting(displayTabRoot.pendingMonScaleName, "scale", displayTabRoot.pendingMonScaleVal);
+                                        displayTabRoot.pendingMonScaleName = "";
                                     }
                                 }
                             }

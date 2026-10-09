@@ -228,8 +228,6 @@ try:
                                     max_x = max(max_x, x)
                                     min_y = min(min_y, y)
                                     max_y = max(max_y, y)
-                                    min_y = min(min_y, y)
-                                    max_y = max(max_y, y)
                                 except ValueError:
                                     pass
             if min_x == float('inf'): min_x, min_y, max_x, max_y = 0, 0, 0, 0
@@ -302,6 +300,16 @@ if [ "$FULL_MODE" = true ] || [ -n "$GEOMETRY" ]; then
                 else
                     GSR_ARGS+=(-a "default_input")
                 fi
+            fi
+            # Merge desktop + mic into ONE track ("a|b"); separate -a flags make
+            # separate tracks and players only play the first (desktop) one.
+            GSR_AUDIO=()
+            for ((i = 0; i < ${#GSR_ARGS[@]}; i++)); do
+                if [ "${GSR_ARGS[i]}" = "-a" ]; then GSR_AUDIO+=("${GSR_ARGS[i+1]}"); unset 'GSR_ARGS[i]' 'GSR_ARGS[i+1]'; ((i++)); fi
+            done
+            GSR_ARGS=("${GSR_ARGS[@]}")
+            if [ ${#GSR_AUDIO[@]} -gt 0 ]; then
+                GSR_ARGS+=(-a "$(IFS='|'; echo "${GSR_AUDIO[*]}")")
             fi
             gpu-screen-recorder "${GSR_ARGS[@]}" -o "$VID_FILENAME" > /dev/null 2>&1 &
             REC_PID=$!

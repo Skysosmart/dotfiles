@@ -11,10 +11,10 @@ import Quickshell.Services.UPower
 import Quickshell.Services.Pipewire
 import "../"
 import "../reusables"
-import "../singletons"
 
 Item {
     id: root
+    visible: false
     focus: true
     enabled: visible
 
@@ -30,6 +30,8 @@ Item {
     }
 
     readonly property bool isLeftAnchored: barPosition === "right"
+    readonly property real slideDistance: sidebarPanel.width > 0 ? sidebarPanel.width : root.s(420)
+    readonly property real rowSlideDistance: root.s(36)
 
     readonly property bool isDesktop: UPower.displayDevice.ready ? !UPower.displayDevice.isLaptopBattery : SystemInfo.isDesktop
 
@@ -88,6 +90,22 @@ Item {
     property bool wifiRadioEnabled: Networking.wifiEnabled
     property bool btRadioEnabled: Boolean(Bluetooth.defaultAdapter && Bluetooth.defaultAdapter.enabled)
 
+    Connections {
+        target: Bluetooth
+        ignoreUnknownSignals: true
+        function onDefaultAdapterChanged() {
+            root.btRadioEnabled = Boolean(Bluetooth.defaultAdapter && Bluetooth.defaultAdapter.enabled);
+        }
+    }
+
+    Connections {
+        target: Bluetooth.defaultAdapter || null
+        ignoreUnknownSignals: true
+        function onEnabledChanged() {
+            root.btRadioEnabled = Boolean(Bluetooth.defaultAdapter && Bluetooth.defaultAdapter.enabled);
+        }
+    }
+
     property bool isDraggingVol: false
     property bool isDraggingBri: false
     property bool usesDdcBrightness: false
@@ -142,18 +160,20 @@ Item {
 
     property real introContent: 0.0
     property real introTop: 0.0
-    property real introCore: 0.0
     property real introSliders: 0.0
+    property real introQuickActions: 0.0
     property real introNotifs: 0.0
     property real introActions: 0.0
+    property real introCore: 0.0
 
     function resetAndPlayIntro() {
         introContent = 0.0;
         introTop = 0.0;
-        introCore = 0.0;
         introSliders = 0.0;
+        introQuickActions = 0.0;
         introNotifs = 0.0;
         introActions = 0.0;
+        introCore = 0.0;
         closeSequence.stop();
         startupSequence.restart();
     }
@@ -165,9 +185,6 @@ Item {
             resetAndPlayIntro();
 
             animCapacity = batCapacity;
-            if (typeof waveCanvas !== "undefined" && waveCanvas) {
-                waveCanvas.requestPaint();
-            }
 
             if (typeof volSlider !== "undefined" && volSlider && !root.isDraggingVol) {
                 volSlider.value = root.sysVolume;
@@ -261,36 +278,41 @@ Item {
 
     ParallelAnimation {
         id: startupSequence
-        NumberAnimation { target: root; property: "introContent"; to: 1.0; duration: 280; easing.type: Easing.OutCubic }
+        NumberAnimation { target: root; property: "introContent"; to: 1.0; duration: 320; easing.type: Easing.OutCubic }
         NumberAnimation { target: root; property: "introTop"; from: 0; to: 1.0; duration: 320; easing.type: Easing.OutCubic }
 
         SequentialAnimation {
-            PauseAnimation { duration: 25 }
+            PauseAnimation { duration: 30 }
             NumberAnimation { target: root; property: "introSliders"; from: 0; to: 1.0; duration: 320; easing.type: Easing.OutCubic }
         }
         SequentialAnimation {
-            PauseAnimation { duration: 40 }
-            NumberAnimation { target: root; property: "introNotifs"; from: 0; to: 1.0; duration: 340; easing.type: Easing.OutCubic }
-        }
-        SequentialAnimation {
             PauseAnimation { duration: 55 }
-            NumberAnimation { target: root; property: "introActions"; from: 0; to: 1.0; duration: 340; easing.type: Easing.OutCubic }
+            NumberAnimation { target: root; property: "introQuickActions"; from: 0; to: 1.0; duration: 320; easing.type: Easing.OutCubic }
         }
         SequentialAnimation {
-            PauseAnimation { duration: 70 }
-            NumberAnimation { target: root; property: "introCore"; from: 0; to: 1.0; duration: 360; easing.type: Easing.OutCubic }
+            PauseAnimation { duration: 80 }
+            NumberAnimation { target: root; property: "introNotifs"; from: 0; to: 1.0; duration: 330; easing.type: Easing.OutCubic }
+        }
+        SequentialAnimation {
+            PauseAnimation { duration: 105 }
+            NumberAnimation { target: root; property: "introActions"; from: 0; to: 1.0; duration: 330; easing.type: Easing.OutCubic }
+        }
+        SequentialAnimation {
+            PauseAnimation { duration: 130 }
+            NumberAnimation { target: root; property: "introCore"; from: 0; to: 1.0; duration: 340; easing.type: Easing.OutCubic }
         }
     }
 
     SequentialAnimation {
         id: closeSequence
         ParallelAnimation {
-            NumberAnimation { target: root; property: "introContent"; to: 0.0; duration: 300; easing.type: Easing.OutQuint }
-            NumberAnimation { target: root; property: "introTop"; to: 0.0; duration: 250; easing.type: Easing.OutQuint }
-            NumberAnimation { target: root; property: "introSliders"; to: 0.0; duration: 250; easing.type: Easing.OutQuint }
-            NumberAnimation { target: root; property: "introNotifs"; to: 0.0; duration: 250; easing.type: Easing.OutQuint }
-            NumberAnimation { target: root; property: "introActions"; to: 0.0; duration: 250; easing.type: Easing.OutQuint }
-            NumberAnimation { target: root; property: "introCore"; to: 0.0; duration: 250; easing.type: Easing.OutQuint }
+            NumberAnimation { target: root; property: "introContent"; to: 0.0; duration: 260; easing.type: Easing.InCubic }
+            NumberAnimation { target: root; property: "introTop"; to: 0.0; duration: 220; easing.type: Easing.InCubic }
+            NumberAnimation { target: root; property: "introSliders"; to: 0.0; duration: 220; easing.type: Easing.InCubic }
+            NumberAnimation { target: root; property: "introQuickActions"; to: 0.0; duration: 220; easing.type: Easing.InCubic }
+            NumberAnimation { target: root; property: "introNotifs"; to: 0.0; duration: 220; easing.type: Easing.InCubic }
+            NumberAnimation { target: root; property: "introActions"; to: 0.0; duration: 220; easing.type: Easing.InCubic }
+            NumberAnimation { target: root; property: "introCore"; to: 0.0; duration: 220; easing.type: Easing.InCubic }
         }
         ScriptAction {
             script: {
@@ -316,7 +338,7 @@ Item {
             spacing: root.s(16)
 
             Text {
-                font.family: "Iosevka Nerd Font"
+                font.family: ThemeBackend.iconFont
                 font.pixelSize: root.s(32)
                 color: bRoot.iconColor
                 text: root.isCharging ? "󰂄" : (root.batCapacity > 20 ? "󰁹" : "󰂃")
@@ -380,6 +402,9 @@ Item {
         property bool isActive: false
         property string iconText: ""
         property color activeColor: ThemeBackend.blue
+        readonly property bool isHovered: qaMa.containsMouse
+        property real customFontSize: 0
+        property string customFontFamily: ""
 
         signal leftClicked()
         signal rightClicked()
@@ -398,8 +423,9 @@ Item {
 
         Text {
             anchors.centerIn: parent
-            font.family: "Iosevka Nerd Font"
-            font.pixelSize: root.s(22)
+            font.family: qaBtn.customFontFamily !== "" ? qaBtn.customFontFamily : ThemeBackend.iconFont
+            font.pixelSize: qaBtn.customFontSize > 0 ? qaBtn.customFontSize : root.s(18)
+            font.weight: qaBtn.customFontSize > 0 ? Font.Bold : Font.Normal
             color: qaBtn.isActive ? ThemeBackend.crust : (qaMa.containsMouse ? ThemeBackend.text : ThemeBackend.subtext0)
             text: qaBtn.iconText
             Behavior on color {
@@ -429,7 +455,7 @@ Item {
         border.width: 0
         clip: true
         opacity: root.introContent
-        transform: Translate { x: (root.isLeftAnchored ? -root.s(75) : root.s(75)) * (1.0 - root.introContent) }
+        transform: Translate { x: (root.isLeftAnchored ? -root.slideDistance : root.slideDistance) * (1.0 - root.introContent) }
 
         Rectangle {
             anchors.top: parent.top
@@ -443,7 +469,6 @@ Item {
 
         Item {
             anchors.fill: parent
-            scale: 0.96 + (0.04 * root.introContent)
 
             ColumnLayout {
                 anchors.fill: parent
@@ -457,12 +482,8 @@ Item {
                     Layout.maximumHeight: root.s(54)
                     radius: root.boxRadius
                     color: Qt.darker(ThemeBackend.surface0, 1.04)
-
                     opacity: root.introTop
-                    transform: [
-                        Translate { y: root.s(-20) * (1.0 - root.introTop) },
-                        Scale { origin.x: userBox.width / 2; origin.y: userBox.height / 2; xScale: 0.95 + (0.05 * root.introTop); yScale: 0.95 + (0.05 * root.introTop) }
-                    ]
+                    transform: Translate { x: (root.isLeftAnchored ? -root.rowSlideDistance : root.rowSlideDistance) * (1.0 - root.introTop) }
 
                     RowLayout {
                         anchors.fill: parent
@@ -482,7 +503,7 @@ Item {
                             Text {
                                 anchors.centerIn: parent
                                 text: ""
-                                font.family: "Iosevka Nerd Font"
+                                font.family: ThemeBackend.iconFont
                                 font.pixelSize: root.s(18)
                                 color: ThemeBackend.text
                                 visible: SystemInfo.avatarPath === ""
@@ -550,12 +571,8 @@ Item {
                     Layout.maximumHeight: slidersCol.implicitHeight + root.s(20)
                     radius: root.boxRadius
                     color: Qt.darker(ThemeBackend.surface0, 1.04)
-
                     opacity: root.introSliders
-                    transform: [
-                        Translate { y: root.s(20) * (1.0 - root.introSliders) },
-                        Scale { origin.x: slidersBox.width / 2; origin.y: slidersBox.height / 2; xScale: 0.95 + (0.05 * root.introSliders); yScale: 0.95 + (0.05 * root.introSliders) }
-                    ]
+                    transform: Translate { x: (root.isLeftAnchored ? -root.rowSlideDistance : root.rowSlideDistance) * (1.0 - root.introSliders) }
 
                     ColumnLayout {
                         id: slidersCol
@@ -570,7 +587,6 @@ Item {
                             IconButton {
                                 Layout.alignment: Qt.AlignVCenter
                                 size: root.s(26)
-                                iconOffsetX: -1
                                 cornerRadius: root.s(8)
                                 buttonIcon: root.sysMuted || root.sysVolume === 0 ? "󰖁" : (root.sysVolume > 50 ? "󰕾" : "󰖀")
                                 iconFontSize: root.s(15)
@@ -661,7 +677,6 @@ Item {
                                 Layout.alignment: Qt.AlignVCenter
                                 size: root.s(26)
                                 cornerRadius: root.s(8)
-                                iconOffsetX: -3
                                 buttonIcon: root.sysBrightness > 66 ? "󰃠" : (root.sysBrightness > 33 ? "󰃟" : "󰃞")
                                 iconFontSize: root.s(15)
                                 accentColor: ThemeBackend.surface1
@@ -740,12 +755,8 @@ Item {
                     Layout.fillWidth: true
                     Layout.preferredHeight: root.s(73)
                     Layout.maximumHeight: root.s(73)
-
-                    opacity: root.introSliders
-                    transform: [
-                        Translate { y: root.s(20) * (1.0 - root.introSliders) },
-                        Scale { origin.x: quickActionsBox.width / 2; origin.y: quickActionsBox.height / 2; xScale: 0.95 + (0.05 * root.introSliders); yScale: 0.95 + (0.05 * root.introSliders) }
-                    ]
+                    opacity: root.introQuickActions
+                    transform: Translate { x: (root.isLeftAnchored ? -root.rowSlideDistance : root.rowSlideDistance) * (1.0 - root.introQuickActions) }
 
                     RowLayout {
                         anchors.fill: parent
@@ -833,19 +844,164 @@ Item {
 
                         QuickActionBtn {
                             id: coffeeBtn
-                            iconText: "󰅶"
                             activeColor: Qt.tint(ThemeBackend.peach, "#5c3016")
 
+                            readonly property string stateFilePath: Caching.runDir + "/caffeine_state.json"
+                            property double coffeeStartTime: 0
+                            property double coffeeEndTime: 0
+                            property int remainingSeconds: 0
+
+                            readonly property string remainingTimeString: {
+                                let secs = remainingSeconds;
+                                if (secs <= 0) return "< 1m";
+                                let h = Math.floor(secs / 3600);
+                                let m = Math.floor((secs % 3600) / 60);
+                                if (h > 0) {
+                                    return h + "h " + (m < 10 ? "0" + m : m) + "m";
+                                }
+                                return Math.max(1, m) + "m";
+                            }
+
+                            iconText: (isActive && isHovered) ? remainingTimeString : "󰅶"
+                            customFontSize: (isActive && isHovered) ? root.s(12) : 0
+                            customFontFamily: (isActive && isHovered) ? ThemeBackend.fontFamily : ""
+
+                            function updateRemaining() {
+                                if (!isActive || coffeeEndTime <= 0) {
+                                    remainingSeconds = 0;
+                                    return;
+                                }
+                                let now = Date.now();
+                                let diff = Math.round((coffeeEndTime - now) / 1000);
+                                if (diff <= 0) {
+                                    remainingSeconds = 0;
+                                    disableCaffeine();
+                                } else {
+                                    remainingSeconds = diff;
+                                }
+                            }
+
+                            function saveState() {
+                                let data = {
+                                    "enabled": isActive,
+                                    "startTime": coffeeStartTime,
+                                    "enabledAt": coffeeStartTime > 0 ? new Date(coffeeStartTime).toISOString() : "",
+                                    "endTime": coffeeEndTime,
+                                    "durationSeconds": (coffeeEndTime > coffeeStartTime) ? Math.round((coffeeEndTime - coffeeStartTime) / 1000) : 0
+                                };
+                                let jsonStr = JSON.stringify(data);
+                                Quickshell.execDetached(["sh", "-c", "mkdir -p '" + Caching.runDir + "' && echo '" + jsonStr + "' > '" + stateFilePath + "'"]);
+                            }
+
+                            function syncConfig(enabled) {
+                                if (typeof Config === "undefined") return;
+                                let idleObj = Object.assign({}, Config.getSetting("idle", {}));
+                                idleObj.manualInhibit = enabled;
+                                idleObj.caffeineStartTime = enabled ? coffeeStartTime : 0;
+                                idleObj.caffeineEndTime = enabled ? coffeeEndTime : 0;
+                                Config.setSetting("idle", idleObj);
+                            }
+
+                            function enableCaffeine(durationMs) {
+                                let now = Date.now();
+                                coffeeStartTime = now;
+                                coffeeEndTime = now + durationMs;
+                                isActive = true;
+                                updateRemaining();
+                                saveState();
+                                syncConfig(true);
+                            }
+
+                            function increaseCaffeine(addMs) {
+                                let now = Date.now();
+                                if (!isActive || coffeeEndTime <= now) {
+                                    enableCaffeine(addMs);
+                                } else {
+                                    coffeeEndTime += addMs;
+                                    updateRemaining();
+                                    saveState();
+                                    syncConfig(true);
+                                }
+                            }
+
+                            function disableCaffeine() {
+                                isActive = false;
+                                coffeeStartTime = 0;
+                                coffeeEndTime = 0;
+                                remainingSeconds = 0;
+                                saveState();
+                                syncConfig(false);
+                            }
+
+                            function applyLoadedState(rawText) {
+                                if (!rawText || rawText.trim() === "") return;
+                                try {
+                                    let data = JSON.parse(rawText.trim());
+                                    if (data && data.enabled && data.endTime) {
+                                        let now = Date.now();
+                                        if (now < data.endTime) {
+                                            coffeeStartTime = data.startTime || now;
+                                            coffeeEndTime = data.endTime;
+                                            isActive = true;
+                                            updateRemaining();
+                                            syncConfig(true);
+                                            return;
+                                        }
+                                    }
+                                } catch (e) {}
+
+                                if (isActive) {
+                                    disableCaffeine();
+                                }
+                            }
+
                             function updateState() {
-                                let idleObj = Config.getSetting("idle", {"manualInhibit": false});
-                                isActive = Boolean(idleObj && idleObj.manualInhibit);
+                                let now = Date.now();
+                                if (typeof Config !== "undefined") {
+                                    let idleObj = Config.getSetting("idle", {"manualInhibit": false});
+                                    if (idleObj && idleObj.manualInhibit && idleObj.caffeineEndTime && idleObj.caffeineEndTime > now) {
+                                        coffeeStartTime = idleObj.caffeineStartTime || now;
+                                        coffeeEndTime = idleObj.caffeineEndTime;
+                                        isActive = true;
+                                        updateRemaining();
+                                    } else if (idleObj && !idleObj.manualInhibit) {
+                                        isActive = false;
+                                        coffeeEndTime = 0;
+                                        coffeeStartTime = 0;
+                                        remainingSeconds = 0;
+                                    }
+                                }
+                                coffeeStateReader.running = true;
+                            }
+
+                            Process {
+                                id: coffeeStateReader
+                                command: ["sh", "-c", "cat '" + coffeeBtn.stateFilePath + "' 2>/dev/null || true"]
+                                running: false
+                                stdout: StdioCollector {
+                                    onStreamFinished: {
+                                        coffeeBtn.applyLoadedState(this.text.trim());
+                                    }
+                                }
+                            }
+
+                            Timer {
+                                id: coffeeTicker
+                                interval: root.visible ? 1000 : 15000
+                                repeat: true
+                                running: coffeeBtn.isActive
+                                triggeredOnStart: true
+                                onTriggered: {
+                                    coffeeBtn.updateRemaining();
+                                }
                             }
 
                             Component.onCompleted: updateState()
 
                             Connections {
-                                target: Config
-                                enabled: root.visible
+                                target: typeof Config !== "undefined" ? Config : null
+                                enabled: true
+                                ignoreUnknownSignals: true
                                 function onSettingsLoaded() {
                                     coffeeBtn.updateState();
                                 }
@@ -853,15 +1009,16 @@ Item {
 
                             onLeftClicked: {
                                 Sounds.playSfx("system/quick_click.wav");
-                                isActive = !isActive;
-                                let idleObj = Object.assign({}, Config.getSetting("idle", {}));
-                                idleObj.manualInhibit = isActive;
-                                Config.setSetting("idle", idleObj);
+                                if (isActive) {
+                                    disableCaffeine();
+                                } else {
+                                    enableCaffeine(3600 * 1000);
+                                }
                             }
 
                             onRightClicked: {
-                                closeSequence.start();
-                                Quickshell.execDetached(["bash", Caching.serpantinumDir + "/scripts/qs_manager.sh", "toggle", "guide", "idle"]);
+                                Sounds.playSfx("system/quick_click.wav");
+                                increaseCaffeine(3600 * 1000);
                             }
                         }
 
@@ -930,12 +1087,8 @@ Item {
                     cardRadius: root.cardRadius
                     baseColor: Qt.darker(ThemeBackend.surface0, 1.04)
                     rootContext: root
-
                     opacity: root.introNotifs
-                    transform: [
-                        Translate { y: root.s(20) * (1.0 - root.introNotifs) },
-                        Scale { origin.x: notifsBox.width / 2; origin.y: notifsBox.height / 2; xScale: 0.95 + (0.05 * root.introNotifs); yScale: 0.95 + (0.05 * root.introNotifs) }
-                    ]
+                    transform: Translate { x: (root.isLeftAnchored ? -root.rowSlideDistance : root.rowSlideDistance) * (1.0 - root.introNotifs) }
                 }
 
                 RowLayout {
@@ -968,8 +1121,7 @@ Item {
                             opacity: root.introActions
                             transform: [
                                 Translate { id: shakeTranslate; x: 0 },
-                                Translate { y: root.s(30) * (1.0 - root.introActions) + (index * root.s(12) * (1.0 - root.introActions)) },
-                                Scale { origin.x: actionCapsule.width / 2; origin.y: actionCapsule.height / 2; xScale: 0.90 + (0.10 * root.introActions); yScale: 0.90 + (0.10 * root.introActions) }
+                                Translate { x: (root.isLeftAnchored ? -root.rowSlideDistance : root.rowSlideDistance) * (1.0 - root.introActions) }
                             ]
 
                             color: (actionMa.containsMouse && !isDisabled) ? ThemeBackend.surface1 : Qt.darker(ThemeBackend.surface0, 1.04)
@@ -1019,12 +1171,10 @@ Item {
                                 shakeAnim.start();
                             }
 
-                            Canvas {
+                            FluidWave {
                                 id: actionWaveCanvas
                                 anchors.fill: parent
                                 visible: root.visible && actionCapsule.fillLevel > 0.001
-                                renderTarget: Canvas.Image
-                                renderStrategy: Canvas.Immediate
 
                                 property real wavePhase: 0.0
                                 NumberAnimation on wavePhase {
@@ -1032,56 +1182,14 @@ Item {
                                     loops: Animation.Infinite
                                     from: 0; to: Math.PI * 2; duration: 800
                                 }
-                                onWavePhaseChanged: requestPaint()
 
-                                Connections {
-                                    target: actionCapsule
-                                    enabled: root.visible
-                                    function onFillLevelChanged() { actionWaveCanvas.requestPaint() }
-                                    function onRadiusChanged() { actionWaveCanvas.requestPaint() }
-                                }
-
-                                onPaint: {
-                                    var ctx = getContext("2d");
-                                    ctx.clearRect(0, 0, width, height);
-                                    if (actionCapsule.fillLevel <= 0.001) return;
-
-                                    var r = Math.min(actionCapsule.radius, Math.min(width, height) / 2);
-                                    var fillY = height * (1.0 - actionCapsule.fillLevel);
-                                    ctx.save();
-                                    ctx.beginPath();
-                                    ctx.moveTo(r, 0);
-                                    ctx.lineTo(width - r, 0);
-                                    ctx.arcTo(width, 0, width, r, r);
-                                    ctx.lineTo(width, height - r);
-                                    ctx.arcTo(width, height, width - r, height, r);
-                                    ctx.lineTo(r, height);
-                                    ctx.arcTo(0, height, 0, height - r, r);
-                                    ctx.lineTo(0, r);
-                                    ctx.arcTo(0, 0, r, 0, r);
-                                    ctx.closePath();
-                                    ctx.clip();
-
-                                    ctx.beginPath();
-                                    ctx.moveTo(0, fillY);
-                                    if (actionCapsule.fillLevel < 0.99) {
-                                        var waveAmp = root.s(10) * Math.sin(actionCapsule.fillLevel * Math.PI);
-                                        var cp1y = fillY + Math.sin(wavePhase) * waveAmp;
-                                        var cp2y = fillY + Math.cos(wavePhase + Math.PI) * waveAmp;
-                                        ctx.bezierCurveTo(width * 0.33, cp2y, width * 0.66, cp1y, width, fillY);
-                                        ctx.lineTo(width, height);
-                                        ctx.lineTo(0, height);
-                                    } else {
-                                        ctx.lineTo(width, 0);
-                                        ctx.lineTo(width, height);
-                                        ctx.lineTo(0, height);
-                                    }
-                                    ctx.closePath();
-
-                                    ctx.fillStyle = (cmd === "poweroff" || cmd === "hibernate" ? ThemeBackend.red : ThemeBackend.blue).toString();
-                                    ctx.fill();
-                                    ctx.restore();
-                                }
+                                radius: actionCapsule.radius
+                                fillLevel: actionCapsule.fillLevel
+                                waveAmp: actionCapsule.fillLevel < 0.99 ? (root.s(10) * Math.sin(actionCapsule.fillLevel * Math.PI)) : 0
+                                phase: wavePhase
+                                vertical: 1.0
+                                color1: (cmd === "poweroff" || cmd === "hibernate" ? ThemeBackend.red : ThemeBackend.blue)
+                                color2: color1
                             }
 
                             Rectangle {
@@ -1104,8 +1212,8 @@ Item {
 
                             Text {
                                 anchors.centerIn: parent
-                                font.family: "Iosevka Nerd Font"
-                                font.pixelSize: root.s(24)
+                                font.family: ThemeBackend.iconFont
+                                font.pixelSize: root.s(19)
                                 color: isDisabled ? ThemeBackend.surface2 : (actionMa.containsMouse ? ThemeBackend.text : ThemeBackend.subtext0)
                                 text: icon
                                 Behavior on color {
@@ -1122,8 +1230,8 @@ Item {
                                 Text {
                                     anchors.horizontalCenter: parent.horizontalCenter
                                     y: (actionCapsule.height / 2) - (height / 2) - (actionCapsule.height - parent.height)
-                                    font.family: "Iosevka Nerd Font"
-                                    font.pixelSize: root.s(24)
+                                    font.family: ThemeBackend.iconFont
+                                    font.pixelSize: root.s(19)
                                     color: ThemeBackend.crust
                                     text: icon
                                 }
@@ -1232,102 +1340,32 @@ Item {
                     radius: root.isDesktop ? root.s(15) : root.boxRadius
                     color: root.isDesktop ? "transparent" : Qt.darker(ThemeBackend.surface0, 1.04)
                     clip: true
-
                     opacity: root.introCore
-                    transform: [
-                        Translate { y: root.s(15) * (1 - root.introCore) },
-                        Scale { origin.x: batteryBox.width / 2; origin.y: batteryBox.height / 2; xScale: 0.95 + (0.05 * root.introCore); yScale: 0.95 + (0.05 * root.introCore) }
-                    ]
+                    transform: Translate { x: (root.isLeftAnchored ? -root.rowSlideDistance : root.rowSlideDistance) * (1.0 - root.introCore) }
 
                     property real fillLevel: root.animCapacity / 100
-                    property real maxWaveAmp: root.isCharging ? root.s(9) : root.s(1.8)
+                    property real maxWaveAmp: root.isCharging ? root.s(10) : root.s(6.5)
                     property real waveAmp: (fillLevel < 0.99 && fillLevel > 0.01) ? maxWaveAmp * Math.sin(fillLevel * Math.PI) : 0
 
-                    Canvas {
+                    FluidWave {
                         id: waveCanvas
                         anchors.fill: parent
                         visible: root.visible && !root.isDesktop && batteryBox.fillLevel > 0.001
-                        renderTarget: Canvas.Image
-                        renderStrategy: Canvas.Immediate
+
                         property real wavePhase: 0.0
                         NumberAnimation on wavePhase {
                             running: root.visible && !root.isDesktop && batteryBox.fillLevel > 0.0 && batteryBox.fillLevel < 1.0
                             loops: Animation.Infinite
-                            from: 0; to: Math.PI * 2; duration: root.isCharging ? 1200 : 3400
+                            from: 0; to: Math.PI * 2; duration: root.isCharging ? 1200 : 2200
                         }
 
-                        onWavePhaseChanged: requestPaint()
-
-                        Connections {
-                            target: batteryBox
-                            enabled: root.visible
-                            function onFillLevelChanged() { waveCanvas.requestPaint() }
-                            function onWaveAmpChanged() { waveCanvas.requestPaint() }
-                            function onRadiusChanged() { waveCanvas.requestPaint() }
-                        }
-
-                        Connections {
-                            target: root
-                            enabled: root.visible
-                            function onBatColorFlatChanged() { waveCanvas.requestPaint() }
-                            function onIsChargingChanged() { waveCanvas.requestPaint() }
-                            function onVisibleChanged() {
-                                if (root.visible) waveCanvas.requestPaint();
-                            }
-                        }
-
-                        Connections {
-                            target: UPower.displayDevice
-                            enabled: root.visible
-                            function onReadyChanged() { waveCanvas.requestPaint() }
-                            function onStateChanged() { waveCanvas.requestPaint() }
-                            function onPercentageChanged() { waveCanvas.requestPaint() }
-                        }
-
-                        onPaint: {
-                            var ctx = getContext("2d");
-                            ctx.clearRect(0, 0, width, height);
-                            if (batteryBox.fillLevel <= 0.001) return;
-
-                            var r = Math.min(batteryBox.radius, Math.min(width, height) / 2);
-                            var currentW = width * batteryBox.fillLevel;
-
-                            ctx.save();
-                            ctx.beginPath();
-                            ctx.moveTo(0, 0);
-                            if (batteryBox.fillLevel < 0.99 && batteryBox.waveAmp > 0) {
-                                var waveAmp = batteryBox.waveAmp;
-                                if (currentW - waveAmp < 0) waveAmp = currentW;
-                                var cp1x = currentW + Math.sin(wavePhase) * waveAmp;
-                                var cp2x = currentW + Math.cos(wavePhase + Math.PI) * waveAmp;
-
-                                ctx.lineTo(currentW, 0);
-                                ctx.bezierCurveTo(cp2x, height * 0.33, cp1x, height * 0.66, currentW, height);
-                                ctx.lineTo(0, height);
-                            } else {
-                                ctx.lineTo(currentW, 0);
-                                ctx.lineTo(currentW, height);
-                                ctx.lineTo(0, height);
-                            }
-                            ctx.closePath();
-                            ctx.clip();
-
-                            ctx.beginPath();
-                            ctx.moveTo(r, 0);
-                            ctx.lineTo(width - r, 0);
-                            ctx.arcTo(width, 0, width, r, r);
-                            ctx.lineTo(width, height - r);
-                            ctx.arcTo(width, height, width - r, height, r);
-                            ctx.lineTo(r, height);
-                            ctx.arcTo(0, height, 0, height - r, r);
-                            ctx.lineTo(0, r);
-                            ctx.arcTo(0, 0, r, 0, r);
-                            ctx.closePath();
-
-                            ctx.fillStyle = root.batColorFlat.toString();
-                            ctx.fill();
-                            ctx.restore();
-                        }
+                        radius: batteryBox.radius
+                        fillLevel: batteryBox.fillLevel
+                        waveAmp: (batteryBox.fillLevel < 0.99 && batteryBox.waveAmp > 0) ? Math.min(batteryBox.waveAmp, Math.min(width * batteryBox.fillLevel, width * (1.0 - batteryBox.fillLevel))) : 0
+                        phase: wavePhase
+                        vertical: 0.0
+                        color1: root.batColorFlat
+                        color2: root.batColorFlat
                     }
 
                     BatteryContent {
@@ -1386,12 +1424,12 @@ Item {
                             options: {
                                 if (root.isDesktop) {
                                     return PowerProfiles.hasPerformanceProfile
-                                        ? ["󰓅 " + I18n.t("syspanel.profiles.performance"), "󰗑 " + I18n.t("syspanel.profiles.balanced"), "󰌪 " + I18n.t("syspanel.profiles.power_saver")]
-                                        : ["󰗑 " + I18n.t("syspanel.profiles.balanced"), "󰌪 " + I18n.t("syspanel.profiles.power_saver")];
+                                        ? ["󰌪 " + I18n.t("syspanel.profiles.power_saver"), "󰗑 " + I18n.t("syspanel.profiles.balanced"), "󰓅 " + I18n.t("syspanel.profiles.performance")]
+                                        : ["󰌪 " + I18n.t("syspanel.profiles.power_saver"), "󰗑 " + I18n.t("syspanel.profiles.balanced")];
                                 } else {
                                     return PowerProfiles.hasPerformanceProfile
-                                        ? ["󰓅", "󰗑", "󰌪"]
-                                        : ["󰗑", "󰌪"];
+                                        ? ["󰌪", "󰗑", "󰓅"]
+                                        : ["󰌪", "󰗑"];
                                 }
                             }
                             accentColor: root.profileColor
@@ -1400,23 +1438,23 @@ Item {
                             activeTextColor: ThemeBackend.crust
                             currentIndex: {
                                 if (PowerProfiles.hasPerformanceProfile) {
-                                    if (root.powerProfile === "performance") return 0;
+                                    if (root.powerProfile === "power-saver") return 0;
                                     if (root.powerProfile === "balanced") return 1;
                                     return 2;
                                 } else {
-                                    if (root.powerProfile === "balanced") return 0;
+                                    if (root.powerProfile === "power-saver") return 0;
                                     return 1;
                                 }
                             }
 
                             onValueChanged: (idx, val) => {
                                 if (PowerProfiles.hasPerformanceProfile) {
-                                    if (idx === 0) PowerProfiles.profile = PowerProfile.Performance;
+                                    if (idx === 0) PowerProfiles.profile = PowerProfile.PowerSaver;
                                     else if (idx === 1) PowerProfiles.profile = PowerProfile.Balanced;
-                                    else PowerProfiles.profile = PowerProfile.PowerSaver;
+                                    else PowerProfiles.profile = PowerProfile.Performance;
                                 } else {
-                                    if (idx === 0) PowerProfiles.profile = PowerProfile.Balanced;
-                                    else PowerProfiles.profile = PowerProfile.PowerSaver;
+                                    if (idx === 0) PowerProfiles.profile = PowerProfile.PowerSaver;
+                                    else PowerProfiles.profile = PowerProfile.Balanced;
                                 }
                             }
                         }

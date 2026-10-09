@@ -37,7 +37,12 @@
       "update": "업데이트",
       "about": "정보",
       "display_widgets": "위젯",
-      "display_general": "일반"
+      "display_general": "일반",
+      "osd": "OSD",
+      "dock": "도크",
+      "bar_general": "일반",
+      "bar_modules": "모듈",
+      "bar_side_modules": "사이드 모듈"
     },
     "launcher": {
       "position": {
@@ -80,7 +85,9 @@
         "bottom_right": "오른쪽 아래",
         "bottom_left": "왼쪽 아래",
         "top_center": "위쪽 가운데",
-        "bottom_center": "아래쪽 가운데"
+        "bottom_center": "아래쪽 가운데",
+        "select_on_screen": "화면에서 선택...",
+        "close_selector": "선택기 닫기"
       },
       "sound": {
         "title": "알림음",
@@ -93,7 +100,9 @@
       "empty_graphic": {
         "title": "빈 알림 센터 애니메이션",
         "desc": "알림 센터가 비어 있을 때 잠자는 고양이 그래픽을 표시합니다"
-      }
+      },
+      "test": "알림 테스트",
+      "test_desc": "이것은 테스트 알림입니다"
     },
     "idle": {
       "enabled": {
@@ -143,19 +152,20 @@
       },
       "dpms": {
         "title": "화면 끄기 (DPMS)",
-        "desc": "화면을 완전히 끄기까지의 시간"
+        "desc": "모니터 디스플레이 신호 끄기"
       },
       "lock": {
         "title": "세션 잠금",
-        "desc": "비밀번호를 요구하기까지의 시간"
+        "desc": "일정 시간 비활성 후 세션 잠금"
       },
       "suspend": {
         "title": "시스템 절전",
-        "desc": "시스템을 절전 모드로 전환하기까지의 시간"
+        "desc": "시스템을 절전 모드로 전환"
       },
       "hooks": {
         "title": "훅 (셸 명령)"
-      }
+      },
+      "custom_action_desc": "사용자 정의 시간 초과 동작 및 명령"
     },
     "welcome": {
       "by_author": "@{author} 제작",
@@ -253,14 +263,33 @@
         "hide_bar": {
           "title": "편집기에서 바 숨기기",
           "desc": "편집기 모드에서 위젯을 수정할 때 자동으로 바를 숨깁니다"
-        }
+        },
+        "hide_presets": "프리셋 숨기기",
+        "choose_preset": "프리셋 선택",
+        "presets": {
+          "title": "위젯 프리셋"
+        },
+        "save_preset": {
+          "title": "프리셋 저장"
+        },
+        "preset_name_placeholder": "프리셋 이름 입력...",
+        "screen_desc": "바탕화면 위젯 설정 및 편집"
       }
     },
     "bar": {
       "modules": {
         "vis": "비주얼라이저 (cava)",
         "actions": "동작",
-        "workspaces": "작업 공간",
+        "workspaces": {
+          "style": {
+            "name": {
+              "pills": "알약",
+              "numbers": "숫자",
+              "pacman": "팩맨"
+            }
+          },
+          "name": "작업 공간"
+        },
         "media": "미디어",
         "tray": "트레이",
         "keyboard": "키보드",
@@ -270,7 +299,16 @@
         "battery": "배터리",
         "focus": "포커스",
         "sysmon": "시스템 모니터",
-        "timedate": "시간/날짜",
+        "timedate": {
+          "name": "시간 및 날짜",
+          "style": {
+            "name": {
+              "classic": "클래식",
+              "material": "머티리얼",
+              "badge": "도트 매트릭스"
+            }
+          }
+        },
         "info": "녹화/타이머",
         "weather": "날씨"
       },
@@ -289,7 +327,15 @@
       "workspaces": {
         "title": "표시할 작업 공간 개수를 선택하세요",
         "disc": "참고: 이 설정은 컴포지터의 실제 작업 공간 개수에는 영향을 주지 않습니다",
-        "desc": "표시할 작업 공간 개수"
+        "desc": "표시할 작업 공간 개수",
+        "hide_empty": {
+          "title": "빈 작업 공간 숨기기",
+          "desc": "사용 중인 작업 공간과 현재 작업 공간만 표시"
+        },
+        "style": {
+          "title": "스타일",
+          "desc": "워크스페이스 표시기의 시각적 스타일을 선택합니다"
+        }
       },
       "opacity": {
         "title": "바 불투명도",
@@ -330,6 +376,81 @@
       "distinct_pills": {
         "title": "위젯에 모듈식의 컴팩트한 스타일 사용",
         "desc": "바 모듈에 테두리를 추가하고 크기를 줄여 모듈식 디자인에 맞는 간결한 모양을 제공합니다"
+      },
+      "timedate": {
+        "show_date": {
+          "title": "날짜 표시",
+          "desc": "시계 옆에 날짜 텍스트를 표시합니다"
+        },
+        "style": {
+          "title": "스타일",
+          "desc": "시계 및 날짜 표시의 시각적 스타일을 선택합니다"
+        }
+      },
+      "vis": {
+        "bars": {
+          "title": "막대 개수",
+          "desc": "표시할 주파수 막대의 개수"
+        },
+        "alignment": {
+          "title": "정렬",
+          "desc": "시각화 도구를 중앙, 상단 또는 하단에 정렬"
+        },
+        "align": {
+          "center": "중앙",
+          "top": "상단",
+          "bottom": "하단",
+          "left": "왼쪽",
+          "right": "오른쪽"
+        },
+        "continuous": {
+          "title": "연속 파동",
+          "desc": "개별 막대 대신 부드러운 파동으로 렌더링"
+        }
+      },
+      "sysmon": {
+        "style": {
+          "title": "원 스타일",
+          "desc": "진행률 링의 시각적 모양",
+          "wave": "웨이브",
+          "circle": "원형"
+        },
+        "cpu": {
+          "title": "CPU 사용량",
+          "desc": "프로세서 사용률 링 표시"
+        },
+        "ram": {
+          "title": "메모리 사용량",
+          "desc": "메모리(RAM) 사용률 링 표시"
+        },
+        "temp": {
+          "title": "온도",
+          "desc": "시스템 온도 링 표시"
+        },
+        "disk": {
+          "title": "디스크 사용량",
+          "desc": "스토리지 디스크 사용률 링 표시"
+        }
+      },
+      "bat": {
+        "show_percent": {
+          "title": "백분율 표시",
+          "desc": "배터리 충전 백분율을 숫자로 표시합니다"
+        },
+        "show_icon": {
+          "title": "아이콘 표시",
+          "desc": "배터리 아이콘 또는 그래픽 표시기를 표시합니다"
+        },
+        "style": {
+          "title": "배터리 스타일",
+          "desc": "배터리 표시기의 시각적 모양을 선택합니다",
+          "name": {
+            "classic": "클래식",
+            "minimal": "미니멀"
+          },
+          "classic": "그라디언트 웨이브 알약 스타일",
+          "minimal": "캡이 있는 iOS/Android 캡슐 스타일"
+        }
       }
     },
     "theme": {
@@ -353,7 +474,8 @@
         "desc": "배경화면을 검색할 디렉터리",
         "select_dir": "디렉터리 선택...",
         "select_wallpaper": "배경화면 선택",
-        "no_wallpaper_selected": "선택된 배경화면 없음"
+        "no_wallpaper_selected": "선택된 배경화면 없음",
+        "select": "배경화면"
       }
     },
     "file_picker": {
@@ -365,7 +487,9 @@
       "places": {
         "home": "홈",
         "downloads": "다운로드",
-        "pictures": "사진"
+        "pictures": "사진",
+        "music": "음악",
+        "documents": "문서"
       }
     },
     "font_picker": {
@@ -468,7 +592,144 @@
         "excluded_apps_desc": "앞으로 전체 사용량 집계에서 제외할 앱을 지정합니다"
       }
     },
-    "update_available": "업데이트 있음"
+    "update_available": "업데이트 있음",
+    "osd": {
+      "capslock": {
+        "title": "Caps Lock 활성화 시 표시"
+      },
+      "numlock": {
+        "title": "Num Lock 활성화 시 표시"
+      },
+      "airplane": {
+        "title": "비행기 탑승 모드 시 표시"
+      },
+      "attach_bar": {
+        "title": "solid/fill 스타일에서 바에 고정",
+        "desc": "solid 또는 fill 모드에서 OSD 팝업을 상태 바에 고정합니다. 비활성화하면 OSD가 항상 설정된 위치에 표시됩니다."
+      },
+      "test": "OSD 테스트",
+      "position": {
+        "title": "화면 On-Screen Display 위치",
+        "desc": "미리보기 상자를 드래그하여 위치를 변경하세요",
+        "select_on_screen": "화면에서 선택...",
+        "close_selector": "선택기 닫기",
+        "bottom_center": "하단 중앙",
+        "bottom_left": "하단 왼쪽",
+        "bottom_right": "하단 오른쪽",
+        "top_center": "상단 중앙",
+        "top_left": "상단 왼쪽",
+        "top_right": "상단 오른쪽"
+      },
+      "orientation": {
+        "horizontal": "가로",
+        "vertical": "세로"
+      }
+    },
+    "common": {
+      "show_bar": "바 표시",
+      "unavailable": "사용 불가"
+    },
+    "position": {
+      "custom": "사용자 지정"
+    },
+    "dock": {
+      "enabled": {
+        "title": "도크 활성화",
+        "desc": "플로팅 애플리케이션 도크 활성화"
+      },
+      "position": {
+        "title": "도크 위치",
+        "desc": "도크를 고정할 화면 가장자리 선택",
+        "bottom": "하단",
+        "top": "상단",
+        "left": "왼쪽",
+        "right": "오른쪽"
+      },
+      "elements": {
+        "title": "요소 수",
+        "desc": "도크에 표시되는 앱 바로가기 총 개수"
+      },
+      "size": {
+        "title": "요소 크기",
+        "desc": "개별 버튼의 픽셀 크기"
+      },
+      "autohide": {
+        "title": "자동 숨김",
+        "desc": "화면 가장자리에 마우스가 없을 때 도크 숨김"
+      },
+      "timeout": {
+        "title": "자동 숨김 지연 시간",
+        "desc": "마우스가 떠난 후 숨겨지기까지의 지연 시간"
+      },
+      "floating": {
+        "title": "플로팅 독",
+        "desc": "모서리를 둥글게 하여 화면 가장자리에서 독 분리"
+      },
+      "transparency": {
+        "title": "독 투명도",
+        "desc": "독 배경 불투명도 조절"
+      },
+      "apps": {
+        "title": "독 애플리케이션",
+        "singular": "개 앱",
+        "plural": "개 앱",
+        "shuffle": "앱 셔플",
+        "empty": "독에 구성된 애플리케이션이 없습니다",
+        "enter_edit": "편집 모드 시작",
+        "exit_edit": "편집 모드 종료"
+      },
+      "picker": {
+        "search": "앱 검색...",
+        "done": "완료",
+        "empty": "일치하는 애플리케이션이 없습니다"
+      },
+      "opacity": {
+        "title": "독 불투명도",
+        "desc": "독 배경 불투명도 수준 조절"
+      },
+      "override_bounds": {
+        "title": "화면 범위 초과 시 크기 자동 보정 비활성화",
+        "desc": "독이 화면 한계를 초과하더라도 사용자 지정 요소 크기를 유지합니다"
+      },
+      "scrolling": {
+        "title": "요소 스크롤 활성화",
+        "desc": "표시되는 요소를 제한하고 마우스 휠 또는 터치패드 스크롤을 허용합니다"
+      },
+      "visible_elements": {
+        "title": "표시할 요소 수",
+        "desc": "독에 동시에 표시되는 항목 수"
+      },
+      "hover_scale": {
+        "title": "호버 확대 효과",
+        "desc": "독 아이템 위에 마우스를 올렸을 때 확대되는 비율"
+      },
+      "cascade_scale": {
+        "title": "인접 요소 함께 확대",
+        "desc": "인접한 아이콘에 계단식 확대 효과 적용"
+      },
+      "exclusive": {
+        "title": "단독 모드",
+        "desc": "창이 독 공간을 차지하지 않도록 방지"
+      },
+      "on_top": {
+        "title": "창 위에 독 배치",
+        "desc": "애플리케이션 창 위에 독이 항상 보이도록 유지"
+      },
+      "smart_autohide": {
+        "title": "스마트 자동 숨기기",
+        "desc": "창이 열려 있을 때만 독을 숨기고 바탕화면에서는 항상 표시"
+      }
+    },
+    "lyrics_picker": {
+      "title": "가사 파일 선택",
+      "no_lyrics_selected": "선택된 가사 없음"
+    },
+    "settings": "설정",
+    "search": {
+      "placeholder": "설정 검색...",
+      "prompt": "설정을 검색하려면 입력하세요...",
+      "no_results": "설정을 찾을 수 없습니다"
+    }
   },
   "sysnotif": {
     "battery": {
@@ -498,7 +759,12 @@
   },
   "applauncher": {
     "search": "검색",
-    "placeholder": "명령을 실행하려면 > 로 시작하세요..."
+    "placeholder": "명령을 실행하려면 > 로 시작하세요...",
+    "tab_applications": "애플리케이션",
+    "tab_files": "파일",
+    "placeholder_files": "파일 검색 또는 경로 입력...",
+    "tab_emojis": "이모지",
+    "placeholder_emojis": "이모지 검색 또는 키워드 입력..."
   },
   "calendar": {
     "loading": "불러오는 중...",
@@ -567,7 +833,11 @@
       "jazz": "재즈",
       "classic": "클래식",
       "custom": "사용자 지정"
-    }
+    },
+    "searching_lyrics": "가사 검색 중...",
+    "no_lyrics": "가사를 찾을 수 없음",
+    "select_local_file": "로컬 파일 선택",
+    "lyrics": "가사"
   },
   "network": {
     "tabs": {
@@ -655,6 +925,16 @@
         "pomo_skipped_title": "뽀모도로 건너뜀",
         "pomo_skipped_focus_body": "집중 세션을 건너뛰고 휴식으로 넘어갑니다.",
         "pomo_skipped_break_body": "휴식을 건너뛰고 다시 집중으로 넘어갑니다."
+      }
+    },
+    "draw": {
+      "notification": {
+        "app_name": "DrawAction",
+        "saved_title": "Drawing saved",
+        "copied_title": "Drawing copied",
+        "copied_body": "Drawing copied to clipboard",
+        "failed_title": "Export failed",
+        "failed_body": "Could not save drawing"
       }
     }
   },
@@ -840,13 +1120,20 @@
       "click_to_add": "아래 도구 모음에서 위젯 아이콘을 클릭해 추가하세요",
       "done": "완료",
       "widget_singular": "개 위젯",
-      "widgets_plural": "개 위젯"
+      "widgets_plural": "개 위젯",
+      "widgets_short": "개"
     },
     "types": {
       "clock": "시계",
       "music": "음악",
       "weather": "날씨",
-      "image": "이미지"
+      "image": "이미지",
+      "visualizer": "시각화 도구",
+      "user": "사용자",
+      "usage": "사용량",
+      "battery": "배터리",
+      "github": "Github",
+      "time": "시간"
     },
     "variants": {
       "digital": "디지털",
@@ -856,7 +1143,49 @@
       "round": "원형",
       "compact": "간소",
       "rect": "사각형",
-      "rounded": "둥근 사각형"
+      "rounded": "둥근 사각형",
+      "bars": "막대",
+      "continuous": "연속형",
+      "default": "기본",
+      "material": "머티리얼",
+      "materialAnalog": "머티리얼 아날로그",
+      "lumen": "루멘",
+      "lyrics": "가사",
+      "simpleLyrics": "단순 가사"
+    },
+    "presets": {
+      "minimal": {
+        "name": "미니멀",
+        "desc": "미니멀한 디지털 시계와 컴팩트한 날씨가 포함된 깔끔한 레이아웃입니다."
+      },
+      "media_station": {
+        "name": "미디어 스테이션",
+        "desc": "중앙 오디오 비주얼라이저 바와 원형 음악 컨트롤러가 포함된 미디어 설정입니다."
+      },
+      "dashboard": {
+        "name": "대시보드",
+        "desc": "디지털 시계, 하드웨어 리소스 사용량 및 배터리 상태를 보여주는 대시보드입니다."
+      }
+    },
+    "github": {
+      "set_user": "사용자 설정",
+      "error": "오류",
+      "commit": "커밋",
+      "commits": "커밋",
+      "no_day_selected": "선택된 날짜 없음",
+      "fetching": "GitHub 기여 내역 가져오는 중...",
+      "fetch_error": "@{user} 사용자를 가져올 수 없습니다",
+      "enter_username": "GitHub 사용자명을 입력하세요",
+      "no_contributions": "기여 내역이 없습니다"
+    },
+    "settings": {
+      "lyricsLines": "줄 수",
+      "lyricsAlignment": "정렬"
+    },
+    "align": {
+      "left": "왼쪽",
+      "center": "가운데",
+      "right": "오른쪽"
     }
   },
   "cli": {

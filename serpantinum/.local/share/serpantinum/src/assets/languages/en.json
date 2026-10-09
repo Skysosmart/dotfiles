@@ -37,7 +37,12 @@
       "update": "Update",
       "about": "About",
       "display_widgets": "Widgets",
-      "display_general": "General"
+      "display_general": "General",
+      "osd": "On-Screen Display",
+      "dock": "Dock",
+      "bar_general": "General",
+      "bar_modules": "Modules",
+      "bar_side_modules": "Side modules"
     },
     "launcher": {
       "position": {
@@ -80,7 +85,9 @@
         "bottom_right": "Bottom right",
         "bottom_left": "Bottom left",
         "top_center": "Top center",
-        "bottom_center": "Bottom center"
+        "bottom_center": "Bottom center",
+        "select_on_screen": "Select on screen...",
+        "close_selector": "Close the selector"
       },
       "sound": {
         "title": "Notification sound",
@@ -93,7 +100,9 @@
       "empty_graphic": {
         "title": "Empty center animation",
         "desc": "Display the sleeping cat graphic in the notification center when empty"
-      }
+      },
+      "test": "Test notification",
+      "test_desc": "This is a test notification"
     },
     "idle": {
       "enabled": {
@@ -139,23 +148,24 @@
       },
       "dim": {
         "title": "Dim screen",
-        "desc": "Time before dimming output"
+        "desc": "Reduce screen brightness before locking"
       },
       "dpms": {
         "title": "Display off (DPMS)",
-        "desc": "Time before turning screen completely off"
+        "desc": "Turn off monitor display signal"
       },
       "lock": {
         "title": "Lock session",
-        "desc": "Time before demanding password"
+        "desc": "Lock the session after a period of inactivity"
       },
       "suspend": {
         "title": "System suspend",
-        "desc": "Time before putting machine to sleep"
+        "desc": "Suspend the system to sleep mode"
       },
       "hooks": {
         "title": "Hooks (shell commands)"
-      }
+      },
+      "custom_action_desc": "Custom timeout action and command"
     },
     "welcome": {
       "by_author": "by @{author}",
@@ -253,14 +263,33 @@
         "hide_bar": {
           "title": "Hide the bar in the redactor",
           "desc": "Automatically hide the bar when editing widgets in redactor mode"
-        }
+        },
+        "hide_presets": "Hide Presets",
+        "choose_preset": "Choose a preset",
+        "presets": {
+          "title": "Widget Presets"
+        },
+        "save_preset": {
+          "title": "Save Preset"
+        },
+        "preset_name_placeholder": "Enter preset name...",
+        "screen_desc": "Configure and edit desktop widgets"
       }
     },
     "bar": {
       "modules": {
         "vis": "Visualizer (cava)",
         "actions": "Actions",
-        "workspaces": "Workspaces",
+        "workspaces": {
+          "style": {
+            "name": {
+              "pills": "Pills",
+              "numbers": "Numbers",
+              "pacman": "Pacman"
+            }
+          },
+          "name": "Workspaces"
+        },
         "media": "Media",
         "tray": "Tray",
         "keyboard": "Keyboard",
@@ -270,7 +299,16 @@
         "battery": "Battery",
         "focus": "Focus",
         "sysmon": "System monitor",
-        "timedate": "Time/date",
+        "timedate": {
+          "name": "Time & Date",
+          "style": {
+            "name": {
+              "classic": "Classic",
+              "material": "Material",
+              "badge": "Dot Matrix"
+            }
+          }
+        },
         "info": "Recording/timer",
         "weather": "Weather"
       },
@@ -289,7 +327,15 @@
       "workspaces": {
         "title": "Choose an amount of workspaces to display",
         "disc": "Note: this doesn't affect the actual amount of workspaces in the compositor",
-        "desc": "Number of workspaces to display"
+        "desc": "Number of workspaces to display",
+        "hide_empty": {
+          "title": "Hide empty workspaces",
+          "desc": "Show only occupied workspaces and the active one"
+        },
+        "style": {
+          "title": "Style",
+          "desc": "Choose the visual style for workspace indicators"
+        }
       },
       "opacity": {
         "title": "Bar opacity",
@@ -330,6 +376,81 @@
       "distinct_pills": {
         "title": "Enable a modular and compact style for widgets",
         "desc": "Makes bar's modules have an outlining rectangle and shrink their size to fit the modular look"
+      },
+      "timedate": {
+        "show_date": {
+          "title": "Show Date",
+          "desc": "Display the date text alongside the clock"
+        },
+        "style": {
+          "title": "Style",
+          "desc": "Choose the visual style for the clock and date display"
+        }
+      },
+      "vis": {
+        "bars": {
+          "title": "Amount of Bars",
+          "desc": "Number of frequency bars to display"
+        },
+        "alignment": {
+          "title": "Alignment",
+          "desc": "Center the visualizer or align to top or bottom"
+        },
+        "align": {
+          "center": "Center",
+          "top": "Top",
+          "bottom": "Bottom",
+          "left": "Left",
+          "right": "Right"
+        },
+        "continuous": {
+          "title": "Continuous Wave",
+          "desc": "Render a smooth fluid wave instead of discrete bars"
+        }
+      },
+      "sysmon": {
+        "style": {
+          "title": "Circle Style",
+          "desc": "Visual appearance of the progress rings",
+          "wave": "Wave",
+          "circle": "Circle"
+        },
+        "cpu": {
+          "title": "CPU Usage",
+          "desc": "Display processor utilization ring"
+        },
+        "ram": {
+          "title": "Memory Usage",
+          "desc": "Display memory (RAM) utilization ring"
+        },
+        "temp": {
+          "title": "Temperature",
+          "desc": "Display system temperature ring"
+        },
+        "disk": {
+          "title": "Disk Usage",
+          "desc": "Display storage disk utilization ring"
+        }
+      },
+      "bat": {
+        "show_percent": {
+          "title": "Show Percentage",
+          "desc": "Display the numeric battery charge percentage"
+        },
+        "show_icon": {
+          "title": "Show Icon",
+          "desc": "Display the battery icon or graphic indicator"
+        },
+        "style": {
+          "title": "Battery Style",
+          "desc": "Choose the visual appearance of the battery indicator",
+          "name": {
+            "classic": "Classic",
+            "minimal": "Minimal"
+          },
+          "classic": "Pill with gradient wave fill",
+          "minimal": "iOS/Android capsule with cap"
+        }
       }
     },
     "theme": {
@@ -353,7 +474,8 @@
         "desc": "Directory to search for wallpapers",
         "select_dir": "Select directory...",
         "select_wallpaper": "Select wallpaper",
-        "no_wallpaper_selected": "No wallpaper selected"
+        "no_wallpaper_selected": "No wallpaper selected",
+        "select": "Wallpaper"
       }
     },
     "file_picker": {
@@ -365,7 +487,9 @@
       "places": {
         "home": "Home",
         "downloads": "Downloads",
-        "pictures": "Pictures"
+        "pictures": "Pictures",
+        "music": "Music",
+        "documents": "Documents"
       }
     },
     "font_picker": {
@@ -469,8 +593,143 @@
       }
     },
     "update_available": "Update available",
-    "save": "Save",
-    "saved": "Saved"
+    "osd": {
+      "capslock": {
+        "title": "Show on Caps Lock"
+      },
+      "numlock": {
+        "title": "Show on Num Lock"
+      },
+      "airplane": {
+        "title": "Show on Airplane Mode"
+      },
+      "attach_bar": {
+        "title": "Attach to the bar in solid/fill style",
+        "desc": "Snap OSD popups to the status bar in solid or fill mode. When disabled, the OSD always stays in the configured position."
+      },
+      "test": "Test OSD",
+      "position": {
+        "title": "Screen position of On-Screen Display",
+        "desc": "Drag the preview box to change position",
+        "select_on_screen": "Select on screen...",
+        "close_selector": "Close the selector",
+        "bottom_center": "Bottom Center",
+        "bottom_left": "Bottom Left",
+        "bottom_right": "Bottom Right",
+        "top_center": "Top Center",
+        "top_left": "Top Left",
+        "top_right": "Top Right"
+      },
+      "orientation": {
+        "horizontal": "Horizontal",
+        "vertical": "Vertical"
+      }
+    },
+    "common": {
+      "show_bar": "Show bar",
+      "unavailable": "Unavailable"
+    },
+    "position": {
+      "custom": "Custom"
+    },
+    "dock": {
+      "enabled": {
+        "title": "Enable dock",
+        "desc": "Enable floating application dock"
+      },
+      "position": {
+        "title": "Dock position",
+        "desc": "Select the screen edge to anchor the dock",
+        "bottom": "Bottom",
+        "top": "Top",
+        "left": "Left",
+        "right": "Right"
+      },
+      "elements": {
+        "title": "Number of elements",
+        "desc": "Total app shortcuts displayed on the dock"
+      },
+      "size": {
+        "title": "Element size",
+        "desc": "Dimensions of individual app buttons in pixels"
+      },
+      "autohide": {
+        "title": "Auto-hide",
+        "desc": "Hide the dock when not hovering over the screen edge"
+      },
+      "timeout": {
+        "title": "Auto-hide delay",
+        "desc": "Duration before hiding after pointer leaves"
+      },
+      "floating": {
+        "title": "Floating dock",
+        "desc": "Detach dock from screen edge with rounded corners"
+      },
+      "transparency": {
+        "title": "Dock transparency",
+        "desc": "Adjust dock background opacity level"
+      },
+      "apps": {
+        "title": "Dock Applications",
+        "singular": "app",
+        "plural": "apps",
+        "shuffle": "Shuffle Apps",
+        "empty": "No applications configured for the dock",
+        "enter_edit": "Edit",
+        "exit_edit": "Exit edit mode"
+      },
+      "picker": {
+        "search": "Search apps...",
+        "done": "Done",
+        "empty": "No matching applications"
+      },
+      "opacity": {
+        "title": "Dock opacity",
+        "desc": "Adjust dock background opacity level"
+      },
+      "override_bounds": {
+        "title": "Override out-of-screen-bounds size correction",
+        "desc": "Keep custom element size even if dock exceeds screen limits"
+      },
+      "scrolling": {
+        "title": "Enable element scrolling",
+        "desc": "Limit visible elements and allow mouse wheel or touchpad scrolling"
+      },
+      "visible_elements": {
+        "title": "Visible elements",
+        "desc": "Number of dock items visible at the same time"
+      },
+      "hover_scale": {
+        "title": "Hover scale effect",
+        "desc": "Magnification level when hovering over dock items"
+      },
+      "cascade_scale": {
+        "title": "Scale nearest elements",
+        "desc": "Cascading magnification on neighboring icons"
+      },
+      "exclusive": {
+        "title": "Exclusive mode",
+        "desc": "Prevent windows from taking space occupied by the dock"
+      },
+      "on_top": {
+        "title": "Place dock on top of windows",
+        "desc": "Keep the dock visible above application windows"
+      },
+      "smart_autohide": {
+        "title": "Smart auto-hide",
+        "desc": "Auto-hide dock only when windows are open, keep visible on desktop"
+      }
+    },
+    "lyrics_picker": {
+      "title": "Select lyrics file",
+      "no_lyrics_selected": "No lyrics selected"
+    },
+    "settings": "Settings",
+    "search": {
+      "placeholder": "Search settings...",
+      "prompt": "Type to search settings...",
+      "no_results": "No settings found"
+    }
   },
   "sysnotif": {
     "battery": {
@@ -500,7 +759,12 @@
   },
   "applauncher": {
     "search": "Search",
-    "placeholder": "Start with > for a command..."
+    "placeholder": "Start with > for a command...",
+    "tab_applications": "Applications",
+    "tab_files": "Files",
+    "placeholder_files": "Search files or enter path...",
+    "tab_emojis": "Emojis",
+    "placeholder_emojis": "Search emojis by name or keyword..."
   },
   "calendar": {
     "loading": "Loading...",
@@ -569,7 +833,11 @@
       "jazz": "Jazz",
       "classic": "Classic",
       "custom": "Custom"
-    }
+    },
+    "searching_lyrics": "Searching lyrics...",
+    "no_lyrics": "No lyrics found",
+    "select_local_file": "Select a local file",
+    "lyrics": "Lyrics"
   },
   "network": {
     "tabs": {
@@ -657,6 +925,16 @@
         "pomo_skipped_title": "Pomodoro skipped",
         "pomo_skipped_focus_body": "Focus session skipped. Moving to break.",
         "pomo_skipped_break_body": "Break skipped. Moving back to focus."
+      }
+    },
+    "draw": {
+      "notification": {
+        "app_name": "DrawAction",
+        "saved_title": "Drawing saved",
+        "copied_title": "Drawing copied",
+        "copied_body": "Drawing copied to clipboard",
+        "failed_title": "Export failed",
+        "failed_body": "Could not save drawing"
       }
     }
   },
@@ -842,13 +1120,20 @@
       "click_to_add": "Click a widget icon in the bottom toolbar to add it",
       "done": "Done",
       "widget_singular": "widget",
-      "widgets_plural": "widgets"
+      "widgets_plural": "widgets",
+      "widgets_short": "w"
     },
     "types": {
       "clock": "Clock",
       "music": "Music",
       "weather": "Weather",
-      "image": "Image"
+      "image": "Image",
+      "visualizer": "Visualizer",
+      "user": "User",
+      "usage": "Usage",
+      "battery": "Battery",
+      "github": "Github",
+      "time": "Time"
     },
     "variants": {
       "digital": "Digital",
@@ -858,7 +1143,46 @@
       "round": "Round",
       "compact": "Compact",
       "rect": "Rect",
-      "rounded": "Rounded"
+      "rounded": "Rounded",
+      "bars": "Bars",
+      "continuous": "Continuous",
+      "default": "Default",
+      "material": "Material",
+      "materialAnalog": "Material Analog",
+      "lumen": "Lumen",
+      "lyrics": "Lyrics",
+      "simpleLyrics": "Simple Lyrics"
+    },
+    "presets": {
+      "minimal": {
+        "name": "Minimal"
+      },
+      "media_station": {
+        "name": "Media station"
+      },
+      "dashboard": {
+        "name": "Dashboard"
+      }
+    },
+    "github": {
+      "set_user": "Set user",
+      "error": "Error",
+      "commit": "commit",
+      "commits": "commits",
+      "no_day_selected": "No day selected",
+      "fetching": "Fetching GitHub contributions...",
+      "fetch_error": "Could not fetch user @{user}",
+      "enter_username": "Enter a GitHub username",
+      "no_contributions": "No contributions found"
+    },
+    "settings": {
+      "lyricsLines": "Lines",
+      "lyricsAlignment": "Alignment"
+    },
+    "align": {
+      "left": "Left",
+      "center": "Center",
+      "right": "Right"
     }
   },
   "cli": {

@@ -1,7 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Window
-import QtCore
 import Qt.labs.folderlistmodel
 import QtMultimedia
 import QtQuick.Effects
@@ -9,10 +8,10 @@ import Quickshell
 import Quickshell.Io
 import "../"
 import "../reusables"
-import "../singletons"
 
 Item {
     id: window
+    visible: false
     width: Screen.width
     focus: true
 
@@ -153,15 +152,15 @@ Item {
         }
     }
 
-    Process {
+    FileView {
         id: wallpaperHistoryReader
-        running: false
-        command: ["cat", Caching.getCacheDir("wallpaper") + "/history.txt"]
-        stdout: StdioCollector {
-            onStreamFinished: {
-                let lines = this.text.trim().split("\n").map(s => s.trim()).filter(s => s.length > 0);
-                window.historyList = lines;
-                if (window.currentFilter === "History") {
+        path: Caching.getCacheDir("wallpaper") + "/history.txt"
+        onLoaded: {
+            let raw = typeof text === "function" ? text() : text;
+            let lines = (raw || "").trim().split("\n").map(s => s.trim()).filter(s => s.length > 0);
+            window.historyList = lines;
+            if (window.currentFilter === "History") {
+                if (!window.reorderHistory()) {
                     window.applyFilters(false);
                 }
             }
@@ -359,6 +358,52 @@ Item {
         }
     }
 
+    function reorderHistory() {
+        if (window.currentFilter !== "History" || displayModel.count === 0 || !window.targetWallName) {
+            return false;
+        }
+
+        let cleanTarget = window.getCleanBaseName(window.targetWallName);
+        let fullTarget = window.getCleanName(window.targetWallName);
+        let foundIdx = -1;
+
+        for (let i = 0; i < displayModel.count; i++) {
+            let fn = displayModel.get(i).fileName;
+            if (fn === window.targetWallName || window.getCleanName(fn) === fullTarget || window.getCleanBaseName(fn) === cleanTarget) {
+                foundIdx = i;
+                break;
+            }
+        }
+
+        if (foundIdx === -1) {
+            return false;
+        }
+
+        if (foundIdx === 0) {
+            view.currentIndex = 0;
+            return true;
+        }
+
+        let histItems = window.getHistoryItems();
+        if (histItems.length !== displayModel.count) {
+            return false;
+        }
+
+        let displaySet = {};
+        for (let i = 0; i < displayModel.count; i++) {
+            displaySet[displayModel.get(i).fileName] = true;
+        }
+        for (let i = 0; i < histItems.length; i++) {
+            if (!displaySet[histItems[i].fileName]) {
+                return false;
+            }
+        }
+
+        displayModel.move(foundIdx, 0, 1);
+        view.currentIndex = 0;
+        return true;
+    }
+
     function applyWallpaper(safeFileName, isVideo) {
         if (!safeFileName || window.isApplying) return;
 
@@ -374,8 +419,11 @@ Item {
         const transitionTypes = ["fade"];
         const randomTransition = transitionTypes[Math.floor(Math.random() * transitionTypes.length)];
 
-        wallpaperHistoryReader.running = false;
-        wallpaperHistoryReader.running = true;
+        if (window.currentFilter === "History") {
+            window.reorderHistory();
+        }
+
+        wallpaperHistoryReader.reload();
 
         if (window.currentFilter === "Search" && window.hasSearched) {
             let alreadyExists = window.isDownloaded(safeFileName);
@@ -447,14 +495,24 @@ Item {
         }
     }
 
-    Settings {
+    QtObject {
         id: searchState
-        location: Caching.getCacheDir("wallpaper") + "/settings.conf"
-        category: "QS_WallpaperPicker"
         property string query: ""
         property bool searched: false
         property string lastName: ""
         property int sessionId: 0
+
+        readonly property string filePath: Caching.getCacheDir("wallpaper") + "/search_state.json"
+
+        function save() {
+            let data = JSON.stringify({
+                query: searchState.query,
+                searched: searchState.searched,
+                lastName: searchState.lastName,
+                sessionId: searchState.sessionId
+            });
+            Quickshell.execDetached(["sh", "-c", "printf '%s\\n' \"$1\" > \"$2\"", "_", data, filePath]);
+        }
     }
 
     onIsSearchPausedChanged: {
@@ -500,8 +558,7 @@ Item {
         window.trackerResolved = false;
         wallpaperMonitorTracker.running = false;
         wallpaperMonitorTracker.running = true;
-        wallpaperHistoryReader.running = false;
-        wallpaperHistoryReader.running = true;
+        wallpaperHistoryReader.reload();
         window.isFilterAnimating = true;
         filterAnimationTimer.restart();
 
@@ -532,12 +589,14 @@ Item {
                 searchState.searched = window.hasSearched;
                 searchState.lastName = window.lastSearchName;
                 searchState.sessionId = window.searchSessionId;
+                searchState.save();
                 Quickshell.execDetached([
                     window.scriptDir + "/search_control.sh",
                     "pause",
                     Caching.getRunDir("wallpaper")
                 ]);
             } else {
+                searchState.save();
                 Quickshell.execDetached([
                     window.scriptDir + "/search_control.sh",
                     "stop",
@@ -625,6 +684,7 @@ Item {
         window.visibleItemCount = 0;
         searchState.searched = true;
         searchState.query = searchInput.text.trim();
+        searchState.save();
         window.isSearchPaused = false;
         window.searchQuery = searchInput.text.trim();
         window._lastFilter = window.currentFilter;
@@ -798,6 +858,37 @@ Item {
         interval: 150
         repeat: false
         onTriggered: window.triggerIndexer()
+    }
+
+    Process {
+        id: searchStateReader
+        running: false
+        command: ["sh", "-c", "[ -f \"$1\" ] && cat \"$1\"", "_", Caching.getCacheDir("wallpaper") + "/search_state.json"]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                let trimmed = this.text ? this.text.trim() : "";
+                if (trimmed.length > 0) {
+                    try {
+                        let data = JSON.parse(trimmed);
+                        if (data && typeof data === "object") {
+                            searchState.query = data.query || "";
+                            searchState.searched = !!data.searched;
+                            searchState.lastName = data.lastName || "";
+                            searchState.sessionId = data.sessionId || 0;
+
+                            if (searchState.searched) {
+                                searchInput.text = searchState.query;
+                                window.searchQuery = searchState.query;
+                                window.hasSearched = true;
+                                window.lastSearchName = searchState.lastName;
+                                window.searchSessionId = searchState.sessionId;
+                                window.isSearchPaused = true;
+                            }
+                        }
+                    } catch(e) {}
+                }
+            }
+        }
     }
 
     Process {
@@ -998,8 +1089,7 @@ Item {
         window.currentFilter = newFilter;
 
         if (newFilter === "History") {
-            wallpaperHistoryReader.running = false;
-            wallpaperHistoryReader.running = true;
+            wallpaperHistoryReader.reload();
         }
 
         Qt.callLater(() => {
@@ -1380,6 +1470,14 @@ Item {
         }
         addDisplaced: Transition {
             enabled: window.allowAddAnimation && !window.isModelChanging && !window.isFilterAnimating && !(window.currentFilter === "Search" && window.hasSearched && !window.isSearchPaused)
+            NumberAnimation { properties: "x,y"; duration: 400; easing.type: Easing.OutCubic }
+        }
+        move: Transition {
+            enabled: !window.isModelChanging && !window.isFilterAnimating && !(window.currentFilter === "Search" && window.hasSearched && !window.isSearchPaused)
+            NumberAnimation { properties: "x,y"; duration: 400; easing.type: Easing.OutCubic }
+        }
+        moveDisplaced: Transition {
+            enabled: !window.isModelChanging && !window.isFilterAnimating && !(window.currentFilter === "Search" && window.hasSearched && !window.isSearchPaused)
             NumberAnimation { properties: "x,y"; duration: 400; easing.type: Easing.OutCubic }
         }
         remove: Transition {
@@ -2001,6 +2099,7 @@ Item {
                     onTextEdited: function(newText) {
                         window.hasSearched = false;
                         searchState.searched = false;
+                        searchState.save();
                     }
 
                     onAccepted: function(finalText) {
@@ -2052,15 +2151,7 @@ Item {
     Component.onCompleted: {
         Quickshell.execDetached(["bash", "-c", "mkdir -p '" + decodeURIComponent(window.searchDir.replace("file://", "")) + "'"]);
 
-        if (searchState.searched) {
-            searchInput.text = searchState.query;
-            window.searchQuery = searchState.query;
-            window.hasSearched = true;
-            window.lastSearchName = searchState.lastName;
-            window.searchSessionId = searchState.sessionId;
-            window.isSearchPaused = true;
-        }
-
+        searchStateReader.running = true;
         indexDiskReader.running = true;
         window.syncFromSrcModel();
         window.triggerIndexer();

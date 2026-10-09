@@ -1,10 +1,10 @@
 import QtQuick
+import QtQuick.Effects
 import Quickshell
 import Quickshell.Wayland
 import Quickshell.Io
 import QtMultimedia
 import "../"
-import "../singletons"
 
 ShellRoot {
     id: globalRoot
@@ -25,7 +25,6 @@ ShellRoot {
 
                 focusable: false
                 exclusionMode: ExclusionMode.Ignore
-                mask: Region {}
                 color: "#0a0a0f"
 
                 anchors { top: true; bottom: true; left: true; right: true }
@@ -45,9 +44,16 @@ ShellRoot {
                 property bool isVideoB: false
                 property bool playbackPaused: false
 
-                readonly property int transitionDuration: 1000
+                readonly property int fadeDuration: 1000
+                readonly property int maskDuration: 1600
                 property real transitionProgress: 1.0
                 property bool isPreloading: false
+                property int activeTransitionType: 0
+                property bool wipeIsVertical: false
+                property int swipeDirection: 0
+                property real transitionOriginX: 0.5
+                property real transitionOriginY: 0.5
+                property bool isInitialLoad: true
 
                 Component.onCompleted: restorePoller.running = true
 
@@ -127,7 +133,7 @@ ShellRoot {
                                 if (savedName !== "") {
                                     let histFile = barWindow.wpCacheDir + "/history.txt";
                                     Quickshell.execDetached(["bash", "-c",
-                                        "HIST='" + histFile + "'; if [ -f \"$HIST\" ]; then if [ \"$(head -n 1 \"$HIST\" 2>/dev/null)\" != '" + savedName + "' ]; then grep -v -F -x '" + savedName + "' \"$HIST\" > \"$HIST.tmp\" 2>/dev/null || true; printf '%s\n' '" + savedName + "' | cat - \"$HIST.tmp\" > \"$HIST\" 2>/dev/null; rm -f \"$HIST.tmp\"; fi; else printf '%s\n' '" + savedName + "' > \"$HIST\"; fi"
+                                        "HIST='" + histFile + "'; if [ -f \"$HIST\" ]; then if [ \"$(head -n 1 \"$HIST\" 2>/dev/null)\" != '" + savedName + "' ]; then grep -v -F -x '" + savedName + "' \"$HIST\" > \"$HIST.tmp\" 2>/dev/null || true; printf '%s\n' '" + savedName + "' | cat - \"$HIST.tmp\" > \"$HIST\"; rm -f \"$HIST.tmp\"; fi; else printf '%s\n' '" + savedName + "' > \"$HIST\"; fi"
                                     ]);
                                 }
                             }
@@ -154,12 +160,25 @@ ShellRoot {
                         barWindow.wpSnapshotPath,
                         barWindow.wpMonitorSnapshotPath
                     ]
+                    onExited: exitCode => {
+                        if (exitCode === 0 && typeof Matugen !== "undefined" && typeof Matugen.generate === "function") {
+                            Matugen.generate(barWindow.wpSnapshotPath);
+                        }
+                    }
                 }
 
                 function isVideo(p) {
                     let lp = p.toLowerCase();
                     return lp.endsWith(".mp4") || lp.endsWith(".mkv") ||
                            lp.endsWith(".mov") || lp.endsWith(".webm");
+                }
+
+                function isSupportedMedia(p) {
+                    if (!p) return false;
+                    let lp = p.toLowerCase();
+                    return lp.endsWith(".jpg") || lp.endsWith(".jpeg") || lp.endsWith(".png") ||
+                           lp.endsWith(".webp") || lp.endsWith(".gif") || lp.endsWith(".bmp") ||
+                           lp.endsWith(".avif") || barWindow.isVideo(p);
                 }
 
                 function playA() {
@@ -205,6 +224,25 @@ ShellRoot {
                         barWindow.originalFileName = filename;
                     }
 
+                    if (barWindow.isInitialLoad) {
+                        barWindow.isInitialLoad = false;
+                        barWindow.transitionProgress = 1.0;
+                        barWindow.isPreloading = false;
+                        if (barWindow.activeLayer === 1) {
+                            barWindow.pathA = cleanPath;
+                            barWindow.isVideoA = vid;
+                            barWindow.activeLayer = 0;
+                            if (vid) barWindow.playA();
+                        } else {
+                            barWindow.pathB = cleanPath;
+                            barWindow.isVideoB = vid;
+                            barWindow.activeLayer = 1;
+                            if (vid) barWindow.playB();
+                        }
+                        barWindow.currentWallpaperPath = cleanPath;
+                        return;
+                    }
+
                     transitionAnim.stop();
                     videoWarmUpTimer.stop();
                     barWindow.transitionProgress = 0.0;
@@ -238,6 +276,65 @@ ShellRoot {
                 function changeWallpaper(path, ttype) {
                     if (!path) return;
 
+                    let isInterrupted = transitionAnim.running && barWindow.transitionProgress > 0.1 && barWindow.transitionProgress < 0.85;
+
+                    barWindow.isInitialLoad = false;
+
+                    let fromMenu = false;
+                    let customOriginX = -1;
+                    let customOriginY = -1;
+                    let chosenType = -1;
+
+                    if (typeof ttype === "object" && ttype !== null) {
+                        if (ttype.type !== undefined) chosenType = Number(ttype.type);
+                        if (ttype.originX !== undefined) customOriginX = Number(ttype.originX);
+                        if (ttype.originY !== undefined) customOriginY = Number(ttype.originY);
+                        fromMenu = true;
+                    } else if (typeof ttype === "string" && ttype.indexOf("circle") !== -1) {
+                        chosenType = 2;
+                        let parts = ttype.split(":");
+                        if (parts.length >= 3) {
+                            customOriginX = parseFloat(parts[1]);
+                            customOriginY = parseFloat(parts[2]);
+                        }
+                        fromMenu = true;
+                    } else if (typeof ttype === "number" && ttype >= 0) {
+                        chosenType = ttype;
+                    }
+
+                    if (typeof DesktopMenuController !== "undefined" && DesktopMenuController.isMenuShuffle) {
+                        let isTargetScreen = !DesktopMenuController.screen || !DesktopMenuController.screen.name || (barWindow.screen && DesktopMenuController.screen.name === barWindow.screen.name);
+                        if (isTargetScreen) {
+                            fromMenu = true;
+                            chosenType = 2;
+                            customOriginX = DesktopMenuController.menuOriginX;
+                            customOriginY = DesktopMenuController.menuOriginY;
+                        }
+                    }
+
+                    if (isInterrupted) {
+                        barWindow.activeTransitionType = 0;
+                    } else if (chosenType >= 0) {
+                        barWindow.activeTransitionType = chosenType;
+                    } else {
+                        barWindow.activeTransitionType = Math.floor(Math.random() * 4);
+                    }
+
+                    barWindow.wipeIsVertical = Math.random() < 0.5;
+                    barWindow.swipeDirection = Math.floor(Math.random() * 8);
+
+                    if (fromMenu && customOriginX >= 0 && customOriginY >= 0) {
+                        barWindow.transitionOriginX = customOriginX;
+                        barWindow.transitionOriginY = customOriginY;
+                    } else {
+                        barWindow.transitionOriginX = 0.15 + Math.random() * 0.70;
+                        barWindow.transitionOriginY = 0.15 + Math.random() * 0.70;
+                    }
+
+                    if (typeof DesktopMenuController !== "undefined") {
+                        DesktopMenuController.isMenuShuffle = false;
+                    }
+
                     let cleanPath = String(path).trim();
                     let slash = cleanPath.lastIndexOf("/");
                     let origName = cleanPath.substring(slash + 1);
@@ -248,32 +345,60 @@ ShellRoot {
                     let vid = barWindow.isVideo(cleanPath);
                     let snapshotPath = barWindow.wpSnapshotPath;
                     let monSnapshotPath = barWindow.wpMonitorSnapshotPath;
-
                     Quickshell.execDetached(["bash", "-c",
                         "mkdir -p '" + wpCopyDir + "'" +
                         " && printf '%s' '" + cleanPath + "' > '" + wpStatePath + "'" +
                         " && printf '%s' '" + origName + "' > '" + wpStatePath + "_name'" +
                         " && cp -f '" + cleanPath + "' '" + dest + "'" +
                         (vid ? "" : " && cp -f '" + cleanPath + "' '" + snapshotPath + "' && cp -f '" + cleanPath + "' '" + monSnapshotPath + "'") +
-                        " && ( HIST='" + histFile + "'; if [ -f \"$HIST\" ]; then grep -v -F -x '" + origName + "' \"$HIST\" > \"$HIST.tmp\" 2>/dev/null || true; printf '%s\n' '" + origName + "' | cat - \"$HIST.tmp\" > \"$HIST\" 2>/dev/null; rm -f \"$HIST.tmp\"; else printf '%s\n' '" + origName + "' > \"$HIST\"; fi )"
+                        " && ( HIST='" + histFile + "'; if [ -f \"$HIST\" ]; then grep -v -F -x '" + origName + "' \"$HIST\" > \"$HIST.tmp\" 2>/dev/null || true; printf '%s\n' '" + origName + "' | cat - \"$HIST.tmp\" > \"$HIST\"; rm -f \"$HIST.tmp\"; else printf '%s\n' '" + origName + "' > \"$HIST\"; fi )"
                     ]);
 
                     if (vid) {
                         videoSnapshotProcess.targetPath = cleanPath;
                         videoSnapshotProcess.running = false;
                         videoSnapshotProcess.running = true;
+                    } else {
+                        if (typeof Matugen !== "undefined" && typeof Matugen.generate === "function") {
+                            Matugen.generate(cleanPath);
+                        }
                     }
 
                     barWindow._loadNew(cleanPath, true);
                 }
 
-                PropertyAnimation {
+                function handleDrop(drop) {
+                    let raw = "";
+                    if (drop.hasUrls && drop.urls.length > 0) {
+                        raw = drop.urls[0].toString();
+                    } else if (drop.hasText && drop.text.length > 0) {
+                        let lines = drop.text.trim().split("\n");
+                        raw = lines[0].trim();
+                    }
+                    if (!raw) return;
+
+                    let cleanPath = decodeURIComponent(raw.replace(/^file:\/\//, "")).trim();
+                    if (!barWindow.isSupportedMedia(cleanPath)) return;
+
+                    let scrW = barWindow.width > 0 ? barWindow.width : (barWindow.screen && barWindow.screen.geometry ? barWindow.screen.geometry.width : 1920);
+                    let scrH = barWindow.height > 0 ? barWindow.height : (barWindow.screen && barWindow.screen.geometry ? barWindow.screen.geometry.height : 1080);
+                    let normX = scrW > 0 ? Math.max(0.0, Math.min(1.0, drop.x / scrW)) : 0.5;
+                    let normY = scrH > 0 ? Math.max(0.0, Math.min(1.0, drop.y / scrH)) : 0.5;
+
+                    barWindow.changeWallpaper(cleanPath, {
+                        type: 2,
+                        originX: normX,
+                        originY: normY
+                    });
+                }
+
+                NumberAnimation {
                     id: transitionAnim
                     target: barWindow
                     property: "transitionProgress"
                     from: 0.0
                     to: 1.0
-                    duration: barWindow.transitionDuration
+                    duration: barWindow.activeTransitionType === 0 ? barWindow.fadeDuration : barWindow.maskDuration
                     easing.type: Easing.InOutCubic
 
                     onFinished: {
@@ -348,6 +473,21 @@ ShellRoot {
                     anchors.fill: parent
                     clip: true
 
+                    ShaderEffect {
+                        id: transitionShaderA
+                        anchors.fill: parent
+                        visible: false
+                        layer.enabled: true
+
+                        property vector2d itemSize: Qt.vector2d(width, height)
+                        property real progress: barWindow.transitionProgress
+                        property real transitionType: barWindow.activeTransitionType
+                        property vector2d origin: Qt.vector2d(barWindow.transitionOriginX, barWindow.transitionOriginY)
+                        property vector4d params: Qt.vector4d(barWindow.wipeIsVertical ? 1.0 : 0.0, barWindow.swipeDirection, 0.0, 0.0)
+
+                        fragmentShader: "file://" + Caching.serpantinumDir + "/assets/shaders/transitions/wallpaper_transition.frag.qsb"
+                    }
+
                     Item {
                         id: layerA
                         width: parent.width
@@ -361,7 +501,16 @@ ShellRoot {
 
                         opacity: {
                             if (barWindow.isPreloading && isIncoming) return 0.0;
+                            if (barWindow.activeTransitionType !== 0) return 1.0;
                             return isIncoming ? p : 1.0 - p;
+                        }
+
+                        layer.enabled: barWindow.activeTransitionType !== 0 && isIncoming && !barWindow.isPreloading && p < 1.0
+                        layer.effect: MultiEffect {
+                            maskEnabled: true
+                            maskSource: transitionShaderA
+                            maskThresholdMin: 0.0
+                            maskSpreadAtMin: 0.0
                         }
 
                         Image {
@@ -372,8 +521,8 @@ ShellRoot {
                             asynchronous: true
                             visible: !barWindow.isVideoA && barWindow.pathA !== ""
                             cache: true
-                            sourceSize.width: parent.width > 0 ? parent.width : undefined
-                            sourceSize.height: parent.height > 0 ? parent.height : undefined
+                            sourceSize.width: parent.width > 0 ? Math.ceil(parent.width * (Screen.devicePixelRatio || 1)) : 0
+                            sourceSize.height: parent.height > 0 ? Math.ceil(parent.height * (Screen.devicePixelRatio || 1)) : 0
                         }
 
                         Loader {
@@ -391,6 +540,21 @@ ShellRoot {
                         }
                     }
 
+                    ShaderEffect {
+                        id: transitionShaderB
+                        anchors.fill: parent
+                        visible: false
+                        layer.enabled: true
+
+                        property vector2d itemSize: Qt.vector2d(width, height)
+                        property real progress: barWindow.transitionProgress
+                        property real transitionType: barWindow.activeTransitionType
+                        property vector2d origin: Qt.vector2d(barWindow.transitionOriginX, barWindow.transitionOriginY)
+                        property vector4d params: Qt.vector4d(barWindow.wipeIsVertical ? 1.0 : 0.0, barWindow.swipeDirection, 0.0, 0.0)
+
+                        fragmentShader: "file://" + Caching.serpantinumDir + "/assets/shaders/transitions/wallpaper_transition.frag.qsb"
+                    }
+
                     Item {
                         id: layerB
                         width: parent.width
@@ -404,7 +568,16 @@ ShellRoot {
 
                         opacity: {
                             if (barWindow.isPreloading && isIncoming) return 0.0;
+                            if (barWindow.activeTransitionType !== 0) return 1.0;
                             return isIncoming ? p : 1.0 - p;
+                        }
+
+                        layer.enabled: barWindow.activeTransitionType !== 0 && isIncoming && !barWindow.isPreloading && p < 1.0
+                        layer.effect: MultiEffect {
+                            maskEnabled: true
+                            maskSource: transitionShaderB
+                            maskThresholdMin: 0.0
+                            maskSpreadAtMin: 0.0
                         }
 
                         Image {
@@ -415,8 +588,8 @@ ShellRoot {
                             asynchronous: true
                             visible: !barWindow.isVideoB && barWindow.pathB !== ""
                             cache: true
-                            sourceSize.width: parent.width > 0 ? parent.width : undefined
-                            sourceSize.height: parent.height > 0 ? parent.height : undefined
+                            sourceSize.width: parent.width > 0 ? Math.ceil(parent.width * (Screen.devicePixelRatio || 1)) : 0
+                            sourceSize.height: parent.height > 0 ? Math.ceil(parent.height * (Screen.devicePixelRatio || 1)) : 0
                         }
 
                         Loader {
@@ -430,6 +603,43 @@ ShellRoot {
                                 if (item && barWindow.activeLayer === 1 && barWindow.isVideoB && !barWindow.playbackPaused) {
                                     item.play();
                                 }
+                            }
+                        }
+                    }
+                }
+
+                DropArea {
+                    anchors.fill: parent
+
+                    onEntered: drag => {
+                        if (drag.hasUrls || drag.hasText) {
+                            if (typeof drag.acceptProposedAction === "function") {
+                                drag.acceptProposedAction();
+                            } else if (typeof drag.accept === "function") {
+                                drag.accept();
+                            }
+                            drag.accepted = true;
+                        }
+                    }
+
+                    onDropped: drop => {
+                        barWindow.handleDrop(drop);
+                        if (typeof drop.acceptProposedAction === "function") {
+                            drop.acceptProposedAction();
+                        } else if (typeof drop.accept === "function") {
+                            drop.accept();
+                        }
+                        drop.accepted = true;
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        acceptedButtons: Qt.RightButton | Qt.LeftButton
+                        onClicked: mouse => {
+                            if (mouse.button === Qt.RightButton) {
+                                DesktopMenuController.toggle(barWindow.screen, mouse.x, mouse.y, "desktop");
+                            } else {
+                                DesktopMenuController.hide();
                             }
                         }
                     }
