@@ -47,6 +47,13 @@ function getWidgetLauncherEntries(i18n) {
             fontIcon: "󰋖"
         },
         {
+            id: "taskmanager",
+            name: tr("widgets.taskmanager.name", "Task Manager"),
+            description: tr("widgets.taskmanager.desc", "RAM check, CPU usage and running processes"),
+            icon: "utilities-system-monitor",
+            fontIcon: "󰍛"
+        },
+        {
             id: "wellbeing",
             name: tr("widgets.wellbeing.name", "Digital Wellbeing"),
             description: tr("widgets.wellbeing.desc", "Screen time, app usage and limits"),
@@ -102,6 +109,15 @@ function getLayout(name, mx, my, mw, mh, userScale, barPosition) {
         },
         "guide": { 
             w: 1200, h: 750, comp: "guide/GuidePopup.qml", draggable: true,
+            pos: { 
+                "top": { anchor: "center" }, 
+                "bottom": { anchor: "center" }, 
+                "left": { anchor: "center" }, 
+                "right": { anchor: "center" } 
+            } 
+        },
+        "taskmanager": { 
+            w: 780, h: 720, comp: "taskmanager/TaskManagerPopup.qml", draggable: true,
             pos: { 
                 "top": { anchor: "center" }, 
                 "bottom": { anchor: "center" }, 
