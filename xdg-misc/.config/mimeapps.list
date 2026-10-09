@@ -2,3 +2,5 @@
 [Default Applications]
 x-scheme-handler/claude-cli=claude-code-url-handler.desktop
 x-scheme-handler/discord=vesktop.desktop
+x-scheme-handler/canva=canva.desktop
+x-scheme-handler/figma=figma-linux.desktop
