@@ -1,0 +1,10 @@
+[Unit]
+Description=Power Saver on battery, Balanced on AC (power-profiles-daemon)
+
+[Service]
+ExecStart=%h/.local/bin/power-auto
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

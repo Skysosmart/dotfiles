@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# Switch power-profiles-daemon to power-saver on battery and back to balanced
+# on AC. Only acts when the charger state actually changes, so a profile picked
+# by hand stays until the next plug/unplug.
+# Runs as the systemd user service power-auto.service.
+
+AC=${POWER_AUTO_AC:-/sys/class/power_supply/ACAD/online}
+last=""
+
+set_profile() {
+    busctl set-property net.hadess.PowerProfiles /net/hadess/PowerProfiles \
+        net.hadess.PowerProfiles ActiveProfile s "$1"
+}
+
+apply() {
+    local online
+    online=$(cat "$AC" 2>/dev/null) || return
+    [[ "$online" == "$last" ]] && return
+    last=$online
+    if [[ "$online" == 1 ]]; then
+        set_profile balanced
+    else
+        set_profile power-saver
+    fi
+}
+
+apply
+udevadm monitor --udev --subsystem-match=power_supply | while read -r _; do
+    apply
+done
