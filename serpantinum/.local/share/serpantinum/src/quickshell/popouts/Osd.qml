@@ -48,8 +48,20 @@ PanelWindow {
 
     readonly property bool isToggleKind: kind === "capslock" || kind === "numlock" || kind === "airplane"
     readonly property bool isToggleActive: stateVal === "on" || stateVal === "true" || stateVal === "1"
+    readonly property bool isLayoutKind: kind === "layout"
+    readonly property color layoutColor: Qt.lighter(ThemeBackend.mauve, 1.2)
+
+    function layoutLabel(raw) {
+        if (!raw) return "";
+        let r = raw.toLowerCase();
+        if (r.indexOf("thai") !== -1) return "ไทย";
+        if (r.indexOf("english") !== -1) return "English";
+        return raw;
+    }
+    readonly property string statusLabel: isLayoutKind ? layoutLabel(stateVal) : toggleStatus
 
     readonly property bool isToggleAllowed: {
+        if (isLayoutKind) return !isVerticalLayout;
         if (!isToggleKind) return true;
         if (isVerticalLayout) return false;
         if (kind === "capslock") return showCapsLock;
@@ -64,6 +76,7 @@ PanelWindow {
         if (kind === "capslock") return capsColor;
         if (kind === "numlock") return numColor;
         if (kind === "airplane") return airColor;
+        if (kind === "layout") return layoutColor;
         return ThemeBackend.mauve;
     }
 
@@ -71,6 +84,7 @@ PanelWindow {
         if (kind === "capslock") return "Caps Lock";
         if (kind === "numlock") return "Num Lock";
         if (kind === "airplane") return "Airplane Mode";
+        if (kind === "layout") return "Keyboard";
         return "";
     }
 
@@ -526,6 +540,8 @@ PanelWindow {
                             return "󰎠";
                         } else if (osdWindow.kind === "airplane") {
                             return "󰀝";
+                        } else if (osdWindow.kind === "layout") {
+                            return "󰌌";
                         } else {
                             return osdWindow.briVal > 66 ? "󰃠" : (osdWindow.briVal > 33 ? "󰃟" : "󰃞");
                         }
@@ -538,6 +554,8 @@ PanelWindow {
                             return osdWindow.isMuted ? ThemeBackend.overlay0 : osdWindow.volColor;
                         } else if (osdWindow.kind === "mic") {
                             return osdWindow.isMicMuted ? ThemeBackend.overlay0 : osdWindow.micColor;
+                        } else if (osdWindow.isLayoutKind) {
+                            return osdWindow.layoutColor;
                         } else if (osdWindow.isToggleKind) {
                             return osdWindow.isToggleActive ? osdWindow.toggleActiveColor : ThemeBackend.overlay0;
                         } else {
@@ -594,7 +612,7 @@ PanelWindow {
 
                 Draggable {
                     id: verticalSlider
-                    visible: !osdWindow.isToggleKind
+                    visible: !osdWindow.isToggleKind && !osdWindow.isLayoutKind
                     vertical: true
                     Layout.fillHeight: true
                     Layout.preferredWidth: osdWindow.s(16)
@@ -684,6 +702,8 @@ PanelWindow {
                                 return "󰎠";
                             } else if (osdWindow.kind === "airplane") {
                                 return "󰀝";
+                            } else if (osdWindow.kind === "layout") {
+                                return "󰌌";
                             } else {
                                 return osdWindow.briVal > 66 ? "󰃠" : (osdWindow.briVal > 33 ? "󰃟" : "󰃞");
                             }
@@ -696,6 +716,8 @@ PanelWindow {
                                 return osdWindow.isMuted ? ThemeBackend.overlay0 : osdWindow.volColor;
                             } else if (osdWindow.kind === "mic") {
                                 return osdWindow.isMicMuted ? ThemeBackend.overlay0 : osdWindow.micColor;
+                            } else if (osdWindow.isLayoutKind) {
+                                return osdWindow.layoutColor;
                             } else if (osdWindow.isToggleKind) {
                                 return osdWindow.isToggleActive ? osdWindow.toggleActiveColor : ThemeBackend.overlay0;
                             } else {
@@ -732,7 +754,7 @@ PanelWindow {
                 }
 
                 RowLayout {
-                    visible: osdWindow.isToggleKind
+                    visible: osdWindow.isToggleKind || osdWindow.isLayoutKind
                     anchors.left: parent.left
                     anchors.leftMargin: osdWindow.s(58)
                     anchors.right: parent.right
@@ -759,10 +781,10 @@ PanelWindow {
                         height: osdWindow.s(24)
                         cornerRadius: osdWindow.s(6)
                         horizontalPadding: osdWindow.s(10)
-                        buttonText: osdWindow.toggleStatus
+                        buttonText: osdWindow.statusLabel
                         textFontSize: osdWindow.s(11)
-                        accentColor: osdWindow.isToggleActive ? osdWindow.toggleActiveColor : ThemeBackend.surface1
-                        textColor: osdWindow.isToggleActive ? ThemeBackend.base : ThemeBackend.subtext0
+                        accentColor: (osdWindow.isToggleActive || osdWindow.isLayoutKind) ? osdWindow.toggleActiveColor : ThemeBackend.surface1
+                        textColor: (osdWindow.isToggleActive || osdWindow.isLayoutKind) ? ThemeBackend.base : ThemeBackend.subtext0
 
                         onClicked: {
                             OsdController.restartTimer();
@@ -789,7 +811,7 @@ PanelWindow {
                     anchors.rightMargin: osdWindow.s(16)
                     anchors.verticalCenter: parent.verticalCenter
                     opacity: Math.max(0.0, Math.min(1.0, (osdContainer.animProgress - 0.2) / 0.8))
-                    visible: !osdWindow.isToggleKind && opacity > 0.01
+                    visible: !osdWindow.isToggleKind && !osdWindow.isLayoutKind && opacity > 0.01
 
                     from: 0.0
                     to: 100.0

@@ -39,6 +39,8 @@ Item {
     property bool lastAirplane: false
     property int lastCapsLock: -1
     property int lastNumLock: -1
+    property string lastLayout: ""
+    property bool layoutInitialized: false
     property int lastBrightness: -1
     property bool brightnessInitialized: false
     property bool kbInitialized: false
@@ -160,6 +162,41 @@ Item {
                     controller.kbInitialized = true;
                 }
             }
+        }
+    }
+
+    Process {
+        id: layoutWatcher
+        running: true
+        command: ["bash", Caching.qsDir + "/watchers/kb_layout.sh", "watch"]
+        stdout: SplitParser {
+            onRead: data => {
+                let line = data.trim();
+                if (!line) return;
+                if (!controller.layoutInitialized) {
+                    controller.layoutInitialized = true;
+                    controller.lastLayout = line;
+                    return;
+                }
+                if (line !== controller.lastLayout) {
+                    controller.lastLayout = line;
+                    controller.show("layout", line);
+                }
+            }
+        }
+        onExited: {
+            // Self-heal: if the watcher ever dies, restart it shortly.
+            layoutRestartTimer.restart();
+        }
+    }
+
+    Timer {
+        id: layoutRestartTimer
+        interval: 1000
+        repeat: false
+        onTriggered: {
+            layoutWatcher.running = false;
+            layoutWatcher.running = true;
         }
     }
 
