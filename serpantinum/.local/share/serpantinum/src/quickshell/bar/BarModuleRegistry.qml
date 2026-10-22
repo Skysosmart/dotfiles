@@ -154,6 +154,20 @@ QtObject {
             horizontalFace: "faces/kb/KbFace.qml",
             verticalFace: "faces/kb/SideKbFace.qml"
         },
+        "privacy": {
+            name: "Privacy indicator",
+            icon: "󰄀",
+            defaultVariant: "default",
+            horizontalFace: "faces/privacy/PrivacyFace.qml",
+            verticalFace: "faces/privacy/SidePrivacyFace.qml"
+        },
+        "discord": {
+            name: typeof I18n !== "undefined" ? I18n.t("guide.bar.modules.discord", "Discord Voice") : "Discord Voice",
+            icon: "󰙯",
+            defaultVariant: "default",
+            horizontalFace: "faces/discord/DiscordFace.qml",
+            verticalFace: "faces/discord/SideDiscordFace.qml"
+        },
         "wifi": {
             name: typeof I18n !== "undefined" ? I18n.t("guide.bar.modules.network", "Network") : "Network",
             icon: "󰤨",
@@ -167,6 +181,27 @@ QtObject {
             defaultVariant: "default",
             horizontalFace: "faces/bt/BtFace.qml",
             verticalFace: "faces/bt/SideBtFace.qml"
+        },
+        "vpn": {
+            name: typeof I18n !== "undefined" ? I18n.t("guide.bar.modules.vpn", "VPN") : "VPN",
+            icon: "󰖂",
+            defaultVariant: "default",
+            horizontalFace: "faces/vpn/VpnFace.qml",
+            verticalFace: "faces/vpn/SideVpnFace.qml"
+        },
+        "home": {
+            name: "Home control",
+            icon: "󰋜",
+            defaultVariant: "default",
+            horizontalFace: "faces/home/HomeFace.qml",
+            verticalFace: "faces/home/SideHomeFace.qml"
+        },
+        "cam3": {
+            name: "cam3 privacy",
+            icon: "󰄀",
+            defaultVariant: "default",
+            horizontalFace: "faces/cam3/Cam3Face.qml",
+            verticalFace: "faces/cam3/SideCam3Face.qml"
         },
         "vol": {
             name: typeof I18n !== "undefined" ? I18n.t("guide.bar.modules.volume", "Volume") : "Volume",

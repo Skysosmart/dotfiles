@@ -19,6 +19,8 @@ PopoutManager 1.0 popouts/PopoutManager.qml
 SideMusicPopout 1.0 popouts/SideMusicPopout.qml
 TrayBase 1.0 popouts/TrayBase.qml
 DesktopMenu 1.0 popouts/DesktopMenu.qml
+DiscordMenuPopout 1.0 popouts/DiscordMenuPopout.qml
+DiscordMenuRow 1.0 popouts/DiscordMenuRow.qml
 
 WidgetLoader 1.0 widgets/WidgetLoader.qml
 WidgetRedactor 1.0 widgets/WidgetRedactor.qml
@@ -50,6 +52,11 @@ singleton FirstLaunch 1.0 singletons/system/FirstLaunch.qml
 singleton I18n 1.0 singletons/system/I18n.qml
 singleton SysNotif 1.0 singletons/system/SysNotif.qml
 singleton TimerState 1.0 singletons/system/TimerState.qml
+singleton PrivacyIndicator 1.0 singletons/system/PrivacyIndicator.qml
+PrivacyFace 1.0 bar/faces/privacy/PrivacyFace.qml
+PrivacyPopup 1.0 bar/faces/privacy/PrivacyPopup.qml
+HomeFace 1.0 bar/faces/home/HomeFace.qml
+HomePopup 1.0 bar/faces/home/HomePopup.qml
 singleton Updater 1.0 singletons/system/Updater.qml
 
 singleton SysData 1.0 singletons/info/SysData.qml
@@ -60,6 +67,8 @@ singleton FloatingController 1.0 singletons/widgetcontrols/FloatingController.qm
 singleton LauncherController 1.0 singletons/widgetcontrols/LauncherController.qml
 singleton OsdController 1.0 singletons/widgetcontrols/OsdController.qml
 singleton SideMusicController 1.0 singletons/widgetcontrols/SideMusicController.qml
+singleton DiscordMenuController 1.0 singletons/widgetcontrols/DiscordMenuController.qml
+singleton DiscordVoice 1.0 singletons/widgetcontrols/DiscordVoice.qml
 singleton TrayMenuController 1.0 singletons/widgetcontrols/TrayMenuController.qml
 singleton WidgetSync 1.0 singletons/widgetcontrols/WidgetSync.qml
 singleton DesktopMenuController singletons/widgetcontrols/DesktopMenuController.qml
